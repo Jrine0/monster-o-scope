@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { useNavScroll } from "@/hooks/useNavScroll";
 
@@ -5,6 +6,19 @@ export function Nav() {
   const { scrolled, navState } = useNavScroll();
   const { resolvedTheme, setTheme } = useTheme();
   const isDark = resolvedTheme !== "light";
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   return (
     <nav
@@ -79,13 +93,172 @@ export function Nav() {
           )}
         </button>
 
-        <a
-          href="#"
-          className="sketch-btn"
-          style={{ fontSize: "0.95rem", padding: "0.45rem 1.2rem" }}
-        >
-          Sign in
-        </a>
+        {/* Sign-in dropdown */}
+        <div ref={menuRef} style={{ position: "relative" }}>
+          <button
+            className="sketch-btn"
+            style={{ fontSize: "0.95rem", padding: "0.45rem 1.2rem" }}
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            Sign in
+          </button>
+
+          {/* Dropdown */}
+          <div
+            style={{
+              position: "absolute",
+              top: "calc(100% + 0.6rem)",
+              right: 0,
+              minWidth: 200,
+              background: "rgba(7,8,13,0.96)",
+              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(237,233,223,0.10)",
+              padding: "0.5rem",
+              zIndex: 700,
+              pointerEvents: menuOpen ? "auto" : "none",
+              opacity: menuOpen ? 1 : 0,
+              transform: menuOpen ? "translateY(0)" : "translateY(-8px)",
+              transition: "opacity 0.22s ease, transform 0.22s ease",
+            }}
+          >
+            {/* Top label */}
+            <div
+              style={{
+                padding: "0.4rem 0.75rem 0.65rem",
+                borderBottom: "1px solid rgba(237,233,223,0.06)",
+                marginBottom: "0.35rem",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "Courier Prime,monospace",
+                  fontSize: "0.55rem",
+                  color: "#8a8d9a",
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Sign in as
+              </span>
+            </div>
+
+            <a
+              href="/dashboard/student"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.7rem",
+                padding: "0.6rem 0.75rem",
+                textDecoration: "none",
+                color: "#ede9df",
+                borderRadius: "1px",
+                transition: "background 0.15s",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "rgba(242,116,13,0.08)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = "transparent")
+              }
+            >
+              <span style={{ fontSize: "1.1rem" }}>🎒</span>
+              <div>
+                <div
+                  style={{
+                    fontFamily: "Caveat,cursive",
+                    fontSize: "1.05rem",
+                    fontWeight: 700,
+                    lineHeight: 1.1,
+                  }}
+                >
+                  Student
+                </div>
+                <div
+                  style={{
+                    fontFamily: "Courier Prime,monospace",
+                    fontSize: "0.54rem",
+                    color: "#8a8d9a",
+                    marginTop: "0.1rem",
+                  }}
+                >
+                  Learn at your own pace
+                </div>
+              </div>
+              <svg
+                style={{ marginLeft: "auto", opacity: 0.35 }}
+                viewBox="0 0 16 16"
+                width="12"
+                fill="none"
+              >
+                <path
+                  d="M3 8h10M9 4l4 4-4 4"
+                  stroke="#ede9df"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
+
+            <a
+              href="/dashboard/teacher"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.7rem",
+                padding: "0.6rem 0.75rem",
+                textDecoration: "none",
+                color: "#ede9df",
+                borderRadius: "1px",
+                transition: "background 0.15s",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "rgba(242,116,13,0.08)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = "transparent")
+              }
+            >
+              <span style={{ fontSize: "1.1rem" }}>🎓</span>
+              <div>
+                <div
+                  style={{
+                    fontFamily: "Caveat,cursive",
+                    fontSize: "1.05rem",
+                    fontWeight: 700,
+                    lineHeight: 1.1,
+                  }}
+                >
+                  Teacher
+                </div>
+                <div
+                  style={{
+                    fontFamily: "Courier Prime,monospace",
+                    fontSize: "0.54rem",
+                    color: "#8a8d9a",
+                    marginTop: "0.1rem",
+                  }}
+                >
+                  Manage your classroom
+                </div>
+              </div>
+              <svg
+                style={{ marginLeft: "auto", opacity: 0.35 }}
+                viewBox="0 0 16 16"
+                width="12"
+                fill="none"
+              >
+                <path
+                  d="M3 8h10M9 4l4 4-4 4"
+                  stroke="#ede9df"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
       </div>
     </nav>
   );

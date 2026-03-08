@@ -75,9 +75,9 @@ class BtnScope {
   private loop() {
     const tick = () => {
       if (!this.alive || this.destroying) { this.raf = null; return; }
-      this.angle1 += 0.018;
-      this.angle2 -= 0.012;
-      this.angle3 += 0.026;
+      this.angle1 += 0.009;
+      this.angle2 -= 0.006;
+      this.angle3 += 0.013;
       this.draw();
       this.raf = requestAnimationFrame(tick);
     };
