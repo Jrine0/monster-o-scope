@@ -11,7 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as R500RouteImport } from './routes/500'
 import { Route as R404RouteImport } from './routes/404'
+import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppTeacherRouteRouteImport } from './routes/_app/teacher/route'
+import { Route as AppStudentRouteRouteImport } from './routes/_app/student/route'
+import { Route as AppAdminRouteRouteImport } from './routes/_app/admin/route'
 
 const R500Route = R500RouteImport.update({
   id: '/500',
@@ -23,38 +27,76 @@ const R404Route = R404RouteImport.update({
   path: '/404',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRouteRoute = AppRouteRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppTeacherRouteRoute = AppTeacherRouteRouteImport.update({
+  id: '/teacher',
+  path: '/teacher',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppStudentRouteRoute = AppStudentRouteRouteImport.update({
+  id: '/student',
+  path: '/student',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppAdminRouteRoute = AppAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/500': typeof R500Route
+  '/admin': typeof AppAdminRouteRoute
+  '/student': typeof AppStudentRouteRoute
+  '/teacher': typeof AppTeacherRouteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/500': typeof R500Route
+  '/admin': typeof AppAdminRouteRoute
+  '/student': typeof AppStudentRouteRoute
+  '/teacher': typeof AppTeacherRouteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteRouteWithChildren
   '/404': typeof R404Route
   '/500': typeof R500Route
+  '/_app/admin': typeof AppAdminRouteRoute
+  '/_app/student': typeof AppStudentRouteRoute
+  '/_app/teacher': typeof AppTeacherRouteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/404' | '/500'
+  fullPaths: '/' | '/404' | '/500' | '/admin' | '/student' | '/teacher'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/404' | '/500'
-  id: '__root__' | '/' | '/404' | '/500'
+  to: '/' | '/404' | '/500' | '/admin' | '/student' | '/teacher'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/404'
+    | '/500'
+    | '/_app/admin'
+    | '/_app/student'
+    | '/_app/teacher'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRouteRoute: typeof AppRouteRouteWithChildren
   R404Route: typeof R404Route
   R500Route: typeof R500Route
 }
@@ -75,6 +117,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof R404RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -82,11 +131,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/teacher': {
+      id: '/_app/teacher'
+      path: '/teacher'
+      fullPath: '/teacher'
+      preLoaderRoute: typeof AppTeacherRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/student': {
+      id: '/_app/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof AppStudentRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
   }
 }
 
+interface AppRouteRouteChildren {
+  AppAdminRouteRoute: typeof AppAdminRouteRoute
+  AppStudentRouteRoute: typeof AppStudentRouteRoute
+  AppTeacherRouteRoute: typeof AppTeacherRouteRoute
+}
+
+const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppAdminRouteRoute: AppAdminRouteRoute,
+  AppStudentRouteRoute: AppStudentRouteRoute,
+  AppTeacherRouteRoute: AppTeacherRouteRoute,
+}
+
+const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
+  AppRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRouteRoute: AppRouteRouteWithChildren,
   R404Route: R404Route,
   R500Route: R500Route,
 }
