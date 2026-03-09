@@ -672,7 +672,7 @@ function PageDashboard({ setPage }: { setPage: (p: TeacherPage) => void }) {
               gap: "0.4rem",
             }}
           >
-            {RECENT_MATERIALS.map((m, i) => {
+            {RECENT_MATERIALS.map((m) => {
               const [hov, setHov] = useState(false);
               const badge = TYPE_BADGE[m.type] ?? {
                 bg: C.orangeDim,
