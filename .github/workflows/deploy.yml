@@ -1,0 +1,177 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  DEPLOY_TARGET: ${{ vars.DEPLOY_TARGET || 'custom' }}
+
+jobs:
+  detect:
+    name: Detect Project Config
+    runs-on: ubuntu-latest
+    outputs:
+      deploy_target: ${{ steps.detect.outputs.deploy_target }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect config
+        id: detect
+        run: node scripts/detect.js
+        env:
+          DEPLOY_TARGET: ${{ env.DEPLOY_TARGET }}
+
+  build:
+    name: Install & Build
+    runs-on: ubuntu-latest
+    needs: detect
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+        env:
+          NODE_ENV: production
+          # ── App env vars ─────────────────────────────────────────────────
+          # Add / remove based on your stack. See docs/env-vars.md
+          NEXT_PUBLIC_API_URL:             ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_SUPABASE_URL:        ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY:   ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          VITE_API_URL:                    ${{ secrets.VITE_API_URL }}
+          VITE_SUPABASE_URL:               ${{ secrets.VITE_SUPABASE_URL }}
+          PUBLIC_SUPABASE_URL:             ${{ secrets.PUBLIC_SUPABASE_URL }}
+          DATABASE_URL:                    ${{ secrets.DATABASE_URL }}
+          AUTH_SECRET:                     ${{ secrets.AUTH_SECRET }}
+          NEXTAUTH_SECRET:                 ${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL:                    ${{ secrets.NEXTAUTH_URL }}
+          # ─────────────────────────────────────────────────────────────────
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: dist
+          retention-days: 1
+
+  deploy:
+    name: Deploy → ${{ needs.detect.outputs.deploy_target }}
+    runs-on: ubuntu-latest
+    needs: [detect, build]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: dist
+
+      # ── Vercel ──────────────────────────────────────────────────────────
+      - name: Deploy to Vercel
+        if: needs.detect.outputs.deploy_target == 'vercel'
+        env:
+          VERCEL_TOKEN:      ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npm install --global vercel@latest
+          vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          vercel build --prod --token=$VERCEL_TOKEN
+          vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+
+      # ── Netlify ─────────────────────────────────────────────────────────
+      - name: Deploy to Netlify
+        if: needs.detect.outputs.deploy_target == 'netlify'
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID:    ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          npm install --global netlify-cli@latest
+          netlify deploy --dir=dist --prod --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
+
+      # ── GitHub Pages ─────────────────────────────────────────────────────
+      - name: Deploy to GitHub Pages
+        if: needs.detect.outputs.deploy_target == 'github-pages'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist
+
+      # ── Cloudflare Pages ─────────────────────────────────────────────────
+      - name: Deploy to Cloudflare Pages
+        if: needs.detect.outputs.deploy_target == 'cloudflare-pages'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }} --branch=main
+
+      # ── Railway ──────────────────────────────────────────────────────────
+      - name: Deploy to Railway
+        if: needs.detect.outputs.deploy_target == 'railway'
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          npm install --global @railway/cli@latest
+          railway up --service=${{ secrets.RAILWAY_SERVICE_ID }} --detach
+
+      # ── Fly.io ───────────────────────────────────────────────────────────
+      - name: Deploy to Fly.io
+        if: needs.detect.outputs.deploy_target == 'fly'
+        uses: superfly/fly-actions/deploy@master
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      # ── Docker ───────────────────────────────────────────────────────────
+      - name: Deploy via Docker
+        if: needs.detect.outputs.deploy_target == 'docker'
+        env:
+          REGISTRY:        ${{ secrets.DOCKER_REGISTRY }}
+          IMAGE_NAME:      ${{ secrets.DOCKER_IMAGE_NAME }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login $REGISTRY -u $DOCKER_USERNAME --password-stdin
+          docker build -t $REGISTRY/$IMAGE_NAME:latest -t $REGISTRY/$IMAGE_NAME:${{ github.sha }} .
+          docker push $REGISTRY/$IMAGE_NAME:latest
+          docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+
+      # ── Custom / SSH ──────────────────────────────────────────────────────
+      - name: Deploy via SSH
+        if: needs.detect.outputs.deploy_target == 'custom'
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST:        ${{ secrets.SSH_HOST }}
+          SSH_USER:        ${{ secrets.SSH_USER }}
+          DEPLOY_PATH:     ${{ secrets.DEPLOY_PATH }}
+        run: |
+          echo "⚙️  No deploy target configured."
+          echo "   Set DEPLOY_TARGET in repo → Settings → Variables."
+          echo "   Options: vercel | netlify | github-pages | cloudflare-pages | railway | fly | docker | custom"
+          echo "✅  Build verified successfully."
+          # Uncomment to enable SSH deploy:
+          # mkdir -p ~/.ssh && echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+          # ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+          # rsync -avz --delete dist/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
