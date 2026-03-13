@@ -11,8 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as R500RouteImport } from './routes/500'
 import { Route as R404RouteImport } from './routes/404'
+import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
+import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AppTeacherRouteRouteImport } from './routes/_app/teacher/route'
 import { Route as AppStudentRouteRouteImport } from './routes/_app/student/route'
 import { Route as AppAdminRouteRouteImport } from './routes/_app/admin/route'
@@ -27,6 +31,10 @@ const R404Route = R404RouteImport.update({
   path: '/404',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRouteRoute = AuthRouteRouteImport.update({
+  id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
@@ -35,6 +43,21 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => AuthRouteRoute,
 } as any)
 const AppTeacherRouteRoute = AppTeacherRouteRouteImport.update({
   id: '/teacher',
@@ -59,6 +82,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AppAdminRouteRoute
   '/student': typeof AppStudentRouteRoute
   '/teacher': typeof AppTeacherRouteRoute
+  '/forgot-password': typeof AuthForgotPasswordRoute
+  '/login': typeof AuthLoginRoute
+  '/reset-password': typeof AuthResetPasswordRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,36 +93,66 @@ export interface FileRoutesByTo {
   '/admin': typeof AppAdminRouteRoute
   '/student': typeof AppStudentRouteRoute
   '/teacher': typeof AppTeacherRouteRoute
+  '/forgot-password': typeof AuthForgotPasswordRoute
+  '/login': typeof AuthLoginRoute
+  '/reset-password': typeof AuthResetPasswordRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteRouteWithChildren
+  '/_auth': typeof AuthRouteRouteWithChildren
   '/404': typeof R404Route
   '/500': typeof R500Route
   '/_app/admin': typeof AppAdminRouteRoute
   '/_app/student': typeof AppStudentRouteRoute
   '/_app/teacher': typeof AppTeacherRouteRoute
+  '/_auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/_auth/login': typeof AuthLoginRoute
+  '/_auth/reset-password': typeof AuthResetPasswordRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/404' | '/500' | '/admin' | '/student' | '/teacher'
+  fullPaths:
+    | '/'
+    | '/404'
+    | '/500'
+    | '/admin'
+    | '/student'
+    | '/teacher'
+    | '/forgot-password'
+    | '/login'
+    | '/reset-password'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/404' | '/500' | '/admin' | '/student' | '/teacher'
+  to:
+    | '/'
+    | '/404'
+    | '/500'
+    | '/admin'
+    | '/student'
+    | '/teacher'
+    | '/forgot-password'
+    | '/login'
+    | '/reset-password'
   id:
     | '__root__'
     | '/'
     | '/_app'
+    | '/_auth'
     | '/404'
     | '/500'
     | '/_app/admin'
     | '/_app/student'
     | '/_app/teacher'
+    | '/_auth/forgot-password'
+    | '/_auth/login'
+    | '/_auth/reset-password'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRouteRoute: typeof AppRouteRouteWithChildren
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren
   R404Route: typeof R404Route
   R500Route: typeof R500Route
 }
@@ -117,6 +173,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof R404RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -130,6 +193,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_auth/reset-password': {
+      id: '/_auth/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/forgot-password': {
+      id: '/_auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
     '/_app/teacher': {
       id: '/_app/teacher'
@@ -171,9 +255,26 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
   AppRouteRouteChildren,
 )
 
+interface AuthRouteRouteChildren {
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+}
+
+const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
+}
+
+const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
+  AuthRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRouteRoute: AppRouteRouteWithChildren,
+  AuthRouteRoute: AuthRouteRouteWithChildren,
   R404Route: R404Route,
   R500Route: R500Route,
 }
