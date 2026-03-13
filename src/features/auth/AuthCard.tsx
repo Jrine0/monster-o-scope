@@ -8,7 +8,8 @@ export default function AuthCard({ children }: { children: React.ReactNode }) {
       <motion.div
         className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(242,116,13,0.12), transparent 70%)",
+          background:
+            "radial-gradient(circle, rgba(242,116,13,0.12), transparent 70%)",
           filter: "blur(20px)",
         }}
         animate={{
@@ -36,7 +37,8 @@ export default function AuthCard({ children }: { children: React.ReactNode }) {
       <motion.div
         className="absolute -bottom-6 left-1/2 -z-10 h-24 w-[80%] -translate-x-1/2 rounded-full blur-3xl"
         style={{
-          background: "linear-gradient(90deg, var(--color-orange-600), var(--color-orange-400))",
+          background:
+            "linear-gradient(90deg, var(--color-orange-600), var(--color-orange-400))",
         }}
         animate={{
           opacity: [0.15, 0.25, 0.15],

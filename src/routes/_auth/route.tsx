@@ -1,6 +1,6 @@
+import AuthCard from "@/features/auth/AuthCard";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import AuthCard from "@/features/auth/AuthCard";
 
 export const Route = createFileRoute("/_auth")({
   component: AuthLayout,
@@ -8,10 +8,15 @@ export const Route = createFileRoute("/_auth")({
 
 const PARTICLES = [...Array(14)].map((_, i) => ({
   id: i,
-  size: i % 4 === 0 ? 5 : 3, 
+  size: i % 4 === 0 ? 5 : 3,
   left: `${6 + ((i * 7.3) % 88)}%`,
   top: `${25 + ((i * 8.1) % 55)}%`,
-  color: i % 3 === 0 ? "var(--color-orange-500)" : i % 3 === 1 ? "var(--color-orange-400)" : "var(--color-text-muted)",
+  color:
+    i % 3 === 0
+      ? "var(--color-orange-500)"
+      : i % 3 === 1
+        ? "var(--color-orange-400)"
+        : "var(--color-text-muted)",
   yTravel: -100 - i * 6,
   xDrift: i % 2 === 0 ? 15 : -15,
   xReturn: i % 2 === 0 ? -8 : 8,
@@ -22,12 +27,16 @@ const PARTICLES = [...Array(14)].map((_, i) => ({
 function AuthLayout() {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-4 bg-deepest overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+        aria-hidden="true"
+      >
         {/* Primary orange blob — top right */}
         <motion.div
           className="absolute -top-[10%] right-[0%] h-150 w-150 rounded-full"
           style={{
-            background: "radial-gradient(circle, var(--color-orange-500) 0%, transparent 60%)",
+            background:
+              "radial-gradient(circle, var(--color-orange-500) 0%, transparent 60%)",
             filter: "blur(80px)", // Reduced blur for a more solid core
           }}
           animate={{
@@ -43,14 +52,15 @@ function AuthLayout() {
         <motion.div
           className="absolute -bottom-[10%] left-[0%] h-125 w-125 rounded-full"
           style={{
-            background: "radial-gradient(circle, var(--color-orange-600) 0%, transparent 60%)",
-            filter: "blur(80px)", 
+            background:
+              "radial-gradient(circle, var(--color-orange-600) 0%, transparent 60%)",
+            filter: "blur(80px)",
           }}
           animate={{
             x: [0, -25, 20, 0],
             y: [0, 20, -15, 0],
             scale: [1, 0.9, 1.1, 1],
-            opacity: [0.20, 0.40, 0.20],
+            opacity: [0.2, 0.4, 0.2],
           }}
           transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
         />
@@ -59,7 +69,8 @@ function AuthLayout() {
         <motion.div
           className="absolute top-[35%] left-1/2 h-150 w-150 -translate-x-1/2 rounded-full"
           style={{
-            background: "radial-gradient(circle, var(--color-orange-400) 0%, transparent 60%)",
+            background:
+              "radial-gradient(circle, var(--color-orange-400) 0%, transparent 60%)",
             filter: "blur(100px)",
           }}
           animate={{
@@ -103,7 +114,7 @@ function AuthLayout() {
             Vyasa
           </h1>
         </div>
-        
+
         <AuthCard>
           <Outlet />
         </AuthCard>
