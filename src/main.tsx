@@ -3,7 +3,9 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
+import { registerSW } from "virtual:pwa-register";
 import "./index.css";
+import "@/styles/index.css";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +19,10 @@ declare module "@tanstack/react-router" {
     router: typeof router;
   }
 }
+
+registerSW({
+  immediate: true,
+});
 
 const rootElement = document.getElementById("root")!;
 

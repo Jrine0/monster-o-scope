@@ -1,0 +1,1 @@
+// returns a useAuth hook that provides authentication state to manage it.
