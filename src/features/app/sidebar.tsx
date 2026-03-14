@@ -19,6 +19,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useLocation } from "@tanstack/react-router";
 import {
   Book,
   CreditCard,
@@ -34,6 +36,7 @@ import {
   Stars,
   User,
 } from "lucide-react";
+import { useMemo } from "react";
 
 const sidebarConfig = {
   admin: {
@@ -93,8 +96,10 @@ const sidebarFooter = {
 } as const;
 
 export default function AppSidebar() {
-  const CURRENT_USER = "teacher";
+  const { user } = useAuthStore();
   const { open } = useSidebar();
+  const location = useLocation();
+  const CURRENT_USER = location.pathname.startsWith("/admin") ? "admin" : location.pathname.startsWith("/teacher") ? "teacher" : "student";
 
   return (
     <Sidebar variant="inset" collapsible="icon">
@@ -143,8 +148,8 @@ export default function AppSidebar() {
           >
             <div className="h-7 w-7 bg-gray-500 rounded-full shrink-0"></div>
             <div className="flex flex-col flex-nowrap">
-            <span>{open ? "John Doe" : null}</span>
-            <span className="text-xs text-gray-500">{open ? "Delhi Public So Cool" : null}</span>
+            <span>{open ? user?.name || "John Doe" : null}</span>
+            <span className="text-xs text-gray-500">{open ? user?.school_name || "Delhi Public So Cool" : null}</span>
             </div>
           </div>
           <DropdownMenu>

@@ -125,7 +125,7 @@ apiClient.interceptors.response.use(
         );
 
         const newToken: string = data.data?.access_token ?? data.access_token;
-        useAuthStore.getState().setSession(newToken, data.data?.user ?? data.user);
+        useAuthStore.getState().setAccessToken(newToken);
 
         processQueue(null, newToken);
 

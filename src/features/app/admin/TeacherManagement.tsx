@@ -26,6 +26,14 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { FormModal } from "@/components/ui/form-modal";
 import AccentLine from "@/components/accent-line";
 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  fetchTeachers,
+  createTeacher,
+  updateTeacher,
+  deactivateTeacher,
+} from "./teachers.api";
+
 /* ── Types ── */
 interface Teacher {
   id: string;
@@ -36,100 +44,6 @@ interface Teacher {
   status: "active" | "invited";
   avatar: string;
 }
-
-/* ── Initial mock data ── */
-const INITIAL_TEACHERS: Teacher[] = [
-  {
-    id: "t1",
-    name: "Rajesh Kumar",
-    email: "rajesh.kumar@school.edu",
-    subject: "Mathematics",
-    classes: "10-A, 10-B",
-    status: "active",
-    avatar: "RK",
-  },
-  {
-    id: "t2",
-    name: "Anita Deshmukh",
-    email: "anita.d@school.edu",
-    subject: "Science",
-    classes: "9-A, 9-B, 10-A",
-    status: "active",
-    avatar: "AD",
-  },
-  {
-    id: "t3",
-    name: "Vikram Patel",
-    email: "vikram.p@school.edu",
-    subject: "English",
-    classes: "8-A, 8-B",
-    status: "active",
-    avatar: "VP",
-  },
-  {
-    id: "t4",
-    name: "Sunita Iyer",
-    email: "sunita.iyer@school.edu",
-    subject: "Hindi",
-    classes: "9-A, 10-A",
-    status: "active",
-    avatar: "SI",
-  },
-  {
-    id: "t5",
-    name: "Arun Mehta",
-    email: "arun.mehta@school.edu",
-    subject: "Social Science",
-    classes: "8-A, 9-A",
-    status: "invited",
-    avatar: "AM",
-  },
-  {
-    id: "t6",
-    name: "Deepa Nair",
-    email: "deepa.nair@school.edu",
-    subject: "Science",
-    classes: "8-B, 9-B",
-    status: "active",
-    avatar: "DN",
-  },
-  {
-    id: "t7",
-    name: "Manoj Tiwari",
-    email: "manoj.t@school.edu",
-    subject: "Mathematics",
-    classes: "9-A, 9-B",
-    status: "active",
-    avatar: "MT",
-  },
-  {
-    id: "t8",
-    name: "Kavita Reddy",
-    email: "kavita.r@school.edu",
-    subject: "English",
-    classes: "10-A, 10-B",
-    status: "invited",
-    avatar: "KR",
-  },
-  {
-    id: "t9",
-    name: "Suresh Gupta",
-    email: "suresh.g@school.edu",
-    subject: "Computer Science",
-    classes: "9-A, 10-A",
-    status: "active",
-    avatar: "SG",
-  },
-  {
-    id: "t10",
-    name: "Meera Joshi",
-    email: "meera.j@school.edu",
-    subject: "Sanskrit",
-    classes: "8-A, 8-B, 9-A",
-    status: "active",
-    avatar: "MJ",
-  },
-];
 
 /* ── Helpers ── */
 function getInitials(name: string): string {
@@ -151,10 +65,13 @@ const rowVariants = slideIn(-6, duration.fast, ease.standard);
 /* ── Animated Background ── */
 function AnimatedBackground() {
   return (
-    <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
+    <div
+      className="pointer-events-none fixed inset-0 overflow-hidden"
+      aria-hidden
+    >
       {/* orange blob - top right */}
       <motion.div
-        className="absolute -top-32 right-[10%] h-[500px] w-[500px] rounded-full opacity-[0.07]"
+        className="absolute -top-32 right-[10%] h-125 w-125 rounded-full opacity-[0.07]"
         style={{
           background: "radial-gradient(circle, #6571f5 0%, transparent 70%)",
           filter: "blur(100px)",
@@ -168,7 +85,7 @@ function AnimatedBackground() {
       />
       {/* orange blob - bottom left */}
       <motion.div
-        className="absolute bottom-[10%] left-[5%] h-[400px] w-[400px] rounded-full opacity-[0.06]"
+        className="absolute bottom-[10%] left-[5%] h-100 w-100 rounded-full opacity-[0.06]"
         style={{
           background: "radial-gradient(circle, #6571f5 0%, transparent 70%)",
           filter: "blur(100px)",
@@ -185,7 +102,8 @@ function AnimatedBackground() {
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: "radial-gradient(circle, rgba(101,113,245,0.04) 1px, transparent 1px)",
+          backgroundImage:
+            "radial-gradient(circle, rgba(101,113,245,0.04) 1px, transparent 1px)",
           backgroundSize: "32px 32px",
         }}
       />
@@ -200,9 +118,8 @@ function AnimatedBackground() {
             height: i % 3 === 0 ? 3 : 2,
             left: `${10 + ((i * 12.5) % 80)}%`,
             top: `${30 + ((i * 9.1) % 50)}%`,
-            background: i % 2 === 0
-              ? "rgba(101,113,245,0.6)"
-              : "rgba(101,113,245,0.35)",
+            background:
+              i % 2 === 0 ? "rgba(101,113,245,0.6)" : "rgba(101,113,245,0.35)",
           }}
           animate={{
             y: [0, -90 - i * 8],
@@ -339,7 +256,10 @@ function MoreDropdown({
   useEffect(() => {
     if (!open) return;
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         onClose();
       }
     }
@@ -361,10 +281,10 @@ function MoreDropdown({
       {open && (
         <div className="absolute right-0 top-full z-30 mt-1 w-44 overflow-hidden rounded-md border border-border-subtle bg-bg-surface shadow-lg">
           <Link
-            to="/admin/teachers/$id"
-            params={{ id: teacher.id }}
+            to="/admin/teachers"
             className="flex w-full items-center px-3 py-2 text-body-sm text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary"
             onClick={onClose}
+            disabled={true}
           >
             View Details
           </Link>
@@ -398,70 +318,98 @@ function MoreDropdown({
 export function TeacherManagement() {
   const addToast = useUIStore((s) => s.addToast);
 
-  /* Teacher state */
-  const [teachers, setTeachers] = useState<Teacher[]>(INITIAL_TEACHERS);
+  const queryClient = useQueryClient();
 
+  
   /* UI state */
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
-  const [deletingTeacherId, setDeletingTeacherId] = useState<string | null>(null);
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-
-  /* Derived */
-  const filteredTeachers = teachers.filter(
-    (t) =>
-      t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.subject.toLowerCase().includes(searchQuery.toLowerCase())
+  const [deletingTeacherId, setDeletingTeacherId] = useState<string | null>(
+    null,
   );
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  
+  const { data, isLoading } = useQuery({
+    queryKey: ["teachers", searchQuery],
+    queryFn: () => fetchTeachers(1, searchQuery),
+  });
+
+  const teachers: Teacher[] =
+    data?.data?.map((t: any) => ({
+      id: t.id,
+      name: `${t.first_name} ${t.last_name}`,
+      email: t.email,
+      subject: "—",
+      classes: "—",
+      status: t.is_active ? "active" : "invited",
+      avatar: getInitials(`${t.first_name} ${t.last_name}`),
+    })) ?? [];
 
   const deletingTeacher = deletingTeacherId
-    ? teachers.find((t) => t.id === deletingTeacherId) ?? null
+    ? (teachers.find((t) => t.id === deletingTeacherId) ?? null)
     : null;
 
   /* ── Handlers ── */
+  const createTeacherMutation = useMutation({
+    mutationFn: createTeacher,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+      addToast("Teacher added successfully", "success");
+      setShowAddModal(false);
+    },
+  });
+
   function handleAddTeacher(data: TeacherFormData) {
-    const newTeacher: Teacher = {
-      id: `t${teachers.length + 1}`,
-      name: data.name,
+    const [first_name, ...rest] = data.name.split(" ");
+
+    createTeacherMutation.mutate({
+      first_name,
+      last_name: rest.join(" ") || "",
       email: data.email,
-      subject: data.subject,
-      classes: data.classes,
-      status: "active",
-      avatar: getInitials(data.name),
-    };
-    setTeachers((prev) => [...prev, newTeacher]);
-    addToast("Teacher added successfully", "success");
-    setShowAddModal(false);
+    });
   }
+
+  const updateTeacherMutation = useMutation({
+    mutationFn: ({ id, data }: any) => updateTeacher(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+      addToast("Teacher updated successfully", "success");
+      setEditingTeacher(null);
+    },
+  });
 
   function handleEditTeacher(data: TeacherFormData) {
     if (!editingTeacher) return;
-    setTeachers((prev) =>
-      prev.map((t) =>
-        t.id === editingTeacher.id
-          ? {
-              ...t,
-              name: data.name,
-              email: data.email,
-              subject: data.subject,
-              classes: data.classes,
-              avatar: getInitials(data.name),
-            }
-          : t
-      )
-    );
-    addToast("Teacher updated successfully", "success");
-    setEditingTeacher(null);
+
+    const [first_name, ...rest] = data.name.split(" ");
+
+    updateTeacherMutation.mutate({
+      id: editingTeacher.id,
+      data: {
+        first_name,
+        last_name: rest.join(" "),
+      },
+    });
   }
+
+  const deleteTeacherMutation = useMutation({
+    mutationFn: deactivateTeacher,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+      addToast("Teacher deactivated", "success");
+      setDeletingTeacherId(null);
+    },
+  });
 
   function handleDeleteTeacher() {
     if (!deletingTeacherId) return;
-    setTeachers((prev) => prev.filter((t) => t.id !== deletingTeacherId));
-    addToast("Teacher removed", "success");
-    setDeletingTeacherId(null);
+    deleteTeacherMutation.mutate(deletingTeacherId);
+  }
+
+  if (isLoading) {
+    return <div className="p-6 text-text-muted">Loading teachers...</div>;
   }
 
   return (
@@ -481,7 +429,12 @@ export function TeacherManagement() {
               <motion.span
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20, delay: 0.2 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 20,
+                  delay: 0.2,
+                }}
                 className="inline-flex items-center rounded-full bg-orange-500/10 px-2.5 py-0.5 text-caption text-orange-400"
               >
                 {teachers.length}
@@ -511,9 +464,7 @@ export function TeacherManagement() {
         </motion.div>
 
         {/* Search */}
-        <motion.div
-          {...fadeUpProps(8, 0.1, 0.4, ease.standard)}
-        >
+        <motion.div {...fadeUpProps(8, 0.1, 0.4, ease.standard)}>
           <div className="relative max-w-sm">
             <Search
               size={16}
@@ -535,9 +486,11 @@ export function TeacherManagement() {
           className="group/table overflow-hidden rounded-lg border border-border-subtle bg-bg-surface transition-all hover:shadow-[0_0_30px_rgba(101,113,245,0.04)]"
         >
           {/* Gradient glow overlay */}
-          <div className="pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-500 group-hover/table:opacity-100"
+          <div
+            className="pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-500 group-hover/table:opacity-100"
             style={{
-              background: "linear-gradient(135deg, rgba(101,113,245,0.02) 0%, transparent 60%)",
+              background:
+                "linear-gradient(135deg, rgba(101,113,245,0.02) 0%, transparent 60%)",
             }}
           />
 
@@ -558,7 +511,7 @@ export function TeacherManagement() {
 
           {/* Table body */}
           <motion.div variants={tableVariants} initial="hidden" animate="show">
-            {filteredTeachers.map((teacher) => (
+            {teachers.map((teacher) => (
               <motion.div
                 key={teacher.id}
                 variants={rowVariants}
@@ -572,9 +525,9 @@ export function TeacherManagement() {
                     </span>
                   </div>
                   <Link
-                    to="/admin/teachers/$id"
-                    params={{ id: teacher.id }}
+                    to="/admin/teachers"
                     className="text-body-md text-text-primary font-medium hover:text-orange-400 transition-colors truncate"
+                    disabled={true}
                   >
                     {teacher.name}
                   </Link>
@@ -633,7 +586,7 @@ export function TeacherManagement() {
                     open={openDropdownId === teacher.id}
                     onToggle={() =>
                       setOpenDropdownId((prev) =>
-                        prev === teacher.id ? null : teacher.id
+                        prev === teacher.id ? null : teacher.id,
                       )
                     }
                     onClose={() => setOpenDropdownId(null)}
@@ -652,7 +605,7 @@ export function TeacherManagement() {
           className="flex items-center justify-between"
         >
           <p className="text-body-sm text-text-muted">
-            Showing {filteredTeachers.length} of {teachers.length} teachers
+            Showing {teachers.length} of {teachers.length} teachers
           </p>
           <div className="flex items-center gap-2">
             <motion.button

@@ -14,7 +14,9 @@ import { Route as R404RouteImport } from './routes/404'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthVerifyRouteImport } from './routes/_auth/verify'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
+import { Route as AuthRequestRouteImport } from './routes/_auth/request'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AppTeacherRouteRouteImport } from './routes/_app/teacher/route'
@@ -30,10 +32,10 @@ import { Route as AppStudentTutorRouteImport } from './routes/_app/student/tutor
 import { Route as AppStudentResultsRouteImport } from './routes/_app/student/results'
 import { Route as AppStudentQuizzesRouteImport } from './routes/_app/student/quizzes'
 import { Route as AppStudentMaterialsRouteImport } from './routes/_app/student/materials'
-import { Route as AppAdminTeachersRouteImport } from './routes/_app/admin/teachers'
 import { Route as AppAdminStudentsRouteImport } from './routes/_app/admin/students'
 import { Route as AppAdminClassesRouteImport } from './routes/_app/admin/classes'
 import { Route as AppAdminBillingRouteImport } from './routes/_app/admin/billing'
+import { Route as AppAdminTeachersIndexRouteImport } from './routes/_app/admin/teachers.index'
 import { Route as AppAdminSettingsIndexRouteImport } from './routes/_app/admin/settings.index'
 import { Route as AppAdminSettingsFeaturesRouteImport } from './routes/_app/admin/settings.features'
 
@@ -60,9 +62,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthVerifyRoute = AuthVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthRequestRoute = AuthRequestRouteImport.update({
+  id: '/request',
+  path: '/request',
   getParentRoute: () => AuthRouteRoute,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
@@ -140,11 +152,6 @@ const AppStudentMaterialsRoute = AppStudentMaterialsRouteImport.update({
   path: '/materials',
   getParentRoute: () => AppStudentRouteRoute,
 } as any)
-const AppAdminTeachersRoute = AppAdminTeachersRouteImport.update({
-  id: '/teachers',
-  path: '/teachers',
-  getParentRoute: () => AppAdminRouteRoute,
-} as any)
 const AppAdminStudentsRoute = AppAdminStudentsRouteImport.update({
   id: '/students',
   path: '/students',
@@ -158,6 +165,11 @@ const AppAdminClassesRoute = AppAdminClassesRouteImport.update({
 const AppAdminBillingRoute = AppAdminBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
+  getParentRoute: () => AppAdminRouteRoute,
+} as any)
+const AppAdminTeachersIndexRoute = AppAdminTeachersIndexRouteImport.update({
+  id: '/teachers/',
+  path: '/teachers/',
   getParentRoute: () => AppAdminRouteRoute,
 } as any)
 const AppAdminSettingsIndexRoute = AppAdminSettingsIndexRouteImport.update({
@@ -181,11 +193,12 @@ export interface FileRoutesByFullPath {
   '/teacher': typeof AppTeacherRouteRouteWithChildren
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
+  '/request': typeof AuthRequestRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/verify': typeof AuthVerifyRoute
   '/admin/billing': typeof AppAdminBillingRoute
   '/admin/classes': typeof AppAdminClassesRoute
   '/admin/students': typeof AppAdminStudentsRoute
-  '/admin/teachers': typeof AppAdminTeachersRoute
   '/student/materials': typeof AppStudentMaterialsRoute
   '/student/quizzes': typeof AppStudentQuizzesRoute
   '/student/results': typeof AppStudentResultsRoute
@@ -198,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/teacher/': typeof AppTeacherIndexRoute
   '/admin/settings/features': typeof AppAdminSettingsFeaturesRoute
   '/admin/settings/': typeof AppAdminSettingsIndexRoute
+  '/admin/teachers/': typeof AppAdminTeachersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -205,11 +219,12 @@ export interface FileRoutesByTo {
   '/500': typeof R500Route
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
+  '/request': typeof AuthRequestRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/verify': typeof AuthVerifyRoute
   '/admin/billing': typeof AppAdminBillingRoute
   '/admin/classes': typeof AppAdminClassesRoute
   '/admin/students': typeof AppAdminStudentsRoute
-  '/admin/teachers': typeof AppAdminTeachersRoute
   '/student/materials': typeof AppStudentMaterialsRoute
   '/student/quizzes': typeof AppStudentQuizzesRoute
   '/student/results': typeof AppStudentResultsRoute
@@ -222,6 +237,7 @@ export interface FileRoutesByTo {
   '/teacher': typeof AppTeacherIndexRoute
   '/admin/settings/features': typeof AppAdminSettingsFeaturesRoute
   '/admin/settings': typeof AppAdminSettingsIndexRoute
+  '/admin/teachers': typeof AppAdminTeachersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -235,11 +251,12 @@ export interface FileRoutesById {
   '/_app/teacher': typeof AppTeacherRouteRouteWithChildren
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
+  '/_auth/request': typeof AuthRequestRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
+  '/_auth/verify': typeof AuthVerifyRoute
   '/_app/admin/billing': typeof AppAdminBillingRoute
   '/_app/admin/classes': typeof AppAdminClassesRoute
   '/_app/admin/students': typeof AppAdminStudentsRoute
-  '/_app/admin/teachers': typeof AppAdminTeachersRoute
   '/_app/student/materials': typeof AppStudentMaterialsRoute
   '/_app/student/quizzes': typeof AppStudentQuizzesRoute
   '/_app/student/results': typeof AppStudentResultsRoute
@@ -252,6 +269,7 @@ export interface FileRoutesById {
   '/_app/teacher/': typeof AppTeacherIndexRoute
   '/_app/admin/settings/features': typeof AppAdminSettingsFeaturesRoute
   '/_app/admin/settings/': typeof AppAdminSettingsIndexRoute
+  '/_app/admin/teachers/': typeof AppAdminTeachersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -264,11 +282,12 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/forgot-password'
     | '/login'
+    | '/request'
     | '/reset-password'
+    | '/verify'
     | '/admin/billing'
     | '/admin/classes'
     | '/admin/students'
-    | '/admin/teachers'
     | '/student/materials'
     | '/student/quizzes'
     | '/student/results'
@@ -281,6 +300,7 @@ export interface FileRouteTypes {
     | '/teacher/'
     | '/admin/settings/features'
     | '/admin/settings/'
+    | '/admin/teachers/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -288,11 +308,12 @@ export interface FileRouteTypes {
     | '/500'
     | '/forgot-password'
     | '/login'
+    | '/request'
     | '/reset-password'
+    | '/verify'
     | '/admin/billing'
     | '/admin/classes'
     | '/admin/students'
-    | '/admin/teachers'
     | '/student/materials'
     | '/student/quizzes'
     | '/student/results'
@@ -305,6 +326,7 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/admin/settings/features'
     | '/admin/settings'
+    | '/admin/teachers'
   id:
     | '__root__'
     | '/'
@@ -317,11 +339,12 @@ export interface FileRouteTypes {
     | '/_app/teacher'
     | '/_auth/forgot-password'
     | '/_auth/login'
+    | '/_auth/request'
     | '/_auth/reset-password'
+    | '/_auth/verify'
     | '/_app/admin/billing'
     | '/_app/admin/classes'
     | '/_app/admin/students'
-    | '/_app/admin/teachers'
     | '/_app/student/materials'
     | '/_app/student/quizzes'
     | '/_app/student/results'
@@ -334,6 +357,7 @@ export interface FileRouteTypes {
     | '/_app/teacher/'
     | '/_app/admin/settings/features'
     | '/_app/admin/settings/'
+    | '/_app/admin/teachers/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -381,11 +405,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth/verify': {
+      id: '/_auth/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof AuthVerifyRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
     '/_auth/reset-password': {
       id: '/_auth/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/request': {
+      id: '/_auth/request'
+      path: '/request'
+      fullPath: '/request'
+      preLoaderRoute: typeof AuthRequestRouteImport
       parentRoute: typeof AuthRouteRoute
     }
     '/_auth/login': {
@@ -493,13 +531,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppStudentMaterialsRouteImport
       parentRoute: typeof AppStudentRouteRoute
     }
-    '/_app/admin/teachers': {
-      id: '/_app/admin/teachers'
-      path: '/teachers'
-      fullPath: '/admin/teachers'
-      preLoaderRoute: typeof AppAdminTeachersRouteImport
-      parentRoute: typeof AppAdminRouteRoute
-    }
     '/_app/admin/students': {
       id: '/_app/admin/students'
       path: '/students'
@@ -519,6 +550,13 @@ declare module '@tanstack/react-router' {
       path: '/billing'
       fullPath: '/admin/billing'
       preLoaderRoute: typeof AppAdminBillingRouteImport
+      parentRoute: typeof AppAdminRouteRoute
+    }
+    '/_app/admin/teachers/': {
+      id: '/_app/admin/teachers/'
+      path: '/teachers'
+      fullPath: '/admin/teachers/'
+      preLoaderRoute: typeof AppAdminTeachersIndexRouteImport
       parentRoute: typeof AppAdminRouteRoute
     }
     '/_app/admin/settings/': {
@@ -542,20 +580,20 @@ interface AppAdminRouteRouteChildren {
   AppAdminBillingRoute: typeof AppAdminBillingRoute
   AppAdminClassesRoute: typeof AppAdminClassesRoute
   AppAdminStudentsRoute: typeof AppAdminStudentsRoute
-  AppAdminTeachersRoute: typeof AppAdminTeachersRoute
   AppAdminIndexRoute: typeof AppAdminIndexRoute
   AppAdminSettingsFeaturesRoute: typeof AppAdminSettingsFeaturesRoute
   AppAdminSettingsIndexRoute: typeof AppAdminSettingsIndexRoute
+  AppAdminTeachersIndexRoute: typeof AppAdminTeachersIndexRoute
 }
 
 const AppAdminRouteRouteChildren: AppAdminRouteRouteChildren = {
   AppAdminBillingRoute: AppAdminBillingRoute,
   AppAdminClassesRoute: AppAdminClassesRoute,
   AppAdminStudentsRoute: AppAdminStudentsRoute,
-  AppAdminTeachersRoute: AppAdminTeachersRoute,
   AppAdminIndexRoute: AppAdminIndexRoute,
   AppAdminSettingsFeaturesRoute: AppAdminSettingsFeaturesRoute,
   AppAdminSettingsIndexRoute: AppAdminSettingsIndexRoute,
+  AppAdminTeachersIndexRoute: AppAdminTeachersIndexRoute,
 }
 
 const AppAdminRouteRouteWithChildren = AppAdminRouteRoute._addFileChildren(
@@ -619,13 +657,17 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 interface AuthRouteRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
+  AuthRequestRoute: typeof AuthRequestRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  AuthVerifyRoute: typeof AuthVerifyRoute
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
+  AuthRequestRoute: AuthRequestRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
+  AuthVerifyRoute: AuthVerifyRoute,
 }
 
 const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(

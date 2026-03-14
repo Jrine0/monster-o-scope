@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { motion, AnimatePresence, cubicBezier } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Mail,
@@ -58,7 +58,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
 
-  const setSession = useAuthStore((s) => s.setSession);
+  const setAccessToken = useAuthStore((s) => s.setAccessToken);
 
   const [mode, setMode] = useState<LoginMode>("teacher");
   const [showPassword, setShowPassword] = useState(false);
@@ -130,10 +130,10 @@ export function LoginPage() {
 
       const response = await apiClient.post("/auth/login", payload);
 
-      const { access_token, user } = response.data;
+      const { access_token } = response.data;
 
-      setSession(access_token, user);
-
+      setAccessToken(access_token);
+      
       const destination = ROLE_DASHBOARD[mode] ?? "/teacher";
       navigate({ to: destination });
     } catch (err: any) {

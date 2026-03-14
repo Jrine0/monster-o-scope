@@ -8,82 +8,8 @@ import {
 } from "lucide-react";
 import { staggerContainer, cardReveal, ease } from "@/lib/animation";
 import AccentLine from "@/components/accent-line";
-
-/* ── Mock data ── */
-const CLASSES = [
-  {
-    id: "c1",
-    name: "Class 10 -- Section A",
-    teacher: "Rajesh Kumar",
-    teacherAvatar: "RK",
-    studentCount: 42,
-    subjects: ["Mathematics", "Science", "English"],
-    color: "orange",
-  },
-  {
-    id: "c2",
-    name: "Class 10 -- Section B",
-    teacher: "Kavita Reddy",
-    teacherAvatar: "KR",
-    studentCount: 38,
-    subjects: ["Mathematics", "Science", "Hindi"],
-    color: "orange",
-  },
-  {
-    id: "c3",
-    name: "Class 9 -- Section A",
-    teacher: "Anita Deshmukh",
-    teacherAvatar: "AD",
-    studentCount: 44,
-    subjects: ["Science", "Social Science", "English"],
-    color: "orange",
-  },
-  {
-    id: "c4",
-    name: "Class 9 -- Section B",
-    teacher: "Manoj Tiwari",
-    teacherAvatar: "MT",
-    studentCount: 40,
-    subjects: ["Mathematics", "Hindi", "Sanskrit"],
-    color: "orange",
-  },
-  {
-    id: "c5",
-    name: "Class 8 -- Section A",
-    teacher: "Vikram Patel",
-    teacherAvatar: "VP",
-    studentCount: 36,
-    subjects: ["English", "Social Science", "Computer Science"],
-    color: "orange",
-  },
-  {
-    id: "c6",
-    name: "Class 8 -- Section B",
-    teacher: "Deepa Nair",
-    teacherAvatar: "DN",
-    studentCount: 34,
-    subjects: ["Science", "Mathematics", "Hindi"],
-    color: "orange",
-  },
-  {
-    id: "c7",
-    name: "Class 10 -- Section C",
-    teacher: "Sunita Iyer",
-    teacherAvatar: "SI",
-    studentCount: 40,
-    subjects: ["Hindi", "Mathematics", "Science"],
-    color: "orange",
-  },
-  {
-    id: "c8",
-    name: "Class 9 -- Section C",
-    teacher: "Suresh Gupta",
-    teacherAvatar: "SG",
-    studentCount: 42,
-    subjects: ["Computer Science", "Mathematics", "English"],
-    color: "orange",
-  },
-] as const;
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchClasses, createClass } from "./classes.api";
 
 /* ── Animation ── */
 const containerVariants = staggerContainer(0.06, 0, true);
@@ -92,7 +18,10 @@ const cardVariants = cardReveal(16, 0.4, ease.standard);
 /* ── Animated Background ── */
 function AnimatedBackground() {
   return (
-    <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
+    <div
+      className="pointer-events-none fixed inset-0 overflow-hidden"
+      aria-hidden
+    >
       {/* orange blob - top right */}
       <motion.div
         className="absolute -top-32 right-[10%] h-[500px] w-[500px] rounded-full opacity-[0.07]"
@@ -126,7 +55,8 @@ function AnimatedBackground() {
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: "radial-gradient(circle, rgba(101,113,245,0.04) 1px, transparent 1px)",
+          backgroundImage:
+            "radial-gradient(circle, rgba(101,113,245,0.04) 1px, transparent 1px)",
           backgroundSize: "32px 32px",
         }}
       />
@@ -141,9 +71,8 @@ function AnimatedBackground() {
             height: i % 3 === 0 ? 3 : 2,
             left: `${6 + ((i * 10.8) % 86)}%`,
             top: `${26 + ((i * 9.5) % 54)}%`,
-            background: i % 2 === 0
-              ? "rgba(101,113,245,0.6)"
-              : "rgba(101,113,245,0.35)",
+            background:
+              i % 2 === 0 ? "rgba(101,113,245,0.6)" : "rgba(101,113,245,0.35)",
           }}
           animate={{
             y: [0, -95 - i * 7],
@@ -162,8 +91,51 @@ function AnimatedBackground() {
   );
 }
 
-
 export function ClassManagement() {
+  const queryClient = useQueryClient();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["classes"],
+    queryFn: () => fetchClasses(1),
+  });
+
+  const classes: {
+    id: string;
+    name: string;
+    teacher: string;
+    teacherAvatar: string;
+    studentCount: number;
+    subjects: string[];
+    color: string;
+  }[] =
+    data?.data?.map((c: any) => ({
+      id: c.id,
+      name: c.name,
+      teacher: c.teacher_name ?? "Unassigned",
+      teacherAvatar: c.teacher_name
+        ? c.teacher_name
+            .split(" ")
+            .map((p: string) => p[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase()
+        : "--",
+      studentCount: 0, // backend does not provide this yet
+      subjects: [c.subject],
+      color: "orange",
+    })) ?? [];
+
+  const createClassMutation = useMutation({
+    mutationFn: createClass,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["classes"] });
+    },
+  });
+
+  if (isLoading) {
+    return <div className="p-6 text-text-muted">Loading classes...</div>;
+  }
+
   return (
     <>
       <AnimatedBackground />
@@ -181,10 +153,15 @@ export function ClassManagement() {
               <motion.span
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20, delay: 0.2 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 20,
+                  delay: 0.2,
+                }}
                 className="inline-flex items-center rounded-full bg-orange-500/10 px-2.5 py-0.5 text-caption text-orange-400"
               >
-                {CLASSES.length}
+                {classes.length}
               </motion.span>
             </div>
             <AccentLine />
@@ -192,6 +169,13 @@ export function ClassManagement() {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            onClick={() =>
+              createClassMutation.mutate({
+                name: "New Class",
+                grade: 10,
+                subject: "Mathematics",
+              })
+            }
             className="inline-flex items-center gap-2 rounded-md bg-orange-500 px-4 py-2.5 text-body-sm font-medium text-white shadow-sm transition-colors hover:bg-orange-600"
           >
             <Plus size={16} strokeWidth={1.5} />
@@ -206,17 +190,22 @@ export function ClassManagement() {
           initial="hidden"
           animate="show"
         >
-          {CLASSES.map((cls) => (
+          {classes.map((cls) => (
             <motion.div
               key={cls.id}
               variants={cardVariants}
-              whileHover={{ y: -4, boxShadow: "0 8px 30px rgba(101,113,245,0.08)" }}
+              whileHover={{
+                y: -4,
+                boxShadow: "0 8px 30px rgba(101,113,245,0.08)",
+              }}
               className="group relative overflow-hidden rounded-lg border border-border-subtle bg-bg-surface p-5 transition-all hover:border-border-default"
             >
               {/* Gradient glow overlay on hover */}
-              <div className="pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              <div
+                className="pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 style={{
-                  background: "linear-gradient(135deg, rgba(101,113,245,0.03) 0%, transparent 60%)",
+                  background:
+                    "linear-gradient(135deg, rgba(101,113,245,0.03) 0%, transparent 60%)",
                 }}
               />
 
@@ -235,7 +224,10 @@ export function ClassManagement() {
               {/* Teacher */}
               <div className="relative mt-3 flex items-center gap-2.5">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-500/15">
-                  <span className="text-caption text-orange-400 font-semibold" style={{ fontSize: "10px" }}>
+                  <span
+                    className="text-caption text-orange-400 font-semibold"
+                    style={{ fontSize: "10px" }}
+                  >
                     {cls.teacherAvatar}
                   </span>
                 </div>

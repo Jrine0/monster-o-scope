@@ -40,27 +40,17 @@ function getPasswordStrength(password: string): {
   return { score, label: "Strong", color: "#10b981" }; // emerald-500
 }
 
-export function ResetPasswordPage() {
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [email, setEmail] = useState("");
+export function VerifyOtpPage() {
   const [otp, setotp] = useState("");
-  const [showNew, setShowNew] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
-
-  const strength = useMemo(() => getPasswordStrength(newPassword), [newPassword]);
-  const passwordsMatch = confirmPassword.length > 0 && newPassword === confirmPassword;
-  const passwordsMismatch = confirmPassword.length > 0 && newPassword !== confirmPassword;
 
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
-    if (!passwordsMatch || strength.score < 2) return;
     
-    apiClient.post("/auth/reset-password", {
-      email,
-      new_password: newPassword,
-      code: otp
+    apiClient.post("/auth/verify-otp", {
+      code: otp,
+      email: email
     }).then(data => data.status == 200 && setSubmitted(true))
   };
 
@@ -189,7 +179,7 @@ export function ResetPasswordPage() {
           initial="hidden"
           animate="show"
         >
-          {"Reset password".split(" ").map((word, i) => (
+          {"Verify your Account".split(" ").map((word, i) => (
             <motion.span
               key={i}
               className="inline-block mr-2"
@@ -223,145 +213,12 @@ export function ResetPasswordPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.5, ease: easeGentle }}
         >
-          Choose a strong password for your account.
+          Entering the OTP to verify your account.
         </motion.p>
       </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* New password field */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.45, ease: easeGentle }}
-        >
-          <label className="text-sm text-muted-foreground font-medium mb-1.5 block">
-            New password
-          </label>
-          <div className="relative">
-            <motion.span
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Lock size={16} strokeWidth={1.5} />
-            </motion.span>
-            <input
-              type={showNew ? "text" : "password"}
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="At least 8 characters"
-              required
-              minLength={8}
-              className="flex h-12 w-full rounded-md border bg-background pl-10 pr-10 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground outline-none transition-all duration-200 border-input focus-visible:border-orange-500"
-              style={{ boxShadow: "none" }}
-              onFocus={(e) => {
-                e.currentTarget.style.boxShadow = themeAccent.glow;
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => setShowNew(!showNew)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {showNew ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
-            </button>
-          </div>
-
-          {/* Strength indicator */}
-          {newPassword.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              className="mt-3 space-y-2"
-            >
-              <div className="flex gap-1.5">
-                {[1, 2, 3, 4, 5].map((level) => (
-                  <motion.div
-                    key={level}
-                    className="h-1 flex-1 rounded-full bg-muted"
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ duration: 0.2, delay: level * 0.05 }}
-                  >
-                    <motion.div 
-                      className="h-full rounded-full w-full origin-left"
-                      style={{
-                        backgroundColor: level <= strength.score ? strength.color : "transparent",
-                      }}
-                      layout
-                    />
-                  </motion.div>
-                ))}
-              </div>
-              <p className="text-xs font-medium" style={{ color: strength.color }}>
-                {strength.label}
-              </p>
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Confirm password field */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, duration: 0.45, ease: easeGentle }}
-        >
-          <label className="text-sm text-muted-foreground font-medium mb-1.5 block">
-            Confirm password
-          </label>
-          <div className="relative">
-            <motion.span
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-            >
-              <Lock size={16} strokeWidth={1.5} />
-            </motion.span>
-            <input
-              type={showConfirm ? "text" : "password"}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Repeat your password"
-              required
-              className={`flex h-12 w-full rounded-md border bg-background pl-10 pr-10 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground outline-none transition-all duration-200 ${
-                passwordsMismatch
-                  ? "border-destructive focus-visible:ring-destructive/30"
-                  : passwordsMatch
-                    ? "border-emerald-500 focus-visible:ring-emerald-500/30"
-                    : "border-input focus-visible:border-orange-500"
-              }`}
-              style={{ boxShadow: "none" }}
-              onFocus={(e) => {
-                e.currentTarget.style.boxShadow = passwordsMismatch 
-                  ? "0 0 24px rgba(239,68,68,0.15)"
-                  : themeAccent.glow;
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {showConfirm ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
-            </button>
-          </div>
-          {passwordsMismatch && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-xs text-destructive mt-1.5"
-            >
-              Passwords do not match
-            </motion.p>
-          )}
-        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -369,43 +226,7 @@ export function ResetPasswordPage() {
           transition={{ delay: 0.35, duration: 0.45, ease: easeGentle }}
         >
           <label className="text-sm text-muted-foreground font-medium mb-1.5 block">
-            E-mail
-          </label>
-          <div className="relative">
-            <motion.span
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-            >
-              <Lock size={16} strokeWidth={1.5} />
-            </motion.span>
-            <Input
-              type={"email"}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your E-mail"
-              required
-              className={`flex h-12 w-full rounded-md border bg-background pl-10 pr-10 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground outline-none transition-all duration-200 ${
-                "border-input focus-visible:border-orange-500"
-              }`}
-              style={{ boxShadow: "none" }}
-              onFocus={(e) => {
-                e.currentTarget.style.boxShadow = themeAccent.glow;
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            />
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, duration: 0.45, ease: easeGentle }}
-        >
-          <label className="text-sm text-muted-foreground font-medium mb-1.5 block">
-            OTP
+            Otp
           </label>
           <div className="relative">
             <motion.span
@@ -434,19 +255,51 @@ export function ResetPasswordPage() {
             />
           </div>
         </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.45, ease: easeGentle }}
+        >
+          <label className="text-sm text-muted-foreground font-medium mb-1.5 block">
+            Email
+          </label>
+          <div className="relative">
+            <motion.span
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            >
+              <Lock size={16} strokeWidth={1.5} />
+            </motion.span>
+            <Input
+              type={"email"}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+              className={`flex h-12 w-full rounded-md border bg-background pl-10 pr-10 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground outline-none transition-all duration-200 ${
+                "border-input focus-visible:border-orange-500"
+              }`}
+              style={{ boxShadow: "none" }}
+              onFocus={(e) => {
+                e.currentTarget.style.boxShadow = themeAccent.glow;
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            />
+          </div>
+        </motion.div>
 
         {/* Submit button */}
         <motion.button
           type="submit"
-          disabled={!passwordsMatch || strength.score < 2}
           className="group mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-orange-500 text-sm font-semibold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-orange-600"
-          whileHover={passwordsMatch && strength.score >= 2 ? { scale: 1.02, boxShadow: themeAccent.glowStrong } : {}}
-          whileTap={passwordsMatch && strength.score >= 2 ? { scale: 0.98 } : {}}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, duration: 0.45, ease: easeGentle }}
         >
-          Reset Password
+          Verify Account
           <motion.span
             className="inline-flex"
             animate={{ x: [0, 3, 0] }}
