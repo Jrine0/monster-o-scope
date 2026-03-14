@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { motion, AnimatePresence, cubicBezier } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Mail,

@@ -386,8 +386,7 @@ export function PracticeQuiz() {
           {isLastQuestion && allAnswered ? (
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link
-                to="/student/quiz/$id/result"
-                params={{ id: QUIZ.id }}
+                to="/student/quizzes"
                 className="flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-body-md font-semibold text-text-inverse transition-all duration-200 hover:bg-orange-400 hover:shadow-glow-orange"
               >
                 Submit Quiz

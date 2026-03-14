@@ -412,8 +412,7 @@ export function StudentDashboard() {
       <section>
         <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.25, ease: ease.gentle }}>
         <Link
-          to="/student/materials/$id"
-          params={{ id: CONTINUE_MATERIAL.id }}
+          to="/student/materials"
           className="group relative block overflow-hidden rounded-xl border border-border-subtle transition-all duration-200 hover:border-orange-500/30 hover:shadow-glow-orange"
           style={{ backgroundColor: "var(--color-portal-student-surface)" }}
         >
@@ -650,8 +649,7 @@ export function StudentDashboard() {
                 return (
                   <motion.div key={quiz.id} whileHover={{ x: 4 }} transition={{ duration: 0.2, ease: ease.gentle }}>
                     <Link
-                      to="/student/quiz/$id/result"
-                      params={{ id: quiz.id }}
+                      to="/student/quizzes"
                       className="group flex items-center gap-5 rounded-xl border border-border-subtle p-5 transition-all duration-200 hover:border-orange-500/20 hover:shadow-glow-orange"
                       style={{ backgroundColor: "var(--color-portal-student-surface)" }}
                     >

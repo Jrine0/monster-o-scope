@@ -322,12 +322,10 @@ function TeacherForm({
 
 /* ── More Actions Dropdown ── */
 function MoreDropdown({
-  teacher,
   open,
   onToggle,
   onClose,
 }: {
-  teacher: Teacher;
   open: boolean;
   onToggle: () => void;
   onClose: () => void;
@@ -361,8 +359,7 @@ function MoreDropdown({
       {open && (
         <div className="absolute right-0 top-full z-30 mt-1 w-44 overflow-hidden rounded-md border border-border-subtle bg-bg-surface shadow-lg">
           <Link
-            to="/admin/teachers/$id"
-            params={{ id: teacher.id }}
+            to="/admin/teachers"
             className="flex w-full items-center px-3 py-2 text-body-sm text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary"
             onClick={onClose}
           >
@@ -572,8 +569,7 @@ export function TeacherManagement() {
                     </span>
                   </div>
                   <Link
-                    to="/admin/teachers/$id"
-                    params={{ id: teacher.id }}
+                    to="/admin/teachers"
                     className="text-body-md text-text-primary font-medium hover:text-orange-400 transition-colors truncate"
                   >
                     {teacher.name}
@@ -629,7 +625,6 @@ export function TeacherManagement() {
                     <Trash2 size={14} strokeWidth={1.5} />
                   </motion.button>
                   <MoreDropdown
-                    teacher={teacher}
                     open={openDropdownId === teacher.id}
                     onToggle={() =>
                       setOpenDropdownId((prev) =>

@@ -258,8 +258,7 @@ export function LibraryItemDetail() {
             </motion.button>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link
-                to="/teacher/editor/$id"
-                params={{ id: ITEM.id }}
+                to="/teacher/materials"
                 className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-orange-500/30 bg-orange-500/8 px-5 py-2.5 text-body-md font-medium text-orange-400 transition-colors duration-200 hover:bg-orange-500/15"
               >
                 <Edit3 size={18} strokeWidth={1.5} />
@@ -285,8 +284,7 @@ export function LibraryItemDetail() {
               transition={{ duration: 0.3, ease: ease.gentle }}
             >
               <Link
-                to="/teacher/library/$id"
-                params={{ id: item.id }}
+                to="/teacher/library"
                 className="group relative block overflow-hidden rounded-[var(--radius-md)] border border-border-subtle bg-bg-surface p-4 transition-all duration-200 hover:border-orange-500/30 hover:shadow-[0_4px_24px_rgba(242,116,13,0.12)]"
               >
                 {/* Card hover gradient glow overlay */}

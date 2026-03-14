@@ -168,7 +168,7 @@ export function GenerateContent() {
           </span>
         </button>
         <Link
-          to="/teacher/upload"
+          to="/teacher/generate"
           onClick={() => setActiveTab("pdf")}
           className={`relative rounded-[var(--radius-sm)] px-4 py-2 text-body-md font-medium transition-colors ${
             activeTab === "pdf"
@@ -350,7 +350,7 @@ export function GenerateContent() {
           {/* Generate button */}
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Link
-              to="/teacher/generate/loading"
+              to="/teacher/generate"
               className="group relative inline-flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-[var(--radius-md)] bg-orange-500 px-6 py-3.5 text-body-lg font-semibold text-white transition-all duration-200 hover:bg-orange-600 hover:shadow-glow-orange-strong sm:w-auto"
             >
               {/* Button hover glow */}

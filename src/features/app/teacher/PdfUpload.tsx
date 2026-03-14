@@ -336,7 +336,7 @@ export function PdfUpload() {
                   whileTap={{ scale: 0.98 }}
                 >
                   <Link
-                    to="/teacher/generate/loading"
+                    to="/teacher/generate"
                     className="inline-flex items-center gap-2.5 rounded-[var(--radius-md)] bg-orange-500 px-6 py-3 text-body-md font-semibold text-white transition-all duration-200 hover:bg-orange-600 hover:shadow-glow-orange-strong"
                   >
                     <motion.div

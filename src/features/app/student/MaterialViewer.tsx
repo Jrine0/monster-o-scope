@@ -405,8 +405,7 @@ export function MaterialViewer() {
       >
         <motion.div whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
           <Link
-            to="/student/tutor/$topicId"
-            params={{ topicId: MATERIAL.id }}
+            to="/student/tutor"
             className="group relative flex items-center gap-4 rounded-xl border border-orange-500/20 p-5 transition-all duration-200 hover:shadow-glow-orange hover:border-orange-500/30 overflow-hidden"
             style={{ backgroundColor: "rgba(242,116,13,0.06)" }}
           >
@@ -448,8 +447,7 @@ export function MaterialViewer() {
       >
         <motion.div whileHover={{ y: -3 }} transition={{ duration: 0.2 }} className="flex-1">
           <Link
-            to="/student/materials/$id"
-            params={{ id: MATERIAL.prevChapter.id }}
+            to="/student/materials"
             className="group flex h-full items-center gap-3 rounded-xl border border-border-subtle p-5 transition-all duration-200 hover:border-border-default hover:shadow-sm"
             style={{ backgroundColor: "var(--color-portal-student-surface)" }}
           >
@@ -468,8 +466,7 @@ export function MaterialViewer() {
         </motion.div>
         <motion.div whileHover={{ y: -3 }} transition={{ duration: 0.2 }} className="flex-1">
           <Link
-            to="/student/materials/$id"
-            params={{ id: MATERIAL.nextChapter.id }}
+            to="/student/materials"
             className="group flex h-full items-center justify-end gap-3 rounded-xl border border-border-subtle p-5 transition-all duration-200 hover:border-border-default hover:shadow-sm"
             style={{ backgroundColor: "var(--color-portal-student-surface)" }}
           >

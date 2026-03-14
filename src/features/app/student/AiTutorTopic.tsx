@@ -293,8 +293,7 @@ export function AiTutorTopic() {
         <div className="border-t border-border-subtle p-4">
           <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
             <Link
-              to="/student/materials/$id"
-              params={{ id: TOPIC.id }}
+              to="/student/materials"
               className="group flex items-center gap-2 rounded-lg border border-border-subtle px-4 py-2.5 text-body-sm font-medium text-text-secondary transition-all duration-200 hover:border-border-default hover:text-text-primary w-full justify-center"
             >
               <BookOpen size={16} strokeWidth={1.5} />

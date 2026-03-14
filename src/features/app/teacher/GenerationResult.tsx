@@ -483,7 +483,7 @@ export function GenerationResult() {
         {/* Regenerate */}
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Link
-            to="/teacher/generate/loading"
+            to="/teacher/generate"
             className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-border-strong bg-bg-elevated px-5 py-2.5 text-body-md font-medium text-text-primary transition-colors duration-200 hover:bg-bg-muted"
           >
             <RefreshCw size={18} strokeWidth={1.5} />
@@ -512,8 +512,7 @@ export function GenerationResult() {
         {/* Edit */}
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Link
-            to="/teacher/editor/$id"
-            params={{ id: "new" }}
+            to="/teacher/materials"
             className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-border-subtle bg-transparent px-5 py-2.5 text-body-md font-medium text-text-secondary transition-colors duration-200 hover:text-text-primary hover:bg-bg-elevated"
           >
             <Edit3 size={18} strokeWidth={1.5} />

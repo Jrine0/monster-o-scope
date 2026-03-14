@@ -283,8 +283,7 @@ export function VideoPlayer() {
           >
             <motion.div whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
               <Link
-                to="/student/tutor/$topicId"
-                params={{ topicId: VIDEO.id }}
+                to="/student/tutor"
                 className="group relative inline-flex items-center gap-2 rounded-xl border border-orange-500/20 px-4 py-3 text-body-md font-medium text-orange-400 transition-all duration-200 hover:shadow-glow-orange hover:border-orange-500/30 overflow-hidden"
                 style={{ backgroundColor: "rgba(242,116,13,0.06)" }}
               >
@@ -315,8 +314,7 @@ export function VideoPlayer() {
           >
             <motion.div whileHover={{ y: -3 }} transition={{ duration: 0.2 }} className="flex-1">
               <Link
-                to="/student/video/$id"
-                params={{ id: VIDEO.prevVideo.id }}
+                to="/student/tutor"
                 className="group flex h-full items-center gap-3 rounded-xl border border-border-subtle p-4 transition-all duration-200 hover:border-border-default hover:shadow-sm"
                 style={{ backgroundColor: "var(--color-portal-student-surface)" }}
               >
@@ -335,8 +333,7 @@ export function VideoPlayer() {
             </motion.div>
             <motion.div whileHover={{ y: -3 }} transition={{ duration: 0.2 }} className="flex-1">
               <Link
-                to="/student/video/$id"
-                params={{ id: VIDEO.nextVideo.id }}
+                to="/student/tutor"
                 className="group flex h-full items-center justify-end gap-3 rounded-xl border border-border-subtle p-4 transition-all duration-200 hover:border-border-default hover:shadow-sm"
                 style={{ backgroundColor: "var(--color-portal-student-surface)" }}
               >

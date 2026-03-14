@@ -366,8 +366,7 @@ export function MyResults() {
               return (
                 <motion.div key={r.id} variants={cardItem} whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
                   <Link
-                    to="/student/quiz/$id/result"
-                    params={{ id: r.id }}
+                    to="/student/quizzes"
                     className="group relative grid grid-cols-12 items-center gap-4 rounded-xl border border-border-subtle p-4 sm:px-5 transition-all duration-200 hover:border-border-default overflow-hidden"
                     style={{ backgroundColor: "var(--color-portal-student-surface)" }}
                   >

@@ -307,8 +307,7 @@ export function StudyMaterials() {
                 {/* Title + material type badges */}
                 <div className="relative z-10 min-w-0 flex-1">
                   <Link
-                    to="/student/materials/$id"
-                    params={{ id: chapter.id }}
+                    to="/student/materials"
                     className="text-body-lg text-text-primary font-medium hover:text-orange-400 transition-colors truncate block"
                   >
                     {chapter.title}
@@ -345,8 +344,7 @@ export function StudyMaterials() {
                   {chapter.hasQuiz && (
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                       <Link
-                        to="/student/quiz/$id"
-                        params={{ id: chapter.id }}
+                        to="/student/quizzes"
                         className="rounded-lg border border-orange-500/30 bg-orange-500/10 px-3 py-1.5 text-body-sm font-medium text-orange-400 transition-all duration-200 hover:bg-orange-500 hover:text-text-inverse"
                       >
                         Practice Quiz
@@ -354,8 +352,7 @@ export function StudyMaterials() {
                     </motion.div>
                   )}
                   <Link
-                    to="/student/materials/$id"
-                    params={{ id: chapter.id }}
+                    to="/student/materials"
                     className="text-text-muted hover:text-text-primary transition-colors"
                   >
                     <ChevronRight size={20} strokeWidth={1.5} />

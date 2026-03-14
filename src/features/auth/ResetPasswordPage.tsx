@@ -47,7 +47,7 @@ export function ResetPasswordPage() {
   const [otp, setotp] = useState("");
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted] = useState(false);
 
   const strength = useMemo(() => getPasswordStrength(newPassword), [newPassword]);
   const passwordsMatch = confirmPassword.length > 0 && newPassword === confirmPassword;

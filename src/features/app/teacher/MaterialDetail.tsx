@@ -336,8 +336,7 @@ export function MaterialDetail() {
       >
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Link
-            to="/teacher/editor/$id"
-            params={{ id: MATERIAL.id }}
+            to="/teacher/materials"
             className="group relative inline-flex items-center gap-2 overflow-hidden rounded-[var(--radius-md)] bg-orange-500 px-5 py-2.5 text-body-md font-medium text-white transition-all duration-200 hover:bg-orange-600 hover:shadow-glow-orange"
           >
             <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-orange-400/20 via-transparent to-orange-400/20" />

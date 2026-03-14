@@ -252,8 +252,7 @@ export function AiTutor() {
                 whileHover={{ x: 3 }}
               >
                 <Link
-                  to="/student/tutor/$topicId"
-                  params={{ topicId: item.id }}
+                  to="/student/tutor"
                   className="group flex items-center gap-3 rounded-lg border border-border-subtle p-3 transition-all duration-200 hover:border-border-default hover:bg-orange-500/[0.03]"
                 >
                   <div className="min-w-0 flex-1">

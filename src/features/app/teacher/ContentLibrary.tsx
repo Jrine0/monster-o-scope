@@ -214,8 +214,7 @@ export function ContentLibrary() {
               transition={{ duration: 0.3, ease: ease.gentle }}
             >
               <Link
-                to="/teacher/library/$id"
-                params={{ id: item.id }}
+                to="/teacher/library"
                 className="group relative flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-border-subtle bg-bg-surface p-5 transition-all duration-200 hover:border-orange-500/30 hover:shadow-[0_4px_24px_rgba(242,116,13,0.12)]"
               >
                 {/* Card hover gradient glow overlay */}

@@ -202,9 +202,9 @@ export function MyMaterials() {
   );
 
   /* ── Context menu actions ── */
-  function handleEdit(material: Material) {
+  function handleEdit() {
     setOpenMenu(null);
-    navigate({ to: "/teacher/editor/$id", params: { id: material.id } });
+    navigate({ to: "/teacher/materials" });
   }
 
   function handleDownload(material: Material) {
@@ -391,8 +391,7 @@ export function MyMaterials() {
               className="relative"
             >
               <Link
-                to="/teacher/materials/$id"
-                params={{ id: material.id }}
+                to="/teacher/materials"
                 className="group relative block overflow-hidden rounded-[var(--radius-lg)] border border-border-subtle bg-bg-surface transition-all duration-200 hover:border-orange-500/30 hover:shadow-[0_4px_24px_rgba(242,116,13,0.12)]"
               >
                 {/* Card hover gradient glow overlay */}
@@ -441,7 +440,7 @@ export function MyMaterials() {
                 >
                   <motion.button
                     whileHover={{ x: 2 }}
-                    onClick={() => handleEdit(material)}
+                    onClick={() => handleEdit()}
                     className="flex w-full items-center gap-2 rounded-[var(--radius-sm)] px-3 py-2 text-body-sm text-text-secondary hover:bg-bg-muted hover:text-text-primary transition-colors"
                   >
                     <Edit3 size={14} strokeWidth={1.5} />
@@ -483,8 +482,7 @@ export function MyMaterials() {
                 className="relative"
               >
                 <Link
-                  to="/teacher/materials/$id"
-                  params={{ id: material.id }}
+                  to="/teacher/materials"
                   className="group relative flex items-center gap-4 overflow-hidden rounded-[var(--radius-md)] border border-border-subtle bg-bg-surface p-4 transition-all duration-200 hover:border-orange-500/30 hover:shadow-[0_4px_24px_rgba(242,116,13,0.12)]"
                 >
                   {/* List item hover glow */}
@@ -528,7 +526,7 @@ export function MyMaterials() {
                   >
                     <motion.button
                       whileHover={{ x: 2 }}
-                      onClick={() => handleEdit(material)}
+                      onClick={() => handleEdit()}
                       className="flex w-full items-center gap-2 rounded-[var(--radius-sm)] px-3 py-2 text-body-sm text-text-secondary hover:bg-bg-muted hover:text-text-primary transition-colors"
                     >
                       <Edit3 size={14} strokeWidth={1.5} />

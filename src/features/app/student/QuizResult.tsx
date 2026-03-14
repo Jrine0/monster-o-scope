@@ -346,8 +346,7 @@ export function QuizResult() {
       >
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Link
-            to="/student/quiz/$id"
-            params={{ id: RESULT.quizId }}
+            to="/student/quizzes"
             className="flex items-center gap-2 rounded-xl border border-orange-500/30 bg-orange-500/10 px-5 py-3 text-body-md font-medium text-orange-400 transition-all duration-200 hover:bg-orange-500 hover:text-text-inverse"
           >
             <RotateCcw size={18} strokeWidth={1.5} />

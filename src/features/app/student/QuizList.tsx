@@ -372,8 +372,7 @@ export function QuizList() {
                     {isCompleted ? (
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                         <Link
-                          to="/student/quiz/$id"
-                          params={{ id: quiz.id }}
+                          to="/student/quizzes"
                           className="flex items-center gap-1.5 rounded-lg border border-border-default bg-transparent px-3 py-1.5 text-body-sm font-medium text-text-secondary transition-all duration-200 hover:border-orange-500/30 hover:text-orange-400"
                         >
                           <RotateCcw size={14} strokeWidth={1.5} />
@@ -383,8 +382,7 @@ export function QuizList() {
                     ) : (
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                         <Link
-                          to="/student/quiz/$id"
-                          params={{ id: quiz.id }}
+                          to="/student/quizzes"
                           className="rounded-lg bg-orange-500 px-4 py-1.5 text-body-sm font-semibold text-text-inverse transition-all duration-200 hover:bg-orange-400 hover:shadow-glow-orange"
                         >
                           Start Quiz
@@ -392,8 +390,7 @@ export function QuizList() {
                       </motion.div>
                     )}
                     <Link
-                      to="/student/quiz/$id/result"
-                      params={{ id: quiz.id }}
+                      to="/student/quizzes"
                       className={`text-text-muted hover:text-text-primary transition-colors ${
                         !isCompleted ? "pointer-events-none opacity-0" : ""
                       }`}

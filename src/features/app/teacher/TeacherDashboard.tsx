@@ -173,7 +173,7 @@ const QUICK_ACTIONS = [
   {
     label: "Upload PDF",
     description: "Import existing materials to your library",
-    to: "/teacher/upload",
+    to: "/teacher/generate",
     icon: Upload,
   },
   {
@@ -393,8 +393,7 @@ export function TeacherDashboard() {
                 whileHover={{ x: 4 }}
               >
                 <Link
-                  to="/teacher/materials/$id"
-                  params={{ id: material.id }}
+                  to="/teacher/materials"
                   className="group flex items-center gap-4 rounded-[var(--radius-md)] border border-border-subtle bg-bg-surface px-6 py-5 transition-all duration-200 hover:border-orange-500/20 hover:bg-bg-elevated"
                 >
                   {/* Icon */}

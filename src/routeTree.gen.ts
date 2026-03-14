@@ -14,6 +14,8 @@ import { Route as R404RouteImport } from './routes/404'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardTeacherRouteImport } from './routes/dashboard/teacher'
+import { Route as DashboardStudentRouteImport } from './routes/dashboard/student'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
@@ -60,7 +62,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-<<<<<<< HEAD
 const DashboardTeacherRoute = DashboardTeacherRouteImport.update({
   id: '/dashboard/teacher',
   path: '/dashboard/teacher',
@@ -71,17 +72,6 @@ const DashboardStudentRoute = DashboardStudentRouteImport.update({
   path: '/dashboard/student',
   getParentRoute: () => rootRouteImport,
 } as any)
-
-export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/dashboard/student': typeof DashboardStudentRoute
-  '/dashboard/teacher': typeof DashboardTeacherRoute
-}
-export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/dashboard/student': typeof DashboardStudentRoute
-  '/dashboard/teacher': typeof DashboardTeacherRoute
-=======
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -204,6 +194,8 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/dashboard/student': typeof DashboardStudentRoute
+  '/dashboard/teacher': typeof DashboardTeacherRoute
   '/admin/billing': typeof AppAdminBillingRoute
   '/admin/classes': typeof AppAdminClassesRoute
   '/admin/students': typeof AppAdminStudentsRoute
@@ -228,6 +220,8 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/dashboard/student': typeof DashboardStudentRoute
+  '/dashboard/teacher': typeof DashboardTeacherRoute
   '/admin/billing': typeof AppAdminBillingRoute
   '/admin/classes': typeof AppAdminClassesRoute
   '/admin/students': typeof AppAdminStudentsRoute
@@ -244,22 +238,10 @@ export interface FileRoutesByTo {
   '/teacher': typeof AppTeacherIndexRoute
   '/admin/settings/features': typeof AppAdminSettingsFeaturesRoute
   '/admin/settings': typeof AppAdminSettingsIndexRoute
->>>>>>> 533b0942e70e86c69a32fc7d3fd5d2eaf5afb64b
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-<<<<<<< HEAD
-  '/dashboard/student': typeof DashboardStudentRoute
-  '/dashboard/teacher': typeof DashboardTeacherRoute
-}
-export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard/student' | '/dashboard/teacher'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard/student' | '/dashboard/teacher'
-  id: '__root__' | '/' | '/dashboard/student' | '/dashboard/teacher'
-=======
   '/_app': typeof AppRouteRouteWithChildren
   '/_auth': typeof AuthRouteRouteWithChildren
   '/404': typeof R404Route
@@ -270,6 +252,8 @@ export interface FileRouteTypes {
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
+  '/dashboard/student': typeof DashboardStudentRoute
+  '/dashboard/teacher': typeof DashboardTeacherRoute
   '/_app/admin/billing': typeof AppAdminBillingRoute
   '/_app/admin/classes': typeof AppAdminClassesRoute
   '/_app/admin/students': typeof AppAdminStudentsRoute
@@ -299,6 +283,8 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/reset-password'
+    | '/dashboard/student'
+    | '/dashboard/teacher'
     | '/admin/billing'
     | '/admin/classes'
     | '/admin/students'
@@ -323,6 +309,8 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/reset-password'
+    | '/dashboard/student'
+    | '/dashboard/teacher'
     | '/admin/billing'
     | '/admin/classes'
     | '/admin/students'
@@ -352,6 +340,8 @@ export interface FileRouteTypes {
     | '/_auth/forgot-password'
     | '/_auth/login'
     | '/_auth/reset-password'
+    | '/dashboard/student'
+    | '/dashboard/teacher'
     | '/_app/admin/billing'
     | '/_app/admin/classes'
     | '/_app/admin/students'
@@ -368,26 +358,20 @@ export interface FileRouteTypes {
     | '/_app/teacher/'
     | '/_app/admin/settings/features'
     | '/_app/admin/settings/'
->>>>>>> 533b0942e70e86c69a32fc7d3fd5d2eaf5afb64b
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-<<<<<<< HEAD
-  DashboardStudentRoute: typeof DashboardStudentRoute
-  DashboardTeacherRoute: typeof DashboardTeacherRoute
-=======
   AppRouteRoute: typeof AppRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   R404Route: typeof R404Route
   R500Route: typeof R500Route
->>>>>>> 533b0942e70e86c69a32fc7d3fd5d2eaf5afb64b
+  DashboardStudentRoute: typeof DashboardStudentRoute
+  DashboardTeacherRoute: typeof DashboardTeacherRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-<<<<<<< HEAD
-=======
     '/500': {
       id: '/500'
       path: '/500'
@@ -416,7 +400,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
->>>>>>> 533b0942e70e86c69a32fc7d3fd5d2eaf5afb64b
     '/': {
       id: '/'
       path: '/'
@@ -424,7 +407,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-<<<<<<< HEAD
     '/dashboard/teacher': {
       id: '/dashboard/teacher'
       path: '/dashboard/teacher'
@@ -438,7 +420,7 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/student'
       preLoaderRoute: typeof DashboardStudentRouteImport
       parentRoute: typeof rootRouteImport
-=======
+    }
     '/_auth/reset-password': {
       id: '/_auth/reset-password'
       path: '/reset-password'
@@ -592,17 +574,10 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/settings/features'
       preLoaderRoute: typeof AppAdminSettingsFeaturesRouteImport
       parentRoute: typeof AppAdminRouteRoute
->>>>>>> 533b0942e70e86c69a32fc7d3fd5d2eaf5afb64b
     }
   }
 }
 
-<<<<<<< HEAD
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  DashboardStudentRoute: DashboardStudentRoute,
-  DashboardTeacherRoute: DashboardTeacherRoute,
-=======
 interface AppAdminRouteRouteChildren {
   AppAdminBillingRoute: typeof AppAdminBillingRoute
   AppAdminClassesRoute: typeof AppAdminClassesRoute
@@ -703,7 +678,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   R404Route: R404Route,
   R500Route: R500Route,
->>>>>>> 533b0942e70e86c69a32fc7d3fd5d2eaf5afb64b
+  DashboardStudentRoute: DashboardStudentRoute,
+  DashboardTeacherRoute: DashboardTeacherRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

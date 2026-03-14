@@ -7,9 +7,9 @@ export const Route = createFileRoute("/dashboard/teacher")({
 
 // ─── Tokens ───────────────────────────────────────────────────────────────────
 const F = {
-  head: "'DM Sans', 'Segoe UI', sans-serif",
-  body: "'Inter', 'Segoe UI', sans-serif",
-  mono: "'JetBrains Mono', 'Fira Code', monospace",
+  head: '"DM Sans", "Segoe UI", sans-serif',
+  body: '"Inter", "Segoe UI", sans-serif',
+  mono: '"JetBrains Mono", "Fira Code", monospace',
 };
 const C = {
   bg: "#0c0d10",
@@ -347,7 +347,7 @@ function TopNav({
               color: page === l.id ? C.text : C.textSub,
               background: "transparent",
               border: "none",
-              borderBottom: `2px solid ${page === l.id ? C.orange : "transparent"}`,
+              borderBottom: `2px solid ${page === l.id ? C.orange : `transparent`}`,
               padding: "0.45rem 0.9rem",
               cursor: "pointer",
               transition: "all 0.15s",
@@ -1491,7 +1491,7 @@ function PageGenerate() {
                   alignItems: "center",
                   gap: "0.875rem",
                   padding: "0.875rem 1.2rem",
-                  borderBottom: i < 2 ? `1px solid ${C.border}` : "none",
+                  borderBottom: i < 2 ? `1px solid ${C.border}` : `none`,
                   background: hov ? C.surfaceB : "transparent",
                   transition: "background 0.15s",
                   cursor: "pointer",
@@ -1677,7 +1677,7 @@ function PageLibrary() {
                 gridTemplateColumns: "1fr 120px 120px 100px 80px 80px",
                 padding: "0.85rem 1.2rem",
                 borderBottom:
-                  i < filtered.length - 1 ? `1px solid ${C.border}` : "none",
+                  i < filtered.length - 1 ? `1px solid ${C.border}` : `none`,
                 background: hov ? C.surfaceB : "transparent",
                 transition: "background 0.15s",
                 cursor: "pointer",
