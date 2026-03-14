@@ -20,6 +20,22 @@ import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-pa
 import { Route as AppTeacherRouteRouteImport } from './routes/_app/teacher/route'
 import { Route as AppStudentRouteRouteImport } from './routes/_app/student/route'
 import { Route as AppAdminRouteRouteImport } from './routes/_app/admin/route'
+import { Route as AppTeacherIndexRouteImport } from './routes/_app/teacher/index'
+import { Route as AppStudentIndexRouteImport } from './routes/_app/student/index'
+import { Route as AppAdminIndexRouteImport } from './routes/_app/admin/index'
+import { Route as AppTeacherMaterialsRouteImport } from './routes/_app/teacher/materials'
+import { Route as AppTeacherLibraryRouteImport } from './routes/_app/teacher/library'
+import { Route as AppTeacherGenerateRouteImport } from './routes/_app/teacher/generate'
+import { Route as AppStudentTutorRouteImport } from './routes/_app/student/tutor'
+import { Route as AppStudentResultsRouteImport } from './routes/_app/student/results'
+import { Route as AppStudentQuizzesRouteImport } from './routes/_app/student/quizzes'
+import { Route as AppStudentMaterialsRouteImport } from './routes/_app/student/materials'
+import { Route as AppAdminTeachersRouteImport } from './routes/_app/admin/teachers'
+import { Route as AppAdminStudentsRouteImport } from './routes/_app/admin/students'
+import { Route as AppAdminClassesRouteImport } from './routes/_app/admin/classes'
+import { Route as AppAdminBillingRouteImport } from './routes/_app/admin/billing'
+import { Route as AppAdminSettingsIndexRouteImport } from './routes/_app/admin/settings.index'
+import { Route as AppAdminSettingsFeaturesRouteImport } from './routes/_app/admin/settings.features'
 
 const R500Route = R500RouteImport.update({
   id: '/500',
@@ -74,28 +90,138 @@ const AppAdminRouteRoute = AppAdminRouteRouteImport.update({
   path: '/admin',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppTeacherIndexRoute = AppTeacherIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppTeacherRouteRoute,
+} as any)
+const AppStudentIndexRoute = AppStudentIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppStudentRouteRoute,
+} as any)
+const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppAdminRouteRoute,
+} as any)
+const AppTeacherMaterialsRoute = AppTeacherMaterialsRouteImport.update({
+  id: '/materials',
+  path: '/materials',
+  getParentRoute: () => AppTeacherRouteRoute,
+} as any)
+const AppTeacherLibraryRoute = AppTeacherLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => AppTeacherRouteRoute,
+} as any)
+const AppTeacherGenerateRoute = AppTeacherGenerateRouteImport.update({
+  id: '/generate',
+  path: '/generate',
+  getParentRoute: () => AppTeacherRouteRoute,
+} as any)
+const AppStudentTutorRoute = AppStudentTutorRouteImport.update({
+  id: '/tutor',
+  path: '/tutor',
+  getParentRoute: () => AppStudentRouteRoute,
+} as any)
+const AppStudentResultsRoute = AppStudentResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => AppStudentRouteRoute,
+} as any)
+const AppStudentQuizzesRoute = AppStudentQuizzesRouteImport.update({
+  id: '/quizzes',
+  path: '/quizzes',
+  getParentRoute: () => AppStudentRouteRoute,
+} as any)
+const AppStudentMaterialsRoute = AppStudentMaterialsRouteImport.update({
+  id: '/materials',
+  path: '/materials',
+  getParentRoute: () => AppStudentRouteRoute,
+} as any)
+const AppAdminTeachersRoute = AppAdminTeachersRouteImport.update({
+  id: '/teachers',
+  path: '/teachers',
+  getParentRoute: () => AppAdminRouteRoute,
+} as any)
+const AppAdminStudentsRoute = AppAdminStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => AppAdminRouteRoute,
+} as any)
+const AppAdminClassesRoute = AppAdminClassesRouteImport.update({
+  id: '/classes',
+  path: '/classes',
+  getParentRoute: () => AppAdminRouteRoute,
+} as any)
+const AppAdminBillingRoute = AppAdminBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AppAdminRouteRoute,
+} as any)
+const AppAdminSettingsIndexRoute = AppAdminSettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => AppAdminRouteRoute,
+} as any)
+const AppAdminSettingsFeaturesRoute =
+  AppAdminSettingsFeaturesRouteImport.update({
+    id: '/settings/features',
+    path: '/settings/features',
+    getParentRoute: () => AppAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/500': typeof R500Route
-  '/admin': typeof AppAdminRouteRoute
-  '/student': typeof AppStudentRouteRoute
-  '/teacher': typeof AppTeacherRouteRoute
+  '/admin': typeof AppAdminRouteRouteWithChildren
+  '/student': typeof AppStudentRouteRouteWithChildren
+  '/teacher': typeof AppTeacherRouteRouteWithChildren
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/admin/billing': typeof AppAdminBillingRoute
+  '/admin/classes': typeof AppAdminClassesRoute
+  '/admin/students': typeof AppAdminStudentsRoute
+  '/admin/teachers': typeof AppAdminTeachersRoute
+  '/student/materials': typeof AppStudentMaterialsRoute
+  '/student/quizzes': typeof AppStudentQuizzesRoute
+  '/student/results': typeof AppStudentResultsRoute
+  '/student/tutor': typeof AppStudentTutorRoute
+  '/teacher/generate': typeof AppTeacherGenerateRoute
+  '/teacher/library': typeof AppTeacherLibraryRoute
+  '/teacher/materials': typeof AppTeacherMaterialsRoute
+  '/admin/': typeof AppAdminIndexRoute
+  '/student/': typeof AppStudentIndexRoute
+  '/teacher/': typeof AppTeacherIndexRoute
+  '/admin/settings/features': typeof AppAdminSettingsFeaturesRoute
+  '/admin/settings/': typeof AppAdminSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/500': typeof R500Route
-  '/admin': typeof AppAdminRouteRoute
-  '/student': typeof AppStudentRouteRoute
-  '/teacher': typeof AppTeacherRouteRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/admin/billing': typeof AppAdminBillingRoute
+  '/admin/classes': typeof AppAdminClassesRoute
+  '/admin/students': typeof AppAdminStudentsRoute
+  '/admin/teachers': typeof AppAdminTeachersRoute
+  '/student/materials': typeof AppStudentMaterialsRoute
+  '/student/quizzes': typeof AppStudentQuizzesRoute
+  '/student/results': typeof AppStudentResultsRoute
+  '/student/tutor': typeof AppStudentTutorRoute
+  '/teacher/generate': typeof AppTeacherGenerateRoute
+  '/teacher/library': typeof AppTeacherLibraryRoute
+  '/teacher/materials': typeof AppTeacherMaterialsRoute
+  '/admin': typeof AppAdminIndexRoute
+  '/student': typeof AppStudentIndexRoute
+  '/teacher': typeof AppTeacherIndexRoute
+  '/admin/settings/features': typeof AppAdminSettingsFeaturesRoute
+  '/admin/settings': typeof AppAdminSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -104,12 +230,28 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteRouteWithChildren
   '/404': typeof R404Route
   '/500': typeof R500Route
-  '/_app/admin': typeof AppAdminRouteRoute
-  '/_app/student': typeof AppStudentRouteRoute
-  '/_app/teacher': typeof AppTeacherRouteRoute
+  '/_app/admin': typeof AppAdminRouteRouteWithChildren
+  '/_app/student': typeof AppStudentRouteRouteWithChildren
+  '/_app/teacher': typeof AppTeacherRouteRouteWithChildren
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
+  '/_app/admin/billing': typeof AppAdminBillingRoute
+  '/_app/admin/classes': typeof AppAdminClassesRoute
+  '/_app/admin/students': typeof AppAdminStudentsRoute
+  '/_app/admin/teachers': typeof AppAdminTeachersRoute
+  '/_app/student/materials': typeof AppStudentMaterialsRoute
+  '/_app/student/quizzes': typeof AppStudentQuizzesRoute
+  '/_app/student/results': typeof AppStudentResultsRoute
+  '/_app/student/tutor': typeof AppStudentTutorRoute
+  '/_app/teacher/generate': typeof AppTeacherGenerateRoute
+  '/_app/teacher/library': typeof AppTeacherLibraryRoute
+  '/_app/teacher/materials': typeof AppTeacherMaterialsRoute
+  '/_app/admin/': typeof AppAdminIndexRoute
+  '/_app/student/': typeof AppStudentIndexRoute
+  '/_app/teacher/': typeof AppTeacherIndexRoute
+  '/_app/admin/settings/features': typeof AppAdminSettingsFeaturesRoute
+  '/_app/admin/settings/': typeof AppAdminSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -123,17 +265,46 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/reset-password'
+    | '/admin/billing'
+    | '/admin/classes'
+    | '/admin/students'
+    | '/admin/teachers'
+    | '/student/materials'
+    | '/student/quizzes'
+    | '/student/results'
+    | '/student/tutor'
+    | '/teacher/generate'
+    | '/teacher/library'
+    | '/teacher/materials'
+    | '/admin/'
+    | '/student/'
+    | '/teacher/'
+    | '/admin/settings/features'
+    | '/admin/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/404'
     | '/500'
-    | '/admin'
-    | '/student'
-    | '/teacher'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
+    | '/admin/billing'
+    | '/admin/classes'
+    | '/admin/students'
+    | '/admin/teachers'
+    | '/student/materials'
+    | '/student/quizzes'
+    | '/student/results'
+    | '/student/tutor'
+    | '/teacher/generate'
+    | '/teacher/library'
+    | '/teacher/materials'
+    | '/admin'
+    | '/student'
+    | '/teacher'
+    | '/admin/settings/features'
+    | '/admin/settings'
   id:
     | '__root__'
     | '/'
@@ -147,6 +318,22 @@ export interface FileRouteTypes {
     | '/_auth/forgot-password'
     | '/_auth/login'
     | '/_auth/reset-password'
+    | '/_app/admin/billing'
+    | '/_app/admin/classes'
+    | '/_app/admin/students'
+    | '/_app/admin/teachers'
+    | '/_app/student/materials'
+    | '/_app/student/quizzes'
+    | '/_app/student/results'
+    | '/_app/student/tutor'
+    | '/_app/teacher/generate'
+    | '/_app/teacher/library'
+    | '/_app/teacher/materials'
+    | '/_app/admin/'
+    | '/_app/student/'
+    | '/_app/teacher/'
+    | '/_app/admin/settings/features'
+    | '/_app/admin/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -236,19 +423,193 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/teacher/': {
+      id: '/_app/teacher/'
+      path: '/'
+      fullPath: '/teacher/'
+      preLoaderRoute: typeof AppTeacherIndexRouteImport
+      parentRoute: typeof AppTeacherRouteRoute
+    }
+    '/_app/student/': {
+      id: '/_app/student/'
+      path: '/'
+      fullPath: '/student/'
+      preLoaderRoute: typeof AppStudentIndexRouteImport
+      parentRoute: typeof AppStudentRouteRoute
+    }
+    '/_app/admin/': {
+      id: '/_app/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AppAdminIndexRouteImport
+      parentRoute: typeof AppAdminRouteRoute
+    }
+    '/_app/teacher/materials': {
+      id: '/_app/teacher/materials'
+      path: '/materials'
+      fullPath: '/teacher/materials'
+      preLoaderRoute: typeof AppTeacherMaterialsRouteImport
+      parentRoute: typeof AppTeacherRouteRoute
+    }
+    '/_app/teacher/library': {
+      id: '/_app/teacher/library'
+      path: '/library'
+      fullPath: '/teacher/library'
+      preLoaderRoute: typeof AppTeacherLibraryRouteImport
+      parentRoute: typeof AppTeacherRouteRoute
+    }
+    '/_app/teacher/generate': {
+      id: '/_app/teacher/generate'
+      path: '/generate'
+      fullPath: '/teacher/generate'
+      preLoaderRoute: typeof AppTeacherGenerateRouteImport
+      parentRoute: typeof AppTeacherRouteRoute
+    }
+    '/_app/student/tutor': {
+      id: '/_app/student/tutor'
+      path: '/tutor'
+      fullPath: '/student/tutor'
+      preLoaderRoute: typeof AppStudentTutorRouteImport
+      parentRoute: typeof AppStudentRouteRoute
+    }
+    '/_app/student/results': {
+      id: '/_app/student/results'
+      path: '/results'
+      fullPath: '/student/results'
+      preLoaderRoute: typeof AppStudentResultsRouteImport
+      parentRoute: typeof AppStudentRouteRoute
+    }
+    '/_app/student/quizzes': {
+      id: '/_app/student/quizzes'
+      path: '/quizzes'
+      fullPath: '/student/quizzes'
+      preLoaderRoute: typeof AppStudentQuizzesRouteImport
+      parentRoute: typeof AppStudentRouteRoute
+    }
+    '/_app/student/materials': {
+      id: '/_app/student/materials'
+      path: '/materials'
+      fullPath: '/student/materials'
+      preLoaderRoute: typeof AppStudentMaterialsRouteImport
+      parentRoute: typeof AppStudentRouteRoute
+    }
+    '/_app/admin/teachers': {
+      id: '/_app/admin/teachers'
+      path: '/teachers'
+      fullPath: '/admin/teachers'
+      preLoaderRoute: typeof AppAdminTeachersRouteImport
+      parentRoute: typeof AppAdminRouteRoute
+    }
+    '/_app/admin/students': {
+      id: '/_app/admin/students'
+      path: '/students'
+      fullPath: '/admin/students'
+      preLoaderRoute: typeof AppAdminStudentsRouteImport
+      parentRoute: typeof AppAdminRouteRoute
+    }
+    '/_app/admin/classes': {
+      id: '/_app/admin/classes'
+      path: '/classes'
+      fullPath: '/admin/classes'
+      preLoaderRoute: typeof AppAdminClassesRouteImport
+      parentRoute: typeof AppAdminRouteRoute
+    }
+    '/_app/admin/billing': {
+      id: '/_app/admin/billing'
+      path: '/billing'
+      fullPath: '/admin/billing'
+      preLoaderRoute: typeof AppAdminBillingRouteImport
+      parentRoute: typeof AppAdminRouteRoute
+    }
+    '/_app/admin/settings/': {
+      id: '/_app/admin/settings/'
+      path: '/settings'
+      fullPath: '/admin/settings/'
+      preLoaderRoute: typeof AppAdminSettingsIndexRouteImport
+      parentRoute: typeof AppAdminRouteRoute
+    }
+    '/_app/admin/settings/features': {
+      id: '/_app/admin/settings/features'
+      path: '/settings/features'
+      fullPath: '/admin/settings/features'
+      preLoaderRoute: typeof AppAdminSettingsFeaturesRouteImport
+      parentRoute: typeof AppAdminRouteRoute
+    }
   }
 }
 
+interface AppAdminRouteRouteChildren {
+  AppAdminBillingRoute: typeof AppAdminBillingRoute
+  AppAdminClassesRoute: typeof AppAdminClassesRoute
+  AppAdminStudentsRoute: typeof AppAdminStudentsRoute
+  AppAdminTeachersRoute: typeof AppAdminTeachersRoute
+  AppAdminIndexRoute: typeof AppAdminIndexRoute
+  AppAdminSettingsFeaturesRoute: typeof AppAdminSettingsFeaturesRoute
+  AppAdminSettingsIndexRoute: typeof AppAdminSettingsIndexRoute
+}
+
+const AppAdminRouteRouteChildren: AppAdminRouteRouteChildren = {
+  AppAdminBillingRoute: AppAdminBillingRoute,
+  AppAdminClassesRoute: AppAdminClassesRoute,
+  AppAdminStudentsRoute: AppAdminStudentsRoute,
+  AppAdminTeachersRoute: AppAdminTeachersRoute,
+  AppAdminIndexRoute: AppAdminIndexRoute,
+  AppAdminSettingsFeaturesRoute: AppAdminSettingsFeaturesRoute,
+  AppAdminSettingsIndexRoute: AppAdminSettingsIndexRoute,
+}
+
+const AppAdminRouteRouteWithChildren = AppAdminRouteRoute._addFileChildren(
+  AppAdminRouteRouteChildren,
+)
+
+interface AppStudentRouteRouteChildren {
+  AppStudentMaterialsRoute: typeof AppStudentMaterialsRoute
+  AppStudentQuizzesRoute: typeof AppStudentQuizzesRoute
+  AppStudentResultsRoute: typeof AppStudentResultsRoute
+  AppStudentTutorRoute: typeof AppStudentTutorRoute
+  AppStudentIndexRoute: typeof AppStudentIndexRoute
+}
+
+const AppStudentRouteRouteChildren: AppStudentRouteRouteChildren = {
+  AppStudentMaterialsRoute: AppStudentMaterialsRoute,
+  AppStudentQuizzesRoute: AppStudentQuizzesRoute,
+  AppStudentResultsRoute: AppStudentResultsRoute,
+  AppStudentTutorRoute: AppStudentTutorRoute,
+  AppStudentIndexRoute: AppStudentIndexRoute,
+}
+
+const AppStudentRouteRouteWithChildren = AppStudentRouteRoute._addFileChildren(
+  AppStudentRouteRouteChildren,
+)
+
+interface AppTeacherRouteRouteChildren {
+  AppTeacherGenerateRoute: typeof AppTeacherGenerateRoute
+  AppTeacherLibraryRoute: typeof AppTeacherLibraryRoute
+  AppTeacherMaterialsRoute: typeof AppTeacherMaterialsRoute
+  AppTeacherIndexRoute: typeof AppTeacherIndexRoute
+}
+
+const AppTeacherRouteRouteChildren: AppTeacherRouteRouteChildren = {
+  AppTeacherGenerateRoute: AppTeacherGenerateRoute,
+  AppTeacherLibraryRoute: AppTeacherLibraryRoute,
+  AppTeacherMaterialsRoute: AppTeacherMaterialsRoute,
+  AppTeacherIndexRoute: AppTeacherIndexRoute,
+}
+
+const AppTeacherRouteRouteWithChildren = AppTeacherRouteRoute._addFileChildren(
+  AppTeacherRouteRouteChildren,
+)
+
 interface AppRouteRouteChildren {
-  AppAdminRouteRoute: typeof AppAdminRouteRoute
-  AppStudentRouteRoute: typeof AppStudentRouteRoute
-  AppTeacherRouteRoute: typeof AppTeacherRouteRoute
+  AppAdminRouteRoute: typeof AppAdminRouteRouteWithChildren
+  AppStudentRouteRoute: typeof AppStudentRouteRouteWithChildren
+  AppTeacherRouteRoute: typeof AppTeacherRouteRouteWithChildren
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
-  AppAdminRouteRoute: AppAdminRouteRoute,
-  AppStudentRouteRoute: AppStudentRouteRoute,
-  AppTeacherRouteRoute: AppTeacherRouteRoute,
+  AppAdminRouteRoute: AppAdminRouteRouteWithChildren,
+  AppStudentRouteRoute: AppStudentRouteRouteWithChildren,
+  AppTeacherRouteRoute: AppTeacherRouteRouteWithChildren,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(

@@ -2,9 +2,10 @@ import { useState } from "react";
 import { motion, cubicBezier } from "motion/react";
 import { Link } from "@tanstack/react-router";
 import { Mail, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
+import { apiClient } from "@/lib/api-client";
 
 /* --- Animation Constants --- */
-const easeGentle =  cubicBezier(0.16, 1, 0.3, 1);
+const easeGentle = cubicBezier(0.16, 1, 0.3, 1);
 const durationSlow = 0.8;
 
 const fadeUpProps = {
@@ -21,12 +22,16 @@ const themeAccent = {
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState<boolean>(false);
 
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
-    // TODO: Connect to your actual password reset API
-    setSubmitted(true);
+
+    apiClient
+      .post("/auth/forgot-password", {
+        email,
+      })
+      .then((res) => (res.status == 200 ? setSubmitted(true) : undefined));
   };
 
   /* ------------------------------------------------------------------ */
@@ -39,7 +44,12 @@ export function ForgotPasswordPage() {
         <motion.div
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.1 }}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 20,
+            delay: 0.1,
+          }}
           className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-full"
           style={{ backgroundColor: "rgba(242, 116, 13, 0.1)" }}
         >
@@ -53,7 +63,11 @@ export function ForgotPasswordPage() {
             animate={{ rotate: [0, 5, -5, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           >
-            <CheckCircle size={28} strokeWidth={1.5} className="text-orange-500" />
+            <CheckCircle
+              size={28}
+              strokeWidth={1.5}
+              className="text-orange-500"
+            />
           </motion.div>
         </motion.div>
 
@@ -63,7 +77,9 @@ export function ForgotPasswordPage() {
             className="text-3xl font-display font-normal text-foreground"
             variants={{
               hidden: {},
-              show: { transition: { delayChildren: 0.3, staggerChildren: 0.08 } },
+              show: {
+                transition: { delayChildren: 0.3, staggerChildren: 0.08 },
+              },
             }}
             initial="hidden"
             animate="show"
@@ -73,7 +89,12 @@ export function ForgotPasswordPage() {
                 key={i}
                 className="inline-block mr-2"
                 variants={{
-                  hidden: { opacity: 0, y: 16, scale: 0.9, filter: "blur(6px)" },
+                  hidden: {
+                    opacity: 0,
+                    y: 16,
+                    scale: 0.9,
+                    filter: "blur(6px)",
+                  },
                   show: {
                     opacity: 1,
                     y: 0,
@@ -231,7 +252,12 @@ export function ForgotPasswordPage() {
           <motion.span
             className="inline-flex"
             animate={{ x: [0, 3, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2,
+            }}
           >
             <ArrowRight size={16} strokeWidth={2} />
           </motion.span>

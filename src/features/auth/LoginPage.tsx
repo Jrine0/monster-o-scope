@@ -18,6 +18,7 @@ import InputField from "@/components/input-field";
 /* --- Import your configured store and API client --- */
 import { useAuthStore } from "@/stores/useAuthStore";
 import { apiClient } from "@/lib/api-client";
+import { ease } from "@/lib/animation";
 
 /* ------------------------------------------------------------------ */
 /* Types & constants                                                  */
@@ -52,13 +53,11 @@ const themeAccent = {
 
 /* Animations */
 const tabSpring = { type: "spring" as const, stiffness: 400, damping: 32 };
-const easeGentle = cubicBezier(0.16, 1, 0.3, 1);
 
 export function LoginPage() {
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
 
-  /* Bring in Zustand actions */
   const setSession = useAuthStore((s) => s.setSession);
 
   const [mode, setMode] = useState<LoginMode>("teacher");
@@ -124,43 +123,29 @@ export function LoginPage() {
     setIsLoading(true);
 
     try {
-      /* * 1. Structure the payload.
-       * (Check your Swagger UI to see if the API expects `email` vs `username`.
-       * If FastAPI expects OAuth2 Form Data, you may need to map this to `username`.)
-       */
       const payload =
         mode === "student"
           ? { student_id: identity, password: pass }
-          : { email: identity, password: pass }; // Change "email" to "username" if your FastAPI requires it
+          : { email: identity, password: pass };
 
-      /* 2. Make the API request */
       const response = await apiClient.post("/auth/login", payload);
 
-      /* * 3. Extract the token and user.
-       * Note: Your apiClient interceptor automatically unwraps the { data: ... } envelope,
-       * so response.data directly contains the inner object.
-       */
       const { access_token, user } = response.data;
 
-      /* 4. Save to Zustand store */
       setSession(access_token, user);
 
-      /* 5. Navigate to the appropriate portal */
       const destination = ROLE_DASHBOARD[mode] ?? "/teacher";
       navigate({ to: destination });
     } catch (err: any) {
-      /* Leverage the ApiRequestError created in your api-client interceptor */
       if (err.apiError) {
         setError(err.apiError.message);
       } else if (err.response?.data?.detail) {
-      /* Fallback for standard FastAPI validation errors (422 Unprocessable Entity) */
         setError(
           typeof err.response.data.detail === "string"
             ? err.response.data.detail
             : "Invalid fields provided.",
         );
       } else {
-      /* Fallback for network or unknown errors */
         setError("Invalid credentials or server error. Please try again.");
       }
     } finally {
@@ -172,7 +157,7 @@ export function LoginPage() {
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: easeGentle }}
+      transition={{ duration: 0.45, ease: ease.gentle }}
       className="space-y-6"
     >
       {/* ---- Heading ---- */}
@@ -197,7 +182,7 @@ export function LoginPage() {
                   y: 0,
                   scale: 1,
                   filter: "blur(0px)",
-                  transition: { duration: 0.8, ease: easeGentle },
+                  transition: { duration: 0.8, ease: ease.gentle },
                 },
               }}
             >
@@ -210,14 +195,14 @@ export function LoginPage() {
           className="mx-auto mt-3 h-px bg-linear-to-r from-transparent via-orange-500/60 to-transparent"
           initial={{ width: 0, opacity: 0 }}
           animate={{ width: 100, opacity: 0.5 }}
-          transition={{ delay: 0.5, duration: 0.7, ease: easeGentle }}
+          transition={{ delay: 0.5, duration: 0.7, ease: ease.gentle }}
         />
 
         <motion.p
           className="mt-3 text-sm text-muted-foreground"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5, ease: easeGentle }}
+          transition={{ delay: 0.4, duration: 0.5, ease: ease.gentle }}
         >
           Sign in to continue to Vyasa
         </motion.p>
@@ -228,7 +213,7 @@ export function LoginPage() {
         className="relative flex rounded-full bg-muted/50 p-1 border border-border/50"
         initial={{ opacity: 0, y: 10, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ delay: 0.25, duration: 0.5, ease: easeGentle }}
+        transition={{ delay: 0.25, duration: 0.5, ease: ease.gentle }}
       >
         {MODES.map((m) => {
           const isActive = mode === m.key;
@@ -272,7 +257,7 @@ export function LoginPage() {
             initial={{ opacity: 0, y: -8, height: 0 }}
             animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: -8, height: 0 }}
-            transition={{ duration: 0.25, ease: easeGentle }}
+            transition={{ duration: 0.25, ease: ease.gentle }}
             className="flex items-start gap-3 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3"
           >
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />

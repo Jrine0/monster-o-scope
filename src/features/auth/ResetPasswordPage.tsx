@@ -2,6 +2,8 @@ import { useState, useMemo } from "react";
 import { motion, cubicBezier } from "motion/react";
 import { Link } from "@tanstack/react-router";
 import { Lock, Eye, EyeOff, ArrowRight, CheckCircle } from "lucide-react";
+import { apiClient } from "@/lib/api-client";
+import { Input } from "@/components/ui/input";
 
 /* --- Animation Constants --- */
 const easeGentle =  cubicBezier(0.16, 1, 0.3, 1);
@@ -41,6 +43,8 @@ function getPasswordStrength(password: string): {
 export function ResetPasswordPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [otp, setotp] = useState("");
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -49,12 +53,15 @@ export function ResetPasswordPage() {
   const passwordsMatch = confirmPassword.length > 0 && newPassword === confirmPassword;
   const passwordsMismatch = confirmPassword.length > 0 && newPassword !== confirmPassword;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     if (!passwordsMatch || strength.score < 2) return;
     
-    // TODO: Connect to your reset password API
-    setSubmitted(true);
+    apiClient.post("/auth/reset-password", {
+      email,
+      new_password: newPassword,
+      code: otp
+    })
   };
 
   /* ------------------------------------------------------------------ */
@@ -354,6 +361,78 @@ export function ResetPasswordPage() {
               Passwords do not match
             </motion.p>
           )}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.45, ease: easeGentle }}
+        >
+          <label className="text-sm text-muted-foreground font-medium mb-1.5 block">
+            E-mail
+          </label>
+          <div className="relative">
+            <motion.span
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            >
+              <Lock size={16} strokeWidth={1.5} />
+            </motion.span>
+            <Input
+              type={"email"}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your E-mail"
+              required
+              className={`flex h-12 w-full rounded-md border bg-background pl-10 pr-10 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground outline-none transition-all duration-200 ${
+                "border-input focus-visible:border-orange-500"
+              }`}
+              style={{ boxShadow: "none" }}
+              onFocus={(e) => {
+                e.currentTarget.style.boxShadow = themeAccent.glow;
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            />
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.45, ease: easeGentle }}
+        >
+          <label className="text-sm text-muted-foreground font-medium mb-1.5 block">
+            OTP
+          </label>
+          <div className="relative">
+            <motion.span
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            >
+              <Lock size={16} strokeWidth={1.5} />
+            </motion.span>
+            <Input
+              type={"text"}
+              value={otp}
+              onChange={(e) => setotp(e.target.value)}
+              placeholder="Enter your OTP"
+              required
+              className={`flex h-12 w-full rounded-md border bg-background pl-10 pr-10 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground outline-none transition-all duration-200 ${
+                "border-input focus-visible:border-orange-500"
+              }`}
+              style={{ boxShadow: "none" }}
+              onFocus={(e) => {
+                e.currentTarget.style.boxShadow = themeAccent.glow;
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            />
+          </div>
         </motion.div>
 
         {/* Submit button */}

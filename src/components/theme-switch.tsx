@@ -4,6 +4,7 @@ import { Moon, Sun } from "lucide-react";
 import { Button } from "./ui/button";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export default function ThemeSwitch({ className }: { className?: string }) {
   const switchTheme = () => {
@@ -32,19 +33,21 @@ export default function ThemeSwitch({ className }: { className?: string }) {
 
   return (
     <>
-      <Button
-        variant="outline"
-        size="icon"
-        className={cn("relative", className)}
-        onClick={switchTheme}
-      >
-        <Sun
-          className="scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 dark:hover:scale-75 dark:hover:rotate-90"
-        />
-        <Moon
-          className="absolute scale-100 rotate-0 transition-all hover:scale-100 hover:rotate-0 dark:scale-0 dark:rotate-90"
-        />
-      </Button>
+      <Tooltip>
+        <TooltipTrigger>
+          <Button
+            variant="outline"
+            size="icon"
+            className={cn("relative", className)}
+            onClick={switchTheme}
+            disabled={true}
+          >
+            <Sun className="scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 dark:hover:scale-75 dark:hover:rotate-90" />
+            <Moon className="absolute scale-100 rotate-0 transition-all hover:scale-100 hover:rotate-0 dark:scale-0 dark:rotate-90" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Coming Soon!</TooltipContent>
+      </Tooltip>
     </>
   );
 }

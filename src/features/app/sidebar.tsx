@@ -19,7 +19,21 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { EllipsisVertical, LayoutDashboardIcon, User } from "lucide-react";
+import {
+  Book,
+  CreditCard,
+  EllipsisVertical,
+  GraduationCap,
+  GraduationCapIcon,
+  LayoutDashboardIcon,
+  LibraryBig,
+  ListChecksIcon,
+  NotebookText,
+  School,
+  Settings,
+  Stars,
+  User,
+} from "lucide-react";
 
 const sidebarConfig = {
   admin: {
@@ -27,12 +41,12 @@ const sidebarConfig = {
       {
         name: "GENERAL",
         items: [
-          {
-            name: "Dashboard",
-            href: "/admin",
-            icon: <LayoutDashboardIcon />,
-          },
-          { name: "Users", href: "/admin", icon: <User /> },
+          { name: "Dashboard", to: "/admin", icon: LayoutDashboardIcon },
+          { name: "Teachers", to: "/admin/teachers", icon: User },
+          { name: "Students", to: "/admin/students", icon: GraduationCap },
+          { name: "Classes", to: "/admin/classes", icon: School },
+          { name: "Billing", to: "/admin/billing", icon: CreditCard },
+          { name: "Settings", to: "/admin/settings", icon: Settings },
         ],
       },
     ],
@@ -42,11 +56,10 @@ const sidebarConfig = {
       {
         name: "GENERAL",
         items: [
-          {
-            name: "Dashboard",
-            href: "/teacher",
-            icon: <LayoutDashboardIcon />,
-          },
+          { name: "Dashboard", to: "/teacher", icon: LayoutDashboardIcon },
+          { name: "Library", to: "/teacher/library", icon: LibraryBig },
+          { name: "Generate", to: "/teacher/generate", icon: Stars },
+          { name: "My Materials", to: "/teacher/materials", icon: Book },
         ],
       },
     ],
@@ -56,19 +69,31 @@ const sidebarConfig = {
       {
         name: "GENERAL",
         items: [
+          { name: "Dashboard", to: "/student", icon: LayoutDashboardIcon },
+          { name: "Study Materials", to: "/student/materials", icon: Book },
           {
-            name: "Dashboard",
-            href: "/student",
-            icon: <LayoutDashboardIcon />,
+            name: "Practice Quizzes",
+            to: "/student/quizzes",
+            icon: ListChecksIcon,
           },
+          { name: "AI Tutor", to: "/student/tutor", icon: GraduationCapIcon },
+          { name: "My Results", to: "/student/results", icon: NotebookText },
         ],
       },
     ],
   },
 } as const;
 
+const sidebarFooter = {
+  dropdown: [
+    { name: "Payment", to: "/admin/billing" },
+    { name: "Settings", to: "/admin/settings" },
+    { name: "Profile", to: "/admin/settings" },
+  ],
+} as const;
+
 export default function AppSidebar() {
-  const CURRENT_USER = "admin";
+  const CURRENT_USER = "teacher";
   const { open } = useSidebar();
 
   return (
@@ -97,8 +122,8 @@ export default function AppSidebar() {
                   className={cn("justify-start", open ? "" : "p-2")}
                   asChild
                 >
-                  <SmartLink variant="noColor" to={item.href}>
-                    {item.icon}
+                  <SmartLink variant="noColor" to={item.to}>
+                    <item.icon />
                     {open ? item.name : null}
                   </SmartLink>
                 </Button>
@@ -117,7 +142,10 @@ export default function AppSidebar() {
             )}
           >
             <div className="h-7 w-7 bg-gray-500 rounded-full shrink-0"></div>
-            {open ? "John Doe" : null}
+            <div className="flex flex-col flex-nowrap">
+            <span>{open ? "John Doe" : null}</span>
+            <span className="text-xs text-gray-500">{open ? "Delhi Public So Cool" : null}</span>
+            </div>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -126,7 +154,9 @@ export default function AppSidebar() {
                 size="icon-sm"
                 className={cn(
                   "",
-                  open ? "" : "absolute top-0 left-0 group-hover:visible invisible",
+                  open
+                    ? ""
+                    : "absolute top-0 left-0 group-hover:visible invisible",
                 )}
               >
                 <EllipsisVertical />
@@ -135,21 +165,15 @@ export default function AppSidebar() {
             <DropdownMenuContent>
               <DropdownMenuGroup>
                 <DropdownMenuLabel>Account</DropdownMenuLabel>
-                <DropdownMenuItem asChild>
-                  <SmartLink variant="noColor" to="/">
-                    Payment
-                  </SmartLink>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <SmartLink variant="noColor" to="/">
-                    Settings
-                  </SmartLink>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <SmartLink variant="noColor" to="/">
-                    Profile
-                  </SmartLink>
-                </DropdownMenuItem>
+                {sidebarFooter.dropdown.map((item, i) => {
+                  return (
+                    <DropdownMenuItem asChild key={i}>
+                      <SmartLink variant="noColor" to={item.to}>
+                        {item.name}
+                      </SmartLink>
+                    </DropdownMenuItem>
+                  );
+                })}
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
