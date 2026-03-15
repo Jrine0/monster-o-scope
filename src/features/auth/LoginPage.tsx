@@ -18,7 +18,7 @@
  *   the landing page theme toggle without sharing state.
  */
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -232,7 +232,6 @@ export function KaleidoscopeLoader({
     resize();
     window.addEventListener("resize", resize, { passive: true });
 
-    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
     const clamp = (v: number, lo: number, hi: number) =>
       Math.max(lo, Math.min(hi, v));
     const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -318,8 +317,8 @@ export function KaleidoscopeLoader({
       const progress = easeOut(clamp(elapsed / duration, 0, 1));
       const t = elapsed / 1000;
 
-      const W = canvas.width,
-        H = canvas.height;
+      const W = canvas!.width,
+        H = canvas!.height;
       const cx = W / 2,
         cy = H / 2;
       const R = Math.min(W, H) * 0.42 * progress;
@@ -573,8 +572,8 @@ function LiveKaleidoscope({ P }: { P: Palette }) {
       if (!t0) t0 = ts;
       const t = (ts - t0) / 1000;
       const CP = Pref.current;
-      const W = canvas.width,
-        H = canvas.height;
+      const W = canvas!.width,
+        H = canvas!.height;
       const cx = W / 2,
         cy = H / 2;
       const R = Math.min(W, H) * 0.42;
@@ -1572,11 +1571,9 @@ export function LoginPage() {
                             }}
                           />
                         )}
-                        <m.Icon
-                          size={11}
-                          strokeWidth={1.5}
-                          style={{ position: "relative", zIndex: 1 }}
-                        />
+                        <span style={{ position: "relative", zIndex: 1 }}>
+                          <m.Icon size={11} strokeWidth={1.5} />
+                        </span>
                         <span style={{ position: "relative", zIndex: 1 }}>
                           {m.label}
                         </span>
