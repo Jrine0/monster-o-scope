@@ -1123,18 +1123,41 @@ export function LoginPage() {
     }
     setError(null);
     setLoading(true);
+    // try {
+    //   const payload =
+    //     mode === "student"
+    //       ? { student_id: id, password: pw }
+    //       : { email: id, password: pw };
+
+    //   const response = await apiClient.post("/auth/login", payload);
+
+    //   const { access_token } = response.data;
+
+    //   setAccessToken(access_token);
+
+    //   const destination = ROLE_DASHBOARD[mode] ?? "/teacher";
+    //   navigate({ to: destination });
+    // } catch (err: any) {
+    //   setError(
+    //     err.apiError?.message ??
+    //       err.response?.data?.detail ??
+    //       "Invalid credentials. Please try again.",
+    //   );
+    // } finally {
+    //   setLoading(false);
+    // }
     try {
-      const payload =
-        mode === "student"
-          ? { student_id: id, password: pw }
-          : { email: id, password: pw };
+      const payload = {
+        email: id,
+        password: pw,
+      };
 
       const response = await apiClient.post("/auth/login", payload);
 
       const { access_token } = response.data;
 
       setAccessToken(access_token);
-      
+
       const destination = ROLE_DASHBOARD[mode] ?? "/teacher";
       navigate({ to: destination });
     } catch (err: any) {
