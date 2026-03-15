@@ -63,11 +63,13 @@ export function ResetPasswordPage() {
     e.preventDefault();
     if (!passwordsMatch || strength.score < 2) return;
 
-    apiClient.post("/auth/reset-password", {
-      email,
-      new_password: newPassword,
-      code: otp
-    }).then(data => data.status == 200 && setSubmitted(true))
+    apiClient
+      .post("/auth/reset-password", {
+        email,
+        new_password: newPassword,
+        code: otp,
+      })
+      .then((data) => data.status == 200 && setSubmitted(true));
   };
 
   /* ------------------------------------------------------------------ */

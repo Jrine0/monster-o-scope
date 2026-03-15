@@ -20,6 +20,15 @@ async function getMe() {
   return res.data;
 }
 
+async function getSchool() {
+  const res = await apiClient.get("/v1/admin/school");
+  if(res.status!=200) {
+    throw new Error("Failed to fetch school data");
+  }
+
+  return res.data;
+}
+
 
 export function AuthHydrator({
   children,

@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, cubicBezier } from "motion/react";
 import { Link } from "@tanstack/react-router";
-import { Lock, ArrowRight, CheckCircle } from "lucide-react";
+import { Lock, Eye, EyeOff, ArrowRight, CheckCircle } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
 
 /* --- Animation Constants --- */
-const easeGentle =  cubicBezier(0.16, 1, 0.3, 1);
+const easeGentle = cubicBezier(0.16, 1, 0.3, 1);
 const durationSlow = 0.8;
 
 const fadeUpProps = {
@@ -21,17 +21,19 @@ const themeAccent = {
   glowStrong: "0 0 32px rgba(242,116,13,0.22)",
 };
 
-
 export function RequestOTPPage() {
+  const [otp, setotp] = useState("");
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
-    
-    apiClient.post("/auth/request-otp", {
-      email: email
-    }).then(data => data.status == 200 && setSubmitted(true))
+
+    apiClient
+      .post("/auth/request-otp", {
+        email: email,
+      })
+      .then((data) => data.status == 200 && setSubmitted(true));
   };
 
   /* ------------------------------------------------------------------ */
@@ -44,7 +46,12 @@ export function RequestOTPPage() {
         <motion.div
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.1 }}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 20,
+            delay: 0.1,
+          }}
           className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-full"
           style={{ backgroundColor: "rgba(16, 185, 129, 0.1)" }} // emerald bg
         >
@@ -59,7 +66,11 @@ export function RequestOTPPage() {
             animate={{ rotate: [0, 5, -5, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           >
-            <CheckCircle size={28} strokeWidth={1.5} className="text-emerald-500" />
+            <CheckCircle
+              size={28}
+              strokeWidth={1.5}
+              className="text-emerald-500"
+            />
           </motion.div>
         </motion.div>
 
@@ -69,7 +80,9 @@ export function RequestOTPPage() {
             className="text-3xl font-display font-normal text-foreground"
             variants={{
               hidden: {},
-              show: { transition: { delayChildren: 0.3, staggerChildren: 0.08 } },
+              show: {
+                transition: { delayChildren: 0.3, staggerChildren: 0.08 },
+              },
             }}
             initial="hidden"
             animate="show"
@@ -79,7 +92,12 @@ export function RequestOTPPage() {
                 key={i}
                 className="inline-block mr-2"
                 variants={{
-                  hidden: { opacity: 0, y: 16, scale: 0.9, filter: "blur(6px)" },
+                  hidden: {
+                    opacity: 0,
+                    y: 16,
+                    scale: 0.9,
+                    filter: "blur(6px)",
+                  },
                   show: {
                     opacity: 1,
                     y: 0,
@@ -132,7 +150,12 @@ export function RequestOTPPage() {
               <motion.span
                 className="inline-flex"
                 animate={{ x: [0, 3, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 2,
+                }}
               >
                 <ArrowRight size={16} strokeWidth={2} />
               </motion.span>
@@ -211,7 +234,12 @@ export function RequestOTPPage() {
             <motion.span
               className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
               animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.5,
+              }}
             >
               <Lock size={16} strokeWidth={1.5} />
             </motion.span>
@@ -221,9 +249,7 @@ export function RequestOTPPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
-              className={`flex h-12 w-full rounded-md border bg-background pl-10 pr-10 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground outline-none transition-all duration-200 ${
-                "border-input focus-visible:border-orange-500"
-              }`}
+              className={`flex h-12 w-full rounded-md border bg-background pl-10 pr-10 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground outline-none transition-all duration-200 ${"border-input focus-visible:border-orange-500"}`}
               style={{ boxShadow: "none" }}
               onFocus={(e) => {
                 e.currentTarget.style.boxShadow = themeAccent.glow;
@@ -247,7 +273,12 @@ export function RequestOTPPage() {
           <motion.span
             className="inline-flex"
             animate={{ x: [0, 3, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2,
+            }}
           >
             <ArrowRight size={16} strokeWidth={2} />
           </motion.span>
