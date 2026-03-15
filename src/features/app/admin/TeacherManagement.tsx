@@ -151,7 +151,10 @@ const rowVariants = slideIn(-6, duration.fast, ease.standard);
 /* ── Animated Background ── */
 function AnimatedBackground() {
   return (
-    <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
+    <div
+      className="pointer-events-none fixed inset-0 overflow-hidden"
+      aria-hidden
+    >
       {/* orange blob - top right */}
       <motion.div
         className="absolute -top-32 right-[10%] h-[500px] w-[500px] rounded-full opacity-[0.07]"
@@ -185,7 +188,8 @@ function AnimatedBackground() {
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: "radial-gradient(circle, rgba(101,113,245,0.04) 1px, transparent 1px)",
+          backgroundImage:
+            "radial-gradient(circle, rgba(101,113,245,0.04) 1px, transparent 1px)",
           backgroundSize: "32px 32px",
         }}
       />
@@ -200,9 +204,8 @@ function AnimatedBackground() {
             height: i % 3 === 0 ? 3 : 2,
             left: `${10 + ((i * 12.5) % 80)}%`,
             top: `${30 + ((i * 9.1) % 50)}%`,
-            background: i % 2 === 0
-              ? "rgba(101,113,245,0.6)"
-              : "rgba(101,113,245,0.35)",
+            background:
+              i % 2 === 0 ? "rgba(101,113,245,0.6)" : "rgba(101,113,245,0.35)",
           }}
           animate={{
             y: [0, -90 - i * 8],
@@ -337,7 +340,10 @@ function MoreDropdown({
   useEffect(() => {
     if (!open) return;
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         onClose();
       }
     }
@@ -403,7 +409,9 @@ export function TeacherManagement() {
   const [currentPage] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
-  const [deletingTeacherId, setDeletingTeacherId] = useState<string | null>(null);
+  const [deletingTeacherId, setDeletingTeacherId] = useState<string | null>(
+    null,
+  );
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   /* Derived */
@@ -411,11 +419,11 @@ export function TeacherManagement() {
     (t) =>
       t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.subject.toLowerCase().includes(searchQuery.toLowerCase())
+      t.subject.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const deletingTeacher = deletingTeacherId
-    ? teachers.find((t) => t.id === deletingTeacherId) ?? null
+    ? (teachers.find((t) => t.id === deletingTeacherId) ?? null)
     : null;
 
   /* ── Handlers ── */
@@ -447,8 +455,8 @@ export function TeacherManagement() {
               classes: data.classes,
               avatar: getInitials(data.name),
             }
-          : t
-      )
+          : t,
+      ),
     );
     addToast("Teacher updated successfully", "success");
     setEditingTeacher(null);
@@ -478,7 +486,12 @@ export function TeacherManagement() {
               <motion.span
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20, delay: 0.2 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 20,
+                  delay: 0.2,
+                }}
                 className="inline-flex items-center rounded-full bg-orange-500/10 px-2.5 py-0.5 text-caption text-orange-400"
               >
                 {teachers.length}
@@ -508,9 +521,7 @@ export function TeacherManagement() {
         </motion.div>
 
         {/* Search */}
-        <motion.div
-          {...fadeUpProps(8, 0.1, 0.4, ease.standard)}
-        >
+        <motion.div {...fadeUpProps(8, 0.1, 0.4, ease.standard)}>
           <div className="relative max-w-sm">
             <Search
               size={16}
@@ -532,9 +543,11 @@ export function TeacherManagement() {
           className="group/table overflow-hidden rounded-lg border border-border-subtle bg-bg-surface transition-all hover:shadow-[0_0_30px_rgba(101,113,245,0.04)]"
         >
           {/* Gradient glow overlay */}
-          <div className="pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-500 group-hover/table:opacity-100"
+          <div
+            className="pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-500 group-hover/table:opacity-100"
             style={{
-              background: "linear-gradient(135deg, rgba(101,113,245,0.02) 0%, transparent 60%)",
+              background:
+                "linear-gradient(135deg, rgba(101,113,245,0.02) 0%, transparent 60%)",
             }}
           />
 
@@ -628,7 +641,7 @@ export function TeacherManagement() {
                     open={openDropdownId === teacher.id}
                     onToggle={() =>
                       setOpenDropdownId((prev) =>
-                        prev === teacher.id ? null : teacher.id
+                        prev === teacher.id ? null : teacher.id,
                       )
                     }
                     onClose={() => setOpenDropdownId(null)}
