@@ -48,7 +48,7 @@ export function ResetPasswordPage() {
   const [otp, setotp] = useState("");
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [submitted] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const strength = useMemo(
     () => getPasswordStrength(newPassword),
@@ -66,8 +66,8 @@ export function ResetPasswordPage() {
     apiClient.post("/auth/reset-password", {
       email,
       new_password: newPassword,
-      code: otp,
-    });
+      code: otp
+    }).then(data => data.status == 200 && setSubmitted(true))
   };
 
   /* ------------------------------------------------------------------ */

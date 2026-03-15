@@ -6,14 +6,12 @@ import { create } from "zustand";
 
 export type UserRole = "admin" | "teacher" | "student";
 
-export interface AuthUser {
+export interface AuthUser extends SchoolContext {
   id: string;
   email: string | null;
   student_id: string | null;
   name: string;
   role: UserRole;
-  school_id: string;
-  school_name: string;
 }
 
 export interface SchoolContext {
@@ -25,12 +23,14 @@ interface AuthState {
   /* Session data — lives in JS memory ONLY (no persist middleware) */
   accessToken: string | null;
   user: AuthUser | null;
+  school: SchoolContext | null;
   isAuthenticated: boolean;
   isHydrating: boolean;
 
   /* Actions */
-  setSession: (token: string, user: AuthUser) => void;
+  setUser: (user: AuthUser) => void;
   clearSession: () => void;
+  setAccessToken: (token: string) => void;
   setHydrating: (v: boolean) => void;
   getSchoolContext: () => SchoolContext | null;
 }
@@ -42,11 +42,12 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()((set, get) => ({
   accessToken: null,
   user: null,
+  school: null,
   isAuthenticated: false,
   isHydrating: true,
 
-  setSession: (token, user) =>
-    set({ accessToken: token, user, isAuthenticated: true }),
+  setUser: (user) =>
+    set({ user, isAuthenticated: true }),
 
   clearSession: () =>
     set({
@@ -54,6 +55,8 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       user: null,
       isAuthenticated: false,
     }),
+
+  setAccessToken: (token) => set({ accessToken: token }),
 
   setHydrating: (v) => set({ isHydrating: v }),
 

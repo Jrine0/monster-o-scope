@@ -34,13 +34,15 @@ export default function SmartLink({
     loadingText?: string;
     prefetch?: "intent" | "render" | "viewport" | false;
   }) {
+  const normalizedTo = to === "/" ? "" : to;
+
   return (
     <Link
       className={cn(smartLinkVariants({ variant }), className)}
       preload={
         prefetch || (to && !notToPreload.includes(to) ? "intent" : false)
       }
-      to={to}
+      to={normalizedTo}
       {...props}
     />
   );

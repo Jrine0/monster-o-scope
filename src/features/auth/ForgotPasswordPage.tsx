@@ -1,15 +1,3 @@
-/**
- * ForgotPasswordPage.tsx — Schoolme
- *
- * Fully theme-aware — reads the same localStorage / data-theme attribute
- * as the landing page and LoginPage. Portal-mounted to escape any layout
- * container constraints.
- *
- * Two states:
- *   default   — email input + "Send Reset Link" button
- *   submitted — success confirmation with back-to-login link
- */
-
 import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
@@ -24,10 +12,19 @@ import {
   Moon,
 } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
+import { ease } from "@/lib/animation";
+
+/* --- Animation Constants --- */
+const durationSlow = 0.8;
+
+const fadeUpProps = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.35, ease: ease.gentle },
+};
 
 /* ─────────────────────────────────────────────────────────────────────
    THEME — identical token sets to LoginPage
-   (copy-paste intentional: this file must be self-contained in a portal)
 ───────────────────────────────────────────────────────────────────── */
 type ThemeId = "dark" | "light";
 type Palette = typeof DARK;
@@ -116,8 +113,7 @@ function useThemeSync(): [ThemeId, () => void] {
 }
 
 /* ─────────────────────────────────────────────────────────────────────
-   BACKGROUND — subtle static kaleidoscope SVG (no canvas needed here,
-   page is simple enough that a static decoration is more appropriate)
+   BACKGROUND
 ───────────────────────────────────────────────────────────────────── */
 function BackgroundDecor({ P }: { P: Palette }) {
   const cx = 200,
@@ -284,7 +280,7 @@ function BackgroundDecor({ P }: { P: Palette }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────
-   CORNER ANNOTATIONS  (matches LoginPage aesthetic)
+   CORNER ANNOTATIONS
 ───────────────────────────────────────────────────────────────────── */
 function CornerAnnotations({ P }: { P: Palette }) {
   const ink = P.inkDim;
@@ -502,7 +498,7 @@ function CornerAnnotations({ P }: { P: Palette }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────
-   FIELD — same branded input as LoginPage
+   FIELD
 ───────────────────────────────────────────────────────────────────── */
 function EmailField({
   P,
@@ -646,10 +642,7 @@ export function ForgotPasswordPage() {
         }}
       />
 
-      {/* Kaleidoscope background */}
       <BackgroundDecor P={P} />
-
-      {/* Corner annotations */}
       <CornerAnnotations P={P} />
 
       {/* ── TOP BAR ─────────────────────────────────────────────────── */}
@@ -682,7 +675,6 @@ export function ForgotPasswordPage() {
         </span>
 
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          {/* Theme toggle */}
           <button
             onClick={toggleTheme}
             aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
@@ -709,7 +701,6 @@ export function ForgotPasswordPage() {
             )}
           </button>
 
-          {/* Back to login */}
           <Link
             to="/login"
             style={{
@@ -800,8 +791,7 @@ export function ForgotPasswordPage() {
 
         {/* ── CARD ────────────────────────────────────────────────────── */}
         <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
+          {...fadeUpProps}
           transition={{ delay: 0.22, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           style={{
             width: "100%",
@@ -852,7 +842,6 @@ export function ForgotPasswordPage() {
                     justifyContent: "center",
                   }}
                 >
-                  {/* Breathing ring */}
                   <motion.div
                     style={{
                       position: "absolute",
@@ -884,7 +873,7 @@ export function ForgotPasswordPage() {
                   </div>
                 </motion.div>
 
-                {/* Heading — staggered word reveal */}
+                {/* Heading — staggered word reveal using durationSlow */}
                 <motion.h1
                   style={{
                     fontFamily: "Caveat, cursive",
@@ -917,7 +906,7 @@ export function ForgotPasswordPage() {
                           y: 0,
                           filter: "blur(0px)",
                           transition: {
-                            duration: 0.65,
+                            duration: durationSlow,
                             ease: [0.16, 1, 0.3, 1],
                           },
                         },
@@ -1006,7 +995,6 @@ export function ForgotPasswordPage() {
                   gap: "1.1rem",
                 }}
               >
-                {/* Card heading */}
                 <div style={{ textAlign: "center" }}>
                   <motion.h1
                     style={{
@@ -1043,7 +1031,7 @@ export function ForgotPasswordPage() {
                             y: 0,
                             filter: "blur(0px)",
                             transition: {
-                              duration: 0.6,
+                              duration: durationSlow,
                               ease: [0.16, 1, 0.3, 1],
                             },
                           },
@@ -1054,7 +1042,6 @@ export function ForgotPasswordPage() {
                     ))}
                   </motion.h1>
 
-                  {/* Orange rule */}
                   <motion.div
                     initial={{ width: 0, opacity: 0 }}
                     animate={{ width: 60, opacity: 1 }}
@@ -1083,7 +1070,6 @@ export function ForgotPasswordPage() {
                   </motion.p>
                 </div>
 
-                {/* Error */}
                 <AnimatePresence>
                   {error && (
                     <motion.div
@@ -1137,7 +1123,6 @@ export function ForgotPasswordPage() {
                   )}
                 </AnimatePresence>
 
-                {/* Form */}
                 <form
                   onSubmit={handleSubmit}
                   noValidate
@@ -1154,7 +1139,6 @@ export function ForgotPasswordPage() {
                     disabled={loading}
                   />
 
-                  {/* Submit */}
                   <motion.button
                     type="submit"
                     disabled={loading}
@@ -1227,7 +1211,6 @@ export function ForgotPasswordPage() {
                   </motion.button>
                 </form>
 
-                {/* Back to login */}
                 <div style={{ textAlign: "center" }}>
                   <Link
                     to="/login"
@@ -1252,7 +1235,6 @@ export function ForgotPasswordPage() {
           </AnimatePresence>
         </motion.div>
 
-        {/* Footnote */}
         <p
           style={{
             fontFamily: "Courier Prime, monospace",

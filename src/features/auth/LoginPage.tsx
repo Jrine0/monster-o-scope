@@ -1,23 +1,3 @@
-/**
- * LoginPage.tsx — Schoolme
- *
- * ── EXPORTS ──────────────────────────────────────────────────────────
- *   KaleidoscopeLoader   reusable app-wide loading screen
- *   LoginPage            portal-mounted route component
- *
- * ── LAYOUT ───────────────────────────────────────────────────────────
- *   Full-page centred layout (no sidebar).
- *   Live rotating kaleidoscope canvas fills the whole background.
- *   Eyebrow + Wordmark float above the form card.
- *   SVG annotations fill the four quadrants around the card.
- *   Theme toggle in top-right synced with the landing page.
- *
- * ── THEMING ──────────────────────────────────────────────────────────
- *   Reads localStorage('schoolme-theme') on mount, then watches
- *   <html data-theme="light"> mutations so it stays in sync with
- *   the landing page theme toggle without sharing state.
- */
-
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
@@ -78,7 +58,7 @@ const MODES: {
   },
 ];
 
-const DEST: Record<Mode, string> = {
+const ROLE_DASHBOARD: Record<Mode, string> = {
   teacher: "/teacher",
   student: "/student",
   admin: "/admin",
@@ -1068,9 +1048,10 @@ function Annotations({ P }: { P: Palette }) {
 export function LoginPage() {
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
-  const setSession = useAuthStore((s) => s.setSession);
-  const { wide: _wide, narrow } = useViewport();
+  const { narrow } = useViewport();
   useLockBodyScroll();
+
+  const setAccessToken = useAuthStore((s) => s.setAccessToken);
 
   const [theme, toggleTheme] = useThemeSync();
   const isDark = theme === "dark";
@@ -1147,9 +1128,15 @@ export function LoginPage() {
         mode === "student"
           ? { student_id: id, password: pw }
           : { email: id, password: pw };
-      const { data } = await apiClient.post("/auth/login", payload);
-      setSession(data.access_token, data.user);
-      navigate({ to: DEST[mode] });
+
+      const response = await apiClient.post("/auth/login", payload);
+
+      const { access_token } = response.data;
+
+      setAccessToken(access_token);
+      
+      const destination = ROLE_DASHBOARD[mode] ?? "/teacher";
+      navigate({ to: destination });
     } catch (err: any) {
       setError(
         err.apiError?.message ??
