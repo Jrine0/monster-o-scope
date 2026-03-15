@@ -37,7 +37,7 @@ const FRAMEWORKS = [
 ];
 const NODE_VERSION_MAP = {   'nextjs':'20',   'nuxt':'20',   'sveltekit':'20',   'astro':'20',   'remix':'20',   'gatsby':'18',   'cra':'18',   'angular':'20',   'vue':'18',   'vue-cli':'18',   'vite':'20',   'express':'20',   'fastify':'20',   'hono':'20',   'nestjs':'20' };
 const NO_BUILD = ['express', 'fastify', 'hono'];
-const PM_RUN   = { npm:'npm run', pnpm:'pnpm run', yarn:'yarn', bun:'bun run' };
+const PM_RUN   = { pnpm:'pnpm run', yarn:'yarn', bun:'bun run' };
 
 const pkg = readJson('package.json');
 if (!pkg) { console.error('❌  No package.json found.'); process.exit(1); }
@@ -48,15 +48,14 @@ const scripts = pkg.scripts || {};
 console.log('\n🔍 Detecting project configuration...\n');
 
 // Package manager
-let pm = 'npm';
+let pm = 'pnpm';
 if (pkg.packageManager) {
   const p = pkg.packageManager.split('@')[0].toLowerCase();
-  if (['npm','pnpm','yarn','bun'].includes(p)) pm = p;
+  if (['pnpm','yarn','bun'].includes(p)) pm = p;
 }
 if      (fileExists('bun.lockb') || fileExists('bun.lock')) pm = 'bun';
 else if (fileExists('pnpm-lock.yaml'))                       pm = 'pnpm';
 else if (fileExists('yarn.lock'))                            pm = 'yarn';
-else if (fileExists('package-lock.json'))                    pm = 'npm';
 console.log(`📦  Package manager : ${pm}`);
 
 // Framework

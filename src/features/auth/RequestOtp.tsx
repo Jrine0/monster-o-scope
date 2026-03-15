@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { motion, cubicBezier } from "motion/react";
 import { Link } from "@tanstack/react-router";
-import { Lock, Eye, EyeOff, ArrowRight, CheckCircle } from "lucide-react";
+import { Lock, ArrowRight, CheckCircle } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
 
@@ -22,7 +22,6 @@ const themeAccent = {
 };
 
 export function RequestOTPPage() {
-  const [otp, setotp] = useState("");
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 

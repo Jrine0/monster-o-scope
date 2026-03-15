@@ -36,7 +36,6 @@ import {
   Stars,
   User,
 } from "lucide-react";
-import { useMemo } from "react";
 
 const sidebarConfig = {
   admin: {

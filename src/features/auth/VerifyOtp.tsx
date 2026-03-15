@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { motion, cubicBezier } from "motion/react";
 import { Link } from "@tanstack/react-router";
-import { Lock, Eye, EyeOff, ArrowRight, CheckCircle } from "lucide-react";
+import { Lock, ArrowRight, CheckCircle } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
 
@@ -20,26 +20,6 @@ const themeAccent = {
   glow: "0 0 24px rgba(242,116,13,0.15)",
   glowStrong: "0 0 32px rgba(242,116,13,0.22)",
 };
-
-/* Password Strength Logic */
-function getPasswordStrength(password: string): {
-  score: number;
-  label: string;
-  color: string;
-} {
-  let score = 0;
-  if (password.length >= 8) score++;
-  if (password.length >= 12) score++;
-  if (/[A-Z]/.test(password)) score++;
-  if (/[0-9]/.test(password)) score++;
-  if (/[^A-Za-z0-9]/.test(password)) score++;
-
-  if (score <= 1) return { score, label: "Weak", color: "#ef4444" }; // red-500
-  if (score <= 2) return { score, label: "Fair", color: "#f59e0b" }; // amber-500
-  if (score <= 3)
-    return { score, label: "Good", color: "var(--color-orange-500)" };
-  return { score, label: "Strong", color: "#10b981" }; // emerald-500
-}
 
 export function VerifyOtpPage() {
   const [otp, setotp] = useState("");

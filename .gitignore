@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
 .pnpm-store/
+package-lock.json
 
 # Build output
 dist/
@@ -23,7 +24,6 @@ workbox-*.js
 
 # Logs
 *.log
-npm-debug.log*
 pnpm-debug.log*
 
 # Editor
