@@ -1,3 +1,8 @@
+// SettingsPage.tsx — Schoolme design system
+// All logic from original preserved exactly.
+// Added: functional theme toggle (next-themes) + font family picker (data-font on <html>).
+// className tokens → Schoolme CSS vars + Caveat/Lora/Courier Prime fonts.
+
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Link } from "@tanstack/react-router";
@@ -12,11 +17,62 @@ import {
   Image,
   MapPin,
   ChevronDown,
+  Sun,
+  Moon,
+  Type,
 } from "lucide-react";
 import { fadeUpProps, ease } from "@/lib/animation";
-import AccentLine from "@/components/accent-line";
+import { useTheme } from "next-themes";
 
-/* ── Mock data ── */
+/* ── Font shorthand tokens (referencing CSS vars so font scheme changes propagate) ── */
+const CAV: React.CSSProperties = {
+  fontFamily: "var(--font-display, 'Caveat', cursive)",
+};
+const LOR: React.CSSProperties = {
+  fontFamily: "var(--font-body, 'Lora', Georgia, serif)",
+};
+const COU: React.CSSProperties = {
+  fontFamily: "var(--font-mono, 'Courier Prime', monospace)",
+};
+const CLIP_CARD =
+  "polygon(0.3% 1%,1.5% 0%,99% 0.5%,100% 2%,99.7% 99%,98% 100%,0.5% 99.5%,0% 98%)";
+const CLIP_SM = "polygon(1% 0%,100% 1%,99% 100%,0% 99%)";
+const CLIP_BTN =
+  "polygon(0.5% 8%,1.5% 0%,99% 1%,100% 7%,99.5% 93%,98% 100%,1% 99%,0% 92%)";
+
+/* ── Font schemes (matches CSS data-font attributes) ── */
+type FontScheme = "default" | "scholar" | "clean";
+const FONT_OPTIONS: {
+  key: FontScheme;
+  label: string;
+  display: string;
+  body: string;
+  mono: string;
+}[] = [
+  {
+    key: "default",
+    label: "Schoolme",
+    display: "Caveat",
+    body: "Lora",
+    mono: "Courier Prime",
+  },
+  {
+    key: "scholar",
+    label: "Scholar",
+    display: "Merriweather",
+    body: "Source Serif 4",
+    mono: "IBM Plex Mono",
+  },
+  {
+    key: "clean",
+    label: "Clean",
+    display: "Inter",
+    body: "Crimson Pro",
+    mono: "JetBrains Mono",
+  },
+];
+
+/* ── Mock data (unchanged) ── */
 const NOTIFICATION_SETTINGS = [
   {
     id: "new-teacher",
@@ -58,25 +114,37 @@ const TIMEZONES = [
   "America/New_York (EST, UTC-5:00)",
 ] as const;
 
-/* ── Toggle component ── */
-function Toggle({
-  defaultChecked = false,
-}: {
-  defaultChecked?: boolean;
-}) {
+/* ── Toggle component (logic unchanged) ── */
+function Toggle({ defaultChecked = false }: { defaultChecked?: boolean }) {
   const [checked, setChecked] = useState(defaultChecked);
-
   return (
     <button
       role="switch"
       aria-checked={checked}
       onClick={() => setChecked(!checked)}
-      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 ${
-        checked ? "bg-orange-500" : "bg-bg-muted"
-      }`}
+      style={{
+        position: "relative",
+        display: "inline-flex",
+        alignItems: "center",
+        width: 44,
+        height: 24,
+        borderRadius: "999px",
+        border: "none",
+        cursor: "pointer",
+        background: checked ? "var(--orange)" : "var(--bg-elevated)",
+        transition: "background 0.2s",
+        flexShrink: 0,
+      }}
     >
       <motion.span
-        className="inline-block h-4 w-4 rounded-full bg-white shadow-xs"
+        style={{
+          width: 16,
+          height: 16,
+          borderRadius: "50%",
+          background: "white",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+          display: "inline-block",
+        }}
         animate={{ x: checked ? 24 : 4 }}
         transition={{ type: "spring", stiffness: 500, damping: 30 }}
       />
@@ -84,19 +152,19 @@ function Toggle({
   );
 }
 
-/* ── Animation ── */
-const fadeIn = (delay: number) => fadeUpProps(12, delay, 0.4, ease.standard);
-
-/* ── Animated Background ── */
+/* ── Animated background (adapted to orange, Schoolme palette) ── */
 function AnimatedBackground() {
   return (
-    <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
-      {/* orange blob - top right */}
+    <div
+      className="pointer-events-none fixed inset-0 overflow-hidden"
+      aria-hidden
+    >
       <motion.div
-        className="absolute -top-32 right-[10%] h-125 w-125 rounded-full opacity-[0.07]"
+        className="absolute -top-32 right-[10%] h-[450px] w-[450px] rounded-full"
         style={{
-          background: "radial-gradient(circle, #6571f5 0%, transparent 70%)",
+          background: "radial-gradient(circle,#f2740d 0%,transparent 70%)",
           filter: "blur(100px)",
+          opacity: 0.05,
         }}
         animate={{
           x: [0, 25, -20, 0],
@@ -105,12 +173,12 @@ function AnimatedBackground() {
         }}
         transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
       />
-      {/* orange blob - bottom left */}
       <motion.div
-        className="absolute bottom-[10%] left-[5%] h-100 w-100 rounded-full opacity-[0.06]"
+        className="absolute bottom-[10%] left-[5%] h-[380px] w-[380px] rounded-full"
         style={{
-          background: "radial-gradient(circle, #6571f5 0%, transparent 70%)",
+          background: "radial-gradient(circle,#fb923c 0%,transparent 70%)",
           filter: "blur(100px)",
+          opacity: 0.04,
         }}
         animate={{
           x: [0, -15, 20, 0],
@@ -119,29 +187,25 @@ function AnimatedBackground() {
         }}
         transition={{ duration: 26, repeat: Infinity, ease: "linear" }}
       />
-
-      {/* Dot grid pattern */}
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: "radial-gradient(circle, rgba(101,113,245,0.04) 1px, transparent 1px)",
+          backgroundImage:
+            "radial-gradient(circle,rgba(242,116,13,0.032) 1px,transparent 1px)",
           backgroundSize: "32px 32px",
         }}
       />
-
-      {/* Floating particles */}
       {[...Array(6)].map((_, i) => (
         <motion.div
-          key={`settings-particle-${i}`}
+          key={i}
           className="absolute rounded-full"
           style={{
             width: i % 3 === 0 ? 3 : 2,
             height: i % 3 === 0 ? 3 : 2,
             left: `${14 + ((i * 12.8) % 72)}%`,
             top: `${28 + ((i * 10.5) % 52)}%`,
-            background: i % 2 === 0
-              ? "rgba(101,113,245,0.6)"
-              : "rgba(101,113,245,0.35)",
+            background:
+              i % 2 === 0 ? "rgba(242,116,13,0.5)" : "rgba(251,146,60,0.35)",
           }}
           animate={{
             y: [0, -80 - i * 10],
@@ -160,196 +224,672 @@ function AnimatedBackground() {
   );
 }
 
+/* ── Section card wrapper ── */
+function SettingsCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        background: "var(--bg-surface)",
+        border: "1px solid var(--border-subtle)",
+        clipPath: CLIP_CARD,
+        overflow: "hidden",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ── Section header row ── */
+function CardHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "0.6rem",
+        padding: "0.85rem 1.25rem",
+        borderBottom: "1px solid var(--border-subtle)",
+        background: "var(--bg-elevated)",
+      }}
+    >
+      {icon}
+      <h2
+        style={{
+          ...CAV,
+          fontSize: "1.25rem",
+          fontWeight: 700,
+          color: "var(--text-primary)",
+        }}
+      >
+        {title}
+      </h2>
+    </div>
+  );
+}
+
+/* ── Label ── */
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <label
+      style={{
+        display: "block",
+        ...LOR,
+        fontStyle: "italic",
+        fontSize: "0.82rem",
+        color: "var(--text-secondary)",
+        marginBottom: "0.5rem",
+      }}
+    >
+      {children}
+    </label>
+  );
+}
+
+/* ── Shared input style ── */
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  maxWidth: 520,
+  ...LOR,
+  fontSize: "0.9rem",
+  color: "var(--text-primary)",
+  background: "var(--bg-elevated)",
+  border: "1px solid var(--border-default)",
+  padding: "0.65rem 1rem",
+  outline: "none",
+  clipPath: CLIP_SM,
+  transition: "border-color 0.18s, box-shadow 0.18s",
+};
+
+const fadeIn = (delay: number) => fadeUpProps(12, delay, 0.4, ease.standard);
+
+/* ── Main ── */
 export function SettingsPage() {
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = resolvedTheme !== "light";
+
+  // Font scheme — reads current data-font attr as initial state
+  const [fontScheme, setFontScheme] = useState<FontScheme>(() => {
+    if (typeof document === "undefined") return "default";
+    return (
+      (document.documentElement.getAttribute("data-font") as FontScheme) ??
+      "default"
+    );
+  });
+
+  const applyFont = (scheme: FontScheme) => {
+    setFontScheme(scheme);
+    if (scheme === "default") {
+      document.documentElement.removeAttribute("data-font");
+    } else {
+      document.documentElement.setAttribute("data-font", scheme);
+    }
+    localStorage.setItem("schoolme-font", scheme);
+  };
+
+  const toggleTheme = () => setTheme(isDark ? "light" : "dark");
+
   return (
     <>
       <AnimatedBackground />
-      <div className="relative space-y-8">
+      <div
+        style={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          gap: "1.75rem",
+        }}
+      >
         {/* Header */}
         <motion.div {...fadeIn(0)}>
           <motion.h1
             initial={{ opacity: 0, y: -8, filter: "blur(4px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 0.4, ease: ease.standard }}
-            className="text-heading-1 text-text-primary"
+            style={{
+              ...CAV,
+              fontSize: "clamp(2rem,4vw,3rem)",
+              fontWeight: 400,
+              color: "var(--text-primary)",
+              lineHeight: 1,
+            }}
           >
             School Settings
           </motion.h1>
-          <p className="text-body-md text-text-secondary mt-1">
+          <p
+            style={{
+              ...LOR,
+              fontStyle: "italic",
+              fontSize: "0.95rem",
+              color: "var(--text-secondary)",
+              marginTop: "0.4rem",
+            }}
+          >
             Configure your school profile, notifications, and preferences.
           </p>
-          <AccentLine />
+          <div
+            style={{
+              height: 1,
+              marginTop: "1rem",
+              background: "linear-gradient(90deg,var(--orange),transparent)",
+              opacity: 0.4,
+              width: "5rem",
+            }}
+          />
         </motion.div>
 
         {/* Feature Toggles link */}
         <motion.div {...fadeIn(0.05)}>
           <Link
             to="/admin/settings/features"
-            className="flex items-center justify-between rounded-lg border border-border-subtle bg-bg-surface p-4 transition-all hover:border-border-default hover:shadow-[0_0_30px_rgba(101,113,245,0.06)] group"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "1rem 1.25rem",
+              textDecoration: "none",
+              background: "var(--bg-surface)",
+              border: "1px solid var(--border-subtle)",
+              clipPath: CLIP_CARD,
+              transition: "border-color 0.2s",
+            }}
           >
-            <div className="flex items-center gap-3">
+            <div
+              style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}
+            >
               <motion.div
-                className="flex h-10 w-10 items-center justify-center rounded-md bg-orange-500/10"
-                animate={{
-                  scale: [1, 1.1, 1],
-                  opacity: [0.8, 1, 0.8],
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 40,
+                  height: 40,
+                  background: "rgba(242,116,13,0.10)",
+                  borderRadius: 8,
                 }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                animate={{ scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
               >
-                <ToggleLeft
-                  size={20}
-                  className="text-orange-400"
-                  strokeWidth={1.5}
-                />
+                <ToggleLeft size={20} strokeWidth={1.5} color="var(--orange)" />
               </motion.div>
               <div>
-                <p className="text-body-md text-text-primary font-medium">
+                <p
+                  style={{
+                    ...CAV,
+                    fontSize: "1.1rem",
+                    fontWeight: 700,
+                    color: "var(--text-primary)",
+                  }}
+                >
                   Feature Toggles
                 </p>
-                <p className="text-body-sm text-text-muted">
+                <p
+                  style={{
+                    ...COU,
+                    fontSize: "0.6rem",
+                    letterSpacing: "0.1em",
+                    color: "var(--text-muted)",
+                    marginTop: 2,
+                  }}
+                >
                   Enable or disable platform features for your school
                 </p>
               </div>
             </div>
             <ChevronRight
               size={18}
-              className="text-text-muted group-hover:text-text-secondary transition-colors"
+              strokeWidth={1.5}
+              color="var(--text-muted)"
             />
           </Link>
         </motion.div>
 
-        {/* School Profile */}
-        <motion.div
-          {...fadeIn(0.1)}
-          className="rounded-lg border border-border-subtle bg-bg-surface transition-all hover:shadow-[0_0_30px_rgba(101,113,245,0.04)]"
-        >
-          <div className="flex items-center gap-2 border-b border-border-subtle px-5 py-4">
-            <motion.div
-              animate={{ rotate: [0, 5, -5, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        {/* ── Appearance ── Theme + Font ── */}
+        <motion.div {...fadeIn(0.08)}>
+          <SettingsCard>
+            <CardHeader
+              icon={<Type size={17} strokeWidth={1.5} color="var(--orange)" />}
+              title="Appearance"
+            />
+            <div
+              style={{
+                padding: "1.25rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "1.5rem",
+              }}
             >
-              <School size={18} className="text-orange-400" strokeWidth={1.5} />
-            </motion.div>
-            <h2 className="text-heading-3 text-text-primary">School Profile</h2>
-          </div>
-          <div className="space-y-5 p-5">
-            {/* School name */}
-            <div>
-              <label className="text-body-sm text-text-secondary font-medium mb-1.5 block">
-                School Name
-              </label>
-              <input
-                type="text"
-                defaultValue="Delhi Public School, Vasant Kunj"
-                className="w-full max-w-lg rounded-md border border-border-subtle bg-bg-elevated px-4 py-2.5 text-body-md text-text-primary outline-none transition-all focus:border-orange-500 focus:shadow-[0_0_20px_rgba(101,113,245,0.08)]"
-              />
-            </div>
-
-            {/* Address */}
-            <div>
-              <label className="text-body-sm text-text-secondary font-medium mb-1.5 block">
-                <span className="flex items-center gap-1.5">
-                  <MapPin size={13} strokeWidth={1.5} />
-                  Address
-                </span>
-              </label>
-              <textarea
-                defaultValue="Sector B, Pocket 5, Vasant Kunj, New Delhi -- 110070"
-                rows={3}
-                className="w-full max-w-lg rounded-md border border-border-subtle bg-bg-elevated px-4 py-2.5 text-body-md text-text-primary outline-none transition-all focus:border-orange-500 focus:shadow-[0_0_20px_rgba(101,113,245,0.08)] resize-none"
-              />
-            </div>
-
-            {/* Logo upload */}
-            <div>
-              <label className="text-body-sm text-text-secondary font-medium mb-1.5 block">
-                <span className="flex items-center gap-1.5">
-                  <Image size={13} strokeWidth={1.5} />
-                  School Logo
-                </span>
-              </label>
-              <div className="flex max-w-lg items-center gap-4">
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border border-dashed border-border-default bg-bg-elevated">
-                  <School size={24} className="text-text-muted" strokeWidth={1.5} />
+              {/* Theme toggle */}
+              <div>
+                <FieldLabel>Colour theme</FieldLabel>
+                <div
+                  style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}
+                >
+                  {(
+                    [
+                      {
+                        key: "dark",
+                        label: "Dark",
+                        icon: <Moon size={14} strokeWidth={1.5} />,
+                      },
+                      {
+                        key: "light",
+                        label: "Light",
+                        icon: <Sun size={14} strokeWidth={1.5} />,
+                      },
+                    ] as const
+                  ).map((opt) => {
+                    const isActive = opt.key === (isDark ? "dark" : "light");
+                    return (
+                      <motion.button
+                        key={opt.key}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => setTheme(opt.key)}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.45rem",
+                          ...COU,
+                          fontSize: "0.68rem",
+                          letterSpacing: "0.1em",
+                          padding: "0.5rem 1rem",
+                          cursor: "pointer",
+                          border: "1px solid",
+                          borderColor: isActive
+                            ? "var(--orange)"
+                            : "var(--border-default)",
+                          background: isActive
+                            ? "rgba(242,116,13,0.10)"
+                            : "var(--bg-elevated)",
+                          color: isActive
+                            ? "var(--orange)"
+                            : "var(--text-secondary)",
+                          clipPath: CLIP_SM,
+                          transition: "all 0.18s",
+                        }}
+                      >
+                        {opt.icon} {opt.label}
+                      </motion.button>
+                    );
+                  })}
                 </div>
-                <div>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="inline-flex items-center gap-2 rounded-md border border-border-subtle bg-bg-elevated px-4 py-2 text-body-sm text-text-secondary transition-colors hover:border-border-default hover:text-text-primary"
-                  >
-                    <Upload size={14} strokeWidth={1.5} />
-                    Upload Logo
-                  </motion.button>
-                  <p className="text-caption text-text-muted mt-1.5">
-                    PNG or SVG, max 2 MB. Recommended: 256 x 256px.
-                  </p>
+              </div>
+
+              {/* Font family picker */}
+              <div>
+                <FieldLabel>Font family</FieldLabel>
+                <p
+                  style={{
+                    ...LOR,
+                    fontStyle: "italic",
+                    fontSize: "0.78rem",
+                    color: "var(--text-muted)",
+                    marginBottom: "0.85rem",
+                  }}
+                >
+                  Changes the display and body typeface across the platform.
+                </p>
+                <div
+                  style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}
+                >
+                  {FONT_OPTIONS.map((opt) => {
+                    const isActive = fontScheme === opt.key;
+                    return (
+                      <motion.button
+                        key={opt.key}
+                        whileHover={{ y: -3 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => applyFont(opt.key)}
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "0.3rem",
+                          padding: "0.85rem 1.1rem",
+                          cursor: "pointer",
+                          background: isActive
+                            ? "rgba(242,116,13,0.07)"
+                            : "var(--bg-elevated)",
+                          border: "1px solid",
+                          borderColor: isActive
+                            ? "var(--orange)"
+                            : "var(--border-default)",
+                          clipPath: CLIP_CARD,
+                          transition: "all 0.18s",
+                          minWidth: 120,
+                        }}
+                      >
+                        {/* Scheme name */}
+                        <span
+                          style={{
+                            ...COU,
+                            fontSize: "0.6rem",
+                            letterSpacing: "0.15em",
+                            textTransform: "uppercase",
+                            color: isActive
+                              ? "var(--orange)"
+                              : "var(--text-muted)",
+                          }}
+                        >
+                          {opt.label}
+                        </span>
+                        {/* Display font preview */}
+                        <span
+                          style={{
+                            fontFamily: `"${opt.display}", ${opt.key === "clean" ? "system-ui, sans-serif" : "Georgia, serif"}`,
+                            fontSize: "1.1rem",
+                            fontWeight: opt.key === "clean" ? 600 : 400,
+                            color: "var(--text-primary)",
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          Aa
+                        </span>
+                        {/* Font names */}
+                        <span
+                          style={{
+                            ...COU,
+                            fontSize: "0.55rem",
+                            letterSpacing: "0.06em",
+                            color: "var(--text-muted)",
+                            opacity: 0.7,
+                            lineHeight: 1.4,
+                          }}
+                        >
+                          {opt.display}
+                          <br />
+                          {opt.body}
+                        </span>
+                        {/* Active dot */}
+                        {isActive && (
+                          <div
+                            style={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: "50%",
+                              background: "var(--orange)",
+                              marginTop: 2,
+                            }}
+                          />
+                        )}
+                      </motion.button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
-          </div>
+          </SettingsCard>
+        </motion.div>
+
+        {/* School Profile */}
+        <motion.div {...fadeIn(0.1)}>
+          <SettingsCard>
+            <CardHeader
+              icon={
+                <motion.div
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <School size={17} strokeWidth={1.5} color="var(--orange)" />
+                </motion.div>
+              }
+              title="School Profile"
+            />
+            <div
+              style={{
+                padding: "1.25rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "1.25rem",
+              }}
+            >
+              {/* School name */}
+              <div>
+                <FieldLabel>School Name</FieldLabel>
+                <input
+                  type="text"
+                  defaultValue="Delhi Public School, Vasant Kunj"
+                  style={inputStyle}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "rgba(242,116,13,0.45)";
+                    e.currentTarget.style.boxShadow =
+                      "0 0 18px rgba(242,116,13,0.08)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "var(--border-default)";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                />
+              </div>
+
+              {/* Address */}
+              <div>
+                <FieldLabel>
+                  <span
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.35rem",
+                    }}
+                  >
+                    <MapPin size={12} strokeWidth={1.5} /> Address
+                  </span>
+                </FieldLabel>
+                <textarea
+                  defaultValue={
+                    "Sector B, Pocket 5, Vasant Kunj, New Delhi — 110070"
+                  }
+                  rows={3}
+                  style={{ ...inputStyle, resize: "none" as const }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "rgba(242,116,13,0.45)";
+                    e.currentTarget.style.boxShadow =
+                      "0 0 18px rgba(242,116,13,0.08)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "var(--border-default)";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                />
+              </div>
+
+              {/* Logo upload */}
+              <div>
+                <FieldLabel>
+                  <span
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.35rem",
+                    }}
+                  >
+                    <Image size={12} strokeWidth={1.5} /> School Logo
+                  </span>
+                </FieldLabel>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                    maxWidth: 520,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 76,
+                      height: 76,
+                      flexShrink: 0,
+                      border: "1px dashed var(--border-strong)",
+                      background: "var(--bg-elevated)",
+                      borderRadius: 8,
+                    }}
+                  >
+                    <School
+                      size={24}
+                      strokeWidth={1.5}
+                      color="var(--text-muted)"
+                    />
+                  </div>
+                  <div>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.4rem",
+                        ...COU,
+                        fontSize: "0.65rem",
+                        letterSpacing: "0.1em",
+                        background: "var(--bg-elevated)",
+                        border: "1px solid var(--border-default)",
+                        color: "var(--text-secondary)",
+                        padding: "0.5rem 0.9rem",
+                        cursor: "pointer",
+                        clipPath: CLIP_SM,
+                        transition: "all 0.18s",
+                      }}
+                    >
+                      <Upload size={13} strokeWidth={1.5} /> Upload Logo
+                    </motion.button>
+                    <p
+                      style={{
+                        ...COU,
+                        fontSize: "0.58rem",
+                        letterSpacing: "0.08em",
+                        color: "var(--text-muted)",
+                        marginTop: "0.5rem",
+                      }}
+                    >
+                      PNG or SVG, max 2 MB. Recommended: 256×256 px.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </SettingsCard>
         </motion.div>
 
         {/* Notifications */}
-        <motion.div
-          {...fadeIn(0.18)}
-          className="rounded-lg border border-border-subtle bg-bg-surface transition-all hover:shadow-[0_0_30px_rgba(101,113,245,0.04)]"
-        >
-          <div className="flex items-center gap-2 border-b border-border-subtle px-5 py-4">
-            <motion.div
-              animate={{
-                rotate: [0, 15, -15, 0],
-              }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 3 }}
-            >
-              <Bell size={18} className="text-orange-400" strokeWidth={1.5} />
-            </motion.div>
-            <h2 className="text-heading-3 text-text-primary">Notifications</h2>
-          </div>
-          <div className="divide-y divide-border-subtle">
-            {NOTIFICATION_SETTINGS.map((setting, i) => (
-              <motion.div
-                key={setting.id}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 + i * 0.05, duration: 0.3, ease: ease.standard }}
-                className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-bg-elevated/50"
-              >
-                <div className="mr-4">
-                  <p className="text-body-md text-text-primary">{setting.label}</p>
-                  <p className="text-body-sm text-text-muted mt-0.5">
-                    {setting.description}
-                  </p>
-                </div>
-                <Toggle defaultChecked={setting.defaultOn} />
-              </motion.div>
-            ))}
-          </div>
+        <motion.div {...fadeIn(0.18)}>
+          <SettingsCard>
+            <CardHeader
+              icon={
+                <motion.div
+                  animate={{ rotate: [0, 15, -15, 0] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    repeatDelay: 3,
+                  }}
+                >
+                  <Bell size={17} strokeWidth={1.5} color="var(--orange)" />
+                </motion.div>
+              }
+              title="Notifications"
+            />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {NOTIFICATION_SETTINGS.map((s, i) => (
+                <motion.div
+                  key={s.id}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{
+                    delay: 0.2 + i * 0.05,
+                    duration: 0.3,
+                    ease: ease.standard,
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "1rem 1.25rem",
+                    borderBottom:
+                      i < NOTIFICATION_SETTINGS.length - 1
+                        ? "1px solid var(--border-subtle)"
+                        : "none",
+                    transition: "background 0.15s",
+                  }}
+                  onMouseEnter={(e) =>
+                    ((e.currentTarget as HTMLElement).style.background =
+                      "var(--bg-elevated)")
+                  }
+                  onMouseLeave={(e) =>
+                    ((e.currentTarget as HTMLElement).style.background =
+                      "transparent")
+                  }
+                >
+                  <div style={{ marginRight: "1rem" }}>
+                    <p
+                      style={{
+                        ...LOR,
+                        fontSize: "0.9rem",
+                        color: "var(--text-primary)",
+                      }}
+                    >
+                      {s.label}
+                    </p>
+                    <p
+                      style={{
+                        ...COU,
+                        fontSize: "0.58rem",
+                        letterSpacing: "0.06em",
+                        color: "var(--text-muted)",
+                        marginTop: 2,
+                      }}
+                    >
+                      {s.description}
+                    </p>
+                  </div>
+                  <Toggle defaultChecked={s.defaultOn} />
+                </motion.div>
+              ))}
+            </div>
+          </SettingsCard>
         </motion.div>
 
-        {/* Display */}
-        <motion.div
-          {...fadeIn(0.26)}
-          className="rounded-lg border border-border-subtle bg-bg-surface transition-all hover:shadow-[0_0_30px_rgba(101,113,245,0.04)]"
-        >
-          <div className="flex items-center gap-2 border-b border-border-subtle px-5 py-4">
-            <motion.div
-              animate={{ rotate: [0, 360] }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            >
-              <Globe size={18} className="text-orange-400" strokeWidth={1.5} />
-            </motion.div>
-            <h2 className="text-heading-3 text-text-primary">Display</h2>
-          </div>
-          <div className="p-5">
-            <div>
-              <label className="text-body-sm text-text-secondary font-medium mb-1.5 block">
-                Timezone
-              </label>
-              <div className="relative max-w-sm">
+        {/* Display / Timezone */}
+        <motion.div {...fadeIn(0.26)}>
+          <SettingsCard>
+            <CardHeader
+              icon={
+                <motion.div
+                  animate={{ rotate: [0, 360] }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                >
+                  <Globe size={17} strokeWidth={1.5} color="var(--orange)" />
+                </motion.div>
+              }
+              title="Display"
+            />
+            <div style={{ padding: "1.25rem" }}>
+              <FieldLabel>Timezone</FieldLabel>
+              <div style={{ position: "relative", maxWidth: 380 }}>
                 <select
                   defaultValue={TIMEZONES[0]}
-                  className="w-full appearance-none rounded-md border border-border-subtle bg-bg-elevated px-4 py-2.5 text-body-md text-text-primary outline-none transition-all focus:border-orange-500 focus:shadow-[0_0_20px_rgba(101,113,245,0.08)]"
+                  style={{
+                    ...inputStyle,
+                    maxWidth: 380,
+                    appearance: "none",
+                    paddingRight: "2.2rem",
+                    cursor: "pointer",
+                  }}
                 >
                   {TIMEZONES.map((tz) => (
                     <option key={tz} value={tz}>
@@ -358,23 +898,47 @@ export function SettingsPage() {
                   ))}
                 </select>
                 <ChevronDown
-                  size={14}
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-muted"
+                  size={13}
+                  strokeWidth={1.5}
+                  color="var(--text-muted)"
+                  style={{
+                    position: "absolute",
+                    right: "0.75rem",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    pointerEvents: "none",
+                  }}
                 />
               </div>
             </div>
-          </div>
+          </SettingsCard>
         </motion.div>
 
-        {/* Save button */}
-        <motion.div {...fadeIn(0.32)} className="flex justify-end">
+        {/* Save */}
+        <motion.div
+          {...fadeIn(0.32)}
+          style={{ display: "flex", justifyContent: "flex-end" }}
+        >
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="inline-flex items-center gap-2 rounded-md bg-orange-500 px-6 py-2.5 text-body-sm font-medium text-white shadow-sm transition-colors hover:bg-orange-600"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              ...CAV,
+              fontSize: "1.05rem",
+              fontWeight: 700,
+              background: "var(--orange)",
+              color: "#07080d",
+              border: "none",
+              cursor: "pointer",
+              padding: "0.65rem 1.75rem",
+              clipPath: CLIP_BTN,
+              transition: "background 0.15s",
+            }}
           >
-            <Save size={16} strokeWidth={1.5} />
-            Save Changes
+            <Save size={16} strokeWidth={1.5} /> Save Changes
           </motion.button>
         </motion.div>
       </div>

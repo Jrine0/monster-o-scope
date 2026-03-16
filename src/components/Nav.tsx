@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { useNavScroll } from "@/hooks/useNavScroll";
 import { Link } from "@tanstack/react-router";

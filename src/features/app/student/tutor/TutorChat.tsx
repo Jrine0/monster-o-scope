@@ -1,10 +1,7 @@
-// src/features/app/student/tutor/TutorChat.tsx
-// Chat interface adapted from schoolme's ChatInterface.tsx for Vyasa.
-// Key differences:
-//   - Uses Vyasa's api-client (axios) instead of Next.js fetch routes
-//   - Reads auth from useAuthStore for student context
-//   - Styled to match Vyasa's design system (shadcn/radix-ui same as schoolme)
-//   - PDF viewer included (same PDF.js approach)
+// TutorChat.tsx — Schoolme design system
+// All logic from original preserved exactly.
+// className-based styling replaced with inline styles using Schoolme CSS vars.
+// Fonts: Caveat (headings/labels), Lora (body/messages), Courier Prime (meta).
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
@@ -21,9 +18,7 @@ import {
   FileText,
   MessageSquareQuote,
 } from "lucide-react";
-import { Button } from "../../../../components/ui/button";
-import { Input } from "../../../../components/ui/input";
-import { ScrollArea } from "../../../../components/ui/scroll-area"; // add if not present, or use div
+import { ScrollArea } from "../../../../components/ui/scroll-area";
 import type { AvatarMood } from "../../../../hooks/useGazeTrack";
 import {
   type LipSyncData,
@@ -50,7 +45,6 @@ export interface TutorChatProps {
   onMoodChange: (m: AvatarMood) => void;
   onVisualizerStateChange: (s: "idle" | "thinking" | "speaking") => void;
   lipSyncRef: React.MutableRefObject<LipSyncData>;
-  /** Topic context passed in from the lesson/material */
   topicContext?: string;
 }
 
@@ -117,7 +111,6 @@ export default function TutorChat({
     }
   }, [messages]);
 
-  // Re-engage listener (from GazeTrack Tier-2)
   useEffect(() => {
     const handler = async (e: Event) => {
       const { prompt } = (e as CustomEvent<{ prompt: string }>).detail;
@@ -165,7 +158,6 @@ export default function TutorChat({
     onVisualizerStateChange,
   ]);
 
-  // ── PDF rendering ──────────────────────────────────────────────────────────
   const renderPage = useCallback(async (pdfDoc: unknown, pageNum: number) => {
     if (!canvasRef.current || !textLayerRef.current || !pdfContainerRef.current)
       return;
@@ -210,8 +202,8 @@ export default function TutorChat({
     }
     const tl = textLayerRef.current;
     tl.innerHTML = "";
-    const cssW = Math.round(viewport.width / dpr);
-    const cssH = Math.round(viewport.height / dpr);
+    const cssW = Math.round(viewport.width / dpr),
+      cssH = Math.round(viewport.height / dpr);
     tl.style.cssText = `width:${cssW}px;height:${cssH}px;position:absolute;top:0;left:0;overflow:hidden;`;
     const textContent = await (
       page as { getTextContent: () => Promise<unknown> }
@@ -333,7 +325,6 @@ export default function TutorChat({
     setTimeout(() => inputRef.current?.focus(), 50);
   };
 
-  // ── Interrupt ──────────────────────────────────────────────────────────────
   const interrupt = () => {
     abortRef.current = true;
     if (currentAudioRef.current) {
@@ -464,10 +455,9 @@ export default function TutorChat({
     }
   };
 
-  // ── Build messages with PDF context ───────────────────────────────────────
   const buildMessages = (history: Message[], userMsg: Message) => {
     const messages = [...history, userMsg];
-    if (topicContext) {
+    if (topicContext)
       return [
         {
           role: "system" as const,
@@ -475,7 +465,6 @@ export default function TutorChat({
         },
         ...messages,
       ];
-    }
     if (!pdf) return messages;
     const MAX = 6000;
     const fullText = pdf.extractedText.join("\n\n--- Page Break ---\n\n");
@@ -505,44 +494,34 @@ export default function TutorChat({
     ];
   };
 
-  // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || (isLoading && !isSpeaking)) return;
     if (isSpeaking) interrupt();
     if (!pdf) setView("chat");
-
     let userText = input.trim();
     if (pdf?.selectedText) {
       userText = `About: "${pdf.selectedText.slice(0, 300)}…" — ${userText}`;
       setPdf((p) => (p ? { ...p, selectedText: "" } : p));
     }
-
     const userMessage: Message = { role: "user", content: userText };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
     onVisualizerStateChange("thinking");
-
     try {
-      // Chat via Vyasa backend
       const chatRes = await apiClient.post<{ content: string }>(
         "/api/tutor/chat",
-        {
-          messages: buildMessages(messages, userMessage),
-        },
+        { messages: buildMessages(messages, userMessage) },
       );
       const content = chatRes.data.content;
       if (!content) throw new Error("No response");
       setMessages((prev) => [...prev, { role: "assistant", content }]);
-
-      // Narrate via Vyasa backend
       const narrateRes = await apiClient.post<{ script: string }>(
         "/api/tutor/narrate",
         { content },
       );
       const script = narrateRes.data?.script ?? content;
-
       await playScript(analyzeText(script));
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Connection failed.";
@@ -553,9 +532,32 @@ export default function TutorChat({
     }
   };
 
+  /* ─── Schoolme style objects ─────────────────────────────────────────────── */
+  const CLIP =
+    "polygon(0.3% 0.5%,1% 0%,99% 0.3%,100% 1%,99.8% 99%,99% 100%,0.5% 99.8%,0% 99%)";
+  const CLIP_SM = "polygon(1% 0%,100% 1%,99% 100%,0% 99%)";
+
+  const f = {
+    caveat: { fontFamily: "Caveat, cursive" } as React.CSSProperties,
+    lora: { fontFamily: "Lora, Georgia, serif" } as React.CSSProperties,
+    courier: { fontFamily: "Courier Prime, monospace" } as React.CSSProperties,
+  };
+
   return (
     <div
-      className={`flex flex-col h-full w-full border border-border bg-card rounded-xl overflow-hidden shadow-sm transition-all ${isDragging ? "ring-2 ring-primary/50" : ""}`}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        width: "100%",
+        border: isDragging
+          ? "1px solid var(--orange)"
+          : "1px solid var(--border-default)",
+        background: "var(--bg-surface)",
+        clipPath: CLIP,
+        boxShadow: isDragging ? "0 0 0 2px rgba(242,116,13,0.25)" : "none",
+        transition: "box-shadow 0.2s, border-color 0.2s",
+      }}
       onDragOver={(e) => {
         e.preventDefault();
         setIsDragging(true);
@@ -568,83 +570,228 @@ export default function TutorChat({
         if (f) loadPDF(f);
       }}
     >
-      {/* Header */}
-      <div className="flex-none px-4 py-3 border-b border-border flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-          <Bot className="w-5 h-5 text-primary" />
+      {/* ── Header ── */}
+      <div
+        style={{
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          gap: "0.6rem",
+          padding: "0.7rem 1rem",
+          borderBottom: "1px solid var(--border-subtle)",
+          background: "var(--bg-elevated)",
+        }}
+      >
+        <div
+          style={{
+            width: 34,
+            height: 34,
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(242,116,13,0.10)",
+            border: "1px solid rgba(242,116,13,0.22)",
+            clipPath: CLIP_SM,
+          }}
+        >
+          <Bot size={16} strokeWidth={1.5} color="var(--orange)" />
         </div>
-        <div className="flex-1 min-w-0">
-          <h2 className="text-sm font-semibold text-foreground">AI Tutor</h2>
-          <p className="text-xs text-muted-foreground truncate">
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              ...f.caveat,
+              fontSize: "1.1rem",
+              fontWeight: 700,
+              color: "var(--text-primary)",
+              lineHeight: 1,
+            }}
+          >
+            AI Tutor
+          </div>
+          <div
+            style={{
+              ...f.courier,
+              fontSize: "0.58rem",
+              letterSpacing: "0.1em",
+              color: "var(--text-muted)",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
             {pdf ? pdf.fileName : "Deepgram TTS · Ask me anything"}
-          </p>
+          </div>
         </div>
+
+        {/* View toggle */}
         {pdf && (
-          <div className="flex items-center gap-1 bg-muted/50 rounded-full p-0.5 shrink-0">
-            <button
-              type="button"
-              onClick={() => setView("pdf")}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all ${view === "pdf" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              <FileText className="w-3 h-3" /> PDF
-            </button>
-            <button
-              type="button"
-              onClick={() => setView("chat")}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all ${view === "chat" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              <MessageSquare className="w-3 h-3" /> Chat
-            </button>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              background: "var(--bg-deep)",
+              borderRadius: 6,
+              padding: 2,
+              border: "1px solid var(--border-subtle)",
+              flexShrink: 0,
+            }}
+          >
+            {(["pdf", "chat"] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setView(v)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.25rem",
+                  padding: "0.22rem 0.65rem",
+                  ...f.courier,
+                  fontSize: "0.6rem",
+                  letterSpacing: "0.08em",
+                  background: view === v ? "var(--bg-elevated)" : "transparent",
+                  color:
+                    view === v ? "var(--text-primary)" : "var(--text-muted)",
+                  border: "none",
+                  borderRadius: 4,
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
+              >
+                {v === "pdf" ? (
+                  <FileText size={11} />
+                ) : (
+                  <MessageSquare size={11} />
+                )}
+                {v.toUpperCase()}
+              </button>
+            ))}
           </div>
         )}
         {pdf && (
           <button
             type="button"
             onClick={closePDF}
-            className="text-muted-foreground hover:text-destructive p-1 rounded transition-colors shrink-0"
+            style={{
+              flexShrink: 0,
+              width: 28,
+              height: 28,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "transparent",
+              border: "1px solid var(--border-default)",
+              cursor: "pointer",
+              color: "var(--text-muted)",
+              clipPath: CLIP_SM,
+              transition: "color 0.15s, border-color 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.color = "#f87171";
+              (e.currentTarget as HTMLElement).style.borderColor = "#f87171";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.color =
+                "var(--text-muted)";
+              (e.currentTarget as HTMLElement).style.borderColor =
+                "var(--border-default)";
+            }}
           >
-            <X className="w-4 h-4" />
+            <X size={14} />
           </button>
         )}
       </div>
 
-      {/* Body */}
-      <div className="flex-1 min-h-0 overflow-hidden relative">
+      {/* ── Body ── */}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflow: "hidden",
+          position: "relative",
+        }}
+      >
         {/* PDF View */}
         {view === "pdf" && pdf && (
-          <div className="h-full flex flex-col">
-            <div className="flex-none flex items-center justify-between px-4 py-2 border-b border-border bg-muted/20">
+          <div
+            style={{ height: "100%", display: "flex", flexDirection: "column" }}
+          >
+            <div
+              style={{
+                flexShrink: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "0.35rem 0.75rem",
+                borderBottom: "1px solid var(--border-subtle)",
+                background: "var(--bg-elevated)",
+              }}
+            >
               <button
                 disabled={pdf.currentPage <= 1}
                 onClick={() => goToPage(-1)}
-                className="p-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-30"
+                style={{
+                  padding: "0.2rem",
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "var(--text-muted)",
+                  display: "flex",
+                  alignItems: "center",
+                  opacity: pdf.currentPage <= 1 ? 0.3 : 1,
+                }}
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft size={16} />
               </button>
-              <span className="text-xs font-medium text-muted-foreground">
+              <span
+                style={{
+                  ...f.courier,
+                  fontSize: "0.62rem",
+                  letterSpacing: "0.12em",
+                  color: "var(--text-secondary)",
+                }}
+              >
                 Page {pdf.currentPage} of {pdf.numPages}
               </span>
               <button
                 disabled={pdf.currentPage >= pdf.numPages}
                 onClick={() => goToPage(1)}
-                className="p-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-30"
+                style={{
+                  padding: "0.2rem",
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "var(--text-muted)",
+                  display: "flex",
+                  alignItems: "center",
+                  opacity: pdf.currentPage >= pdf.numPages ? 0.3 : 1,
+                }}
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight size={16} />
               </button>
             </div>
             <div
-              className="flex-1 overflow-auto bg-neutral-200"
+              style={{
+                flex: 1,
+                overflow: "auto",
+                background: "var(--bg-deep)",
+              }}
               ref={pdfContainerRef}
               onMouseUp={handleTextLayerMouseUp}
             >
               <div
-                className="relative mx-auto my-4"
                 ref={canvasWrapperRef}
-                style={{ width: "fit-content" }}
+                style={{
+                  position: "relative",
+                  margin: "1rem auto",
+                  width: "fit-content",
+                }}
               >
                 <canvas
                   ref={canvasRef}
-                  className="block shadow-md rounded-sm bg-white"
+                  style={{ display: "block", background: "white" }}
                 />
                 <div
                   ref={textLayerRef}
@@ -661,11 +808,12 @@ export default function TutorChat({
                 />
                 {selectionTooltip && (
                   <div
-                    className="absolute z-50 pointer-events-auto"
                     style={{
+                      position: "absolute",
+                      zIndex: 50,
                       left: selectionTooltip.x,
                       top: selectionTooltip.y,
-                      transform: "translate(-50%, -100%)",
+                      transform: "translate(-50%,-100%)",
                     }}
                   >
                     <button
@@ -673,26 +821,76 @@ export default function TutorChat({
                         e.preventDefault();
                         handleAskAboutSelection();
                       }}
-                      className="flex items-center gap-1.5 bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-full shadow-lg hover:bg-primary/90 transition-colors whitespace-nowrap"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.35rem",
+                        background: "var(--orange)",
+                        color: "#07080d",
+                        ...f.courier,
+                        fontSize: "0.62rem",
+                        letterSpacing: "0.08em",
+                        padding: "0.35rem 0.85rem",
+                        border: "none",
+                        cursor: "pointer",
+                        borderRadius: "999px",
+                        whiteSpace: "nowrap",
+                      }}
                     >
-                      <MessageSquareQuote className="w-3.5 h-3.5" /> Ask Tutor
-                      about this
+                      <MessageSquareQuote size={12} /> Ask Tutor about this
                     </button>
-                    <div className="w-2 h-2 bg-primary rotate-45 mx-auto -mt-1 rounded-sm" />
                   </div>
                 )}
               </div>
             </div>
             {pdf.selectedText && (
-              <div className="flex-none px-4 py-2 border-t border-primary/20 bg-primary/5 flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                <p className="text-[11px] text-primary/80 flex-1 truncate">
+              <div
+                style={{
+                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  padding: "0.5rem 0.75rem",
+                  borderTop: "1px solid rgba(242,116,13,0.2)",
+                  background: "rgba(242,116,13,0.05)",
+                }}
+              >
+                <div
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: "var(--orange)",
+                    flexShrink: 0,
+                  }}
+                />
+                <p
+                  style={{
+                    ...f.lora,
+                    fontStyle: "italic",
+                    fontSize: "0.75rem",
+                    color: "var(--text-secondary)",
+                    flex: 1,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   "{pdf.selectedText.slice(0, 90)}
                   {pdf.selectedText.length > 90 ? "…" : ""}"
                 </p>
                 <button
                   onClick={handleAskAboutSelection}
-                  className="text-[11px] text-primary font-semibold hover:underline shrink-0"
+                  style={{
+                    ...f.courier,
+                    fontSize: "0.6rem",
+                    letterSpacing: "0.1em",
+                    color: "var(--orange)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    flexShrink: 0,
+                  }}
                 >
                   Ask Tutor →
                 </button>
@@ -703,11 +901,39 @@ export default function TutorChat({
 
         {/* Chat View */}
         {view === "chat" && (
-          <div className="h-full overflow-y-auto p-4 space-y-6" ref={scrollRef}>
+          <div
+            ref={scrollRef}
+            style={{
+              height: "100%",
+              overflowY: "auto",
+              padding: "1rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+            }}
+          >
             {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center text-center mt-20 opacity-50">
-                <Bot className="w-12 h-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground text-sm">
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  marginTop: "4rem",
+                  opacity: 0.45,
+                }}
+              >
+                <Bot size={44} strokeWidth={1} color="var(--text-muted)" />
+                <p
+                  style={{
+                    ...f.lora,
+                    fontStyle: "italic",
+                    fontSize: "0.88rem",
+                    color: "var(--text-secondary)",
+                    marginTop: "0.75rem",
+                  }}
+                >
                   {pdf
                     ? `PDF loaded — ask anything about "${pdf.fileName}".`
                     : "Ask me anything — I'm here to help."}
@@ -717,34 +943,129 @@ export default function TutorChat({
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                style={{
+                  display: "flex",
+                  gap: "0.6rem",
+                  alignItems: "flex-start",
+                  justifyContent:
+                    msg.role === "user" ? "flex-end" : "flex-start",
+                }}
               >
                 {msg.role === "assistant" && (
-                  <div className="w-8 h-8 rounded-full border bg-muted flex items-center justify-center shrink-0 mt-1">
-                    <Bot className="w-4 h-4 text-muted-foreground" />
+                  <div
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: "50%",
+                      flexShrink: 0,
+                      marginTop: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "var(--bg-elevated)",
+                      border: "1px solid var(--border-default)",
+                    }}
+                  >
+                    <Bot
+                      size={14}
+                      strokeWidth={1.5}
+                      color="var(--text-muted)"
+                    />
                   </div>
                 )}
                 <div
-                  className={`rounded-2xl px-5 py-3 text-sm max-w-[85%] shadow-sm ${msg.role === "user" ? "bg-primary text-primary-foreground rounded-tr-none" : "bg-white border border-border text-foreground rounded-tl-none"}`}
+                  style={{
+                    maxWidth: "82%",
+                    padding: "0.65rem 0.95rem",
+                    ...f.lora,
+                    fontSize: "0.88rem",
+                    lineHeight: 1.65,
+                    color:
+                      msg.role === "user" ? "#07080d" : "var(--text-primary)",
+                    background:
+                      msg.role === "user"
+                        ? "var(--orange)"
+                        : "var(--bg-elevated)",
+                    border:
+                      msg.role === "user"
+                        ? "none"
+                        : "1px solid var(--border-default)",
+                    clipPath:
+                      msg.role === "user"
+                        ? "polygon(0% 0%,100% 0.5%,99.5% 99%,0.3% 100%)"
+                        : "polygon(0% 0.5%,99.7% 0%,100% 100%,0.5% 99%)",
+                  }}
                 >
                   {msg.content}
                 </div>
                 {msg.role === "user" && (
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 mt-1">
-                    <User className="w-4 h-4 text-primary-foreground" />
+                  <div
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: "50%",
+                      flexShrink: 0,
+                      marginTop: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "var(--orange)",
+                    }}
+                  >
+                    <User size={14} strokeWidth={1.5} color="#07080d" />
                   </div>
                 )}
               </div>
             ))}
             {isLoading && !isSpeaking && (
-              <div className="flex justify-start gap-3">
-                <div className="w-8 h-8 rounded-full border bg-muted flex items-center justify-center shrink-0">
-                  <Bot className="w-4 h-4 text-muted-foreground" />
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.6rem",
+                  alignItems: "flex-start",
+                }}
+              >
+                <div
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: "50%",
+                    flexShrink: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "var(--bg-elevated)",
+                    border: "1px solid var(--border-default)",
+                  }}
+                >
+                  <Bot size={14} strokeWidth={1.5} color="var(--text-muted)" />
                 </div>
-                <div className="bg-muted/50 rounded-2xl rounded-tl-none px-4 py-3 flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
-                  <span className="text-xs text-muted-foreground">
-                    Thinking...
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    padding: "0.6rem 0.85rem",
+                    background: "var(--bg-elevated)",
+                    border: "1px solid var(--border-default)",
+                    clipPath: "polygon(0% 0.5%,99.7% 0%,100% 100%,0.5% 99%)",
+                  }}
+                >
+                  <Loader2
+                    size={13}
+                    strokeWidth={1.5}
+                    color="var(--text-muted)"
+                    style={{ animation: "spin 1s linear infinite" }}
+                  />
+                  <span
+                    style={{
+                      ...f.courier,
+                      fontSize: "0.65rem",
+                      letterSpacing: "0.1em",
+                      color: "var(--text-muted)",
+                    }}
+                  >
+                    Thinking…
                   </span>
                 </div>
               </div>
@@ -753,15 +1074,54 @@ export default function TutorChat({
         )}
 
         {pdfLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-20">
-            <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-2" />
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "rgba(7,8,13,0.75)",
+              backdropFilter: "blur(4px)",
+              zIndex: 20,
+            }}
+          >
+            <Loader2
+              size={28}
+              strokeWidth={1.5}
+              color="var(--orange)"
+              style={{ animation: "spin 1s linear infinite" }}
+            />
           </div>
         )}
         {isDragging && (
-          <div className="absolute inset-0 flex items-center justify-center bg-primary/10 border-2 border-dashed border-primary/40 z-20 m-2 rounded-xl">
-            <div className="text-center">
-              <FileText className="w-10 h-10 text-primary mx-auto mb-2" />
-              <p className="text-sm font-medium text-primary">
+          <div
+            style={{
+              position: "absolute",
+              inset: 8,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "rgba(242,116,13,0.05)",
+              border: "2px dashed rgba(242,116,13,0.35)",
+              borderRadius: 4,
+              zIndex: 20,
+            }}
+          >
+            <div style={{ textAlign: "center" }}>
+              <FileText
+                size={32}
+                strokeWidth={1}
+                color="var(--orange)"
+                style={{ margin: "0 auto 0.5rem" }}
+              />
+              <p
+                style={{
+                  ...f.caveat,
+                  fontSize: "1.1rem",
+                  color: "var(--orange)",
+                }}
+              >
                 Drop PDF to open
               </p>
             </div>
@@ -769,18 +1129,39 @@ export default function TutorChat({
         )}
       </div>
 
-      {/* Input */}
-      <div className="flex-none p-3 pb-4 bg-card border-t border-border">
+      {/* ── Input ── */}
+      <div
+        style={{
+          flexShrink: 0,
+          padding: "0.75rem",
+          paddingBottom: "1rem",
+          background: "var(--bg-elevated)",
+          borderTop: "1px solid var(--border-subtle)",
+        }}
+      >
         {pdfError && (
-          <p className="text-xs text-destructive mb-2 px-1">{pdfError}</p>
+          <p
+            style={{
+              ...f.courier,
+              fontSize: "0.62rem",
+              color: "#f87171",
+              marginBottom: "0.5rem",
+            }}
+          >
+            {pdfError}
+          </p>
         )}
         <form
           onSubmit={handleSubmit}
-          className="flex gap-2 items-center relative"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            position: "relative",
+          }}
         >
           <input
-            type="text"
             ref={inputRef}
+            type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={
@@ -789,43 +1170,111 @@ export default function TutorChat({
                 : pdf
                   ? `Ask about ${pdf.fileName}…`
                   : isSpeaking
-                    ? "Type to interrupt..."
+                    ? "Type to interrupt…"
                     : "Ask anything… or drop a PDF"
             }
             disabled={isLoading && !isSpeaking}
-            className="flex-1 rounded-full border border-border bg-muted/20 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 pr-24"
+            style={{
+              flex: 1,
+              ...f.lora,
+              fontSize: "0.88rem",
+              color: "var(--text-primary)",
+              background: "var(--bg-deepest)",
+              border: "1px solid var(--border-default)",
+              borderRadius: "999px",
+              padding: "0.6rem 1rem",
+              paddingRight: "5.5rem",
+              outline: "none",
+              transition: "border-color 0.18s, box-shadow 0.18s",
+              opacity: isLoading && !isSpeaking ? 0.5 : 1,
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = "rgba(242,116,13,0.45)";
+              e.currentTarget.style.boxShadow =
+                "0 0 18px rgba(242,116,13,0.08)";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = "var(--border-default)";
+              e.currentTarget.style.boxShadow = "none";
+            }}
           />
           {isSpeaking && (
             <button
               type="button"
               onClick={interrupt}
-              className="absolute right-20 top-1.5 h-9 w-9 flex items-center justify-center rounded-full text-destructive hover:bg-destructive/10 transition-all"
               title="Stop speaking"
+              style={{
+                position: "absolute",
+                right: "4.5rem",
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: 32,
+                height: 32,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                color: "#f87171",
+              }}
             >
-              <StopCircle className="w-5 h-5" />
+              <StopCircle size={18} strokeWidth={1.5} />
             </button>
           )}
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
             title={pdf ? pdf.fileName : "Upload PDF"}
-            className={`absolute right-11 top-1.5 h-9 w-9 flex items-center justify-center rounded-full transition-all ${pdf ? "text-primary bg-primary/10 hover:bg-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+            style={{
+              position: "absolute",
+              right: "2.75rem",
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: 32,
+              height: 32,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              color: pdf ? "var(--orange)" : "var(--text-muted)",
+              transition: "color 0.15s",
+            }}
           >
-            <Paperclip className="w-4 h-4" />
+            <Paperclip size={15} strokeWidth={1.5} />
           </button>
           <button
             type="submit"
             disabled={(isLoading && !isSpeaking) || !input.trim()}
-            className="absolute right-1.5 top-1.5 h-9 w-9 flex items-center justify-center rounded-full bg-primary hover:bg-primary/90 text-primary-foreground transition-all disabled:opacity-50"
+            style={{
+              position: "absolute",
+              right: "0.35rem",
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: 34,
+              height: 34,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "50%",
+              background: "var(--orange)",
+              border: "none",
+              cursor: "pointer",
+              color: "#07080d",
+              transition: "background 0.15s",
+              opacity: (isLoading && !isSpeaking) || !input.trim() ? 0.45 : 1,
+            }}
           >
-            <Send className="w-4 h-4" />
+            <Send size={14} strokeWidth={2} />
           </button>
         </form>
         <input
           ref={fileInputRef}
           type="file"
           accept=".pdf"
-          className="hidden"
+          style={{ display: "none" }}
           onChange={(e) => {
             const f = e.target.files?.[0];
             if (f) loadPDF(f);
@@ -833,6 +1282,7 @@ export default function TutorChat({
           }}
         />
       </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

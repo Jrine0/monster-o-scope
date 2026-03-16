@@ -11,7 +11,8 @@ function src(i: number) {
 
 const PANELS = [
   {
-    frames: [58, 90] as [number, number],
+    frames: [58, 100] as [number, number],
+    isLast: false,
     side: "left" as const,
     eyebrow: "Adaptive learning",
     headline: "Knows when to slow down before you do.",
@@ -21,7 +22,8 @@ const PANELS = [
     statLabel: "say it helped",
   },
   {
-    frames: [91, 122] as [number, number],
+    frames: [101, 144] as [number, number],
+    isLast: false,
     side: "right" as const,
     eyebrow: "38 subjects covered",
     headline: "From alphabets to algorithms.",
@@ -31,7 +33,8 @@ const PANELS = [
     statLabel: "subjects",
   },
   {
-    frames: [123, 155] as [number, number],
+    frames: [145, 187] as [number, number],
+    isLast: false,
     side: "left" as const,
     eyebrow: "Works everywhere",
     headline: "Download Sunday. Learn all week without signal.",
@@ -41,7 +44,10 @@ const PANELS = [
     statLabel: "countries",
   },
   {
-    frames: [156, 189] as [number, number],
+    // Extended to frame 189 (end of sequence) with no exit anim —
+    // holds visible through the final scroll so there's no blank dead zone.
+    frames: [188, 189] as [number, number],
+    isLast: true,
     side: "right" as const,
     eyebrow: "No dark patterns",
     headline: "We don't bribe kids to learn.",
@@ -53,47 +59,43 @@ const PANELS = [
 ] as const;
 
 // ─── Panel animation ─────────────────────────────────────────────────────────
-// Returns { opacity, translateY } based on frame position within the panel window.
-// Entry: rises from +40vh → 0 (bottom 30% of window)
-// Hold:  sits at 0
-// Exit:  floats up to -20vh (top 20% of window)
+// Entry: 15% rise-in. Exit: 12% float-out — except the last panel which
+// never exits, holding visible right through to the end of the sequence.
 function panelAnim(
   frames: [number, number],
   f: number,
+  isLast = false,
 ): { opacity: number; y: number } {
   const [s, e] = frames;
   const total = e - s;
-  const entryF = Math.floor(total * 0.3); // 30% = rise-in
-  const exitF = Math.floor(total * 0.2); // 20% = float-out
+  const entryF = Math.floor(total * 0.15);
+  const exitF = Math.floor(total * 0.12);
 
   if (f < s || f > e) return { opacity: 0, y: 40 };
 
   const pos = f - s;
 
-  // Entry: 0 → entryF — fade in + rise from 40vh
+  // Entry
   if (pos <= entryF) {
     const t = pos / entryF;
-    // ease out cubic
     const te = 1 - Math.pow(1 - t, 3);
     return { opacity: te, y: 40 * (1 - te) };
   }
 
-  // Exit: last exitF frames — fade out + float up
-  if (pos >= total - exitF) {
+  // Exit — skipped for last panel so it holds until sequence end
+  if (!isLast && pos >= total - exitF) {
     const t = (pos - (total - exitF)) / exitF;
     const te = Math.pow(t, 2);
     return { opacity: 1 - te, y: -20 * te };
   }
 
-  // Hold
   return { opacity: 1, y: 0 };
 }
 
 // ─── Persistent side annotations — both sides, full sequence ─────────────────
 function SideAnnotations({ f }: { f: number }) {
   const t = f / (FRAME_COUNT - 1);
-  // annotations appear once the sequence starts (frame 0+) — full visibility
-  const vis = Math.min(1, f / 10); // fade in over first 10 frames
+  const vis = Math.min(1, f / 10);
 
   return (
     <div
@@ -745,9 +747,7 @@ function SideAnnotations({ f }: { f: number }) {
             fontSize="6.5"
             fill="#8a8d9a"
             textAnchor="end"
-          >
-            {`seq. ${String(f + 1).padStart(3, "0")}–190`}
-          </text>
+          >{`seq. ${String(f + 1).padStart(3, "0")}–190`}</text>
         </svg>
       </div>
 
@@ -930,7 +930,7 @@ function SideAnnotations({ f }: { f: number }) {
   );
 }
 
-// ─── Panel card — pop-up animation driven by panelAnim ───────────────────────
+// ─── Panel card ───────────────────────────────────────────────────────────────
 function PanelCard({
   panel,
   f,
@@ -938,7 +938,7 @@ function PanelCard({
   panel: (typeof PANELS)[number];
   f: number;
 }) {
-  const { opacity, y } = panelAnim(panel.frames, f);
+  const { opacity, y } = panelAnim(panel.frames, f, panel.isLast);
   if (opacity < 0.01) return null;
 
   return (
@@ -947,7 +947,6 @@ function PanelCard({
         position: "absolute",
         top: "50%",
         left: "50%",
-        // centre horizontally + vertically, then apply pop-up y offset
         transform: `translate(-50%, calc(-50% + ${y}vh))`,
         width: "min(480px, 52vw)",
         zIndex: 25,
@@ -1155,29 +1154,137 @@ export function LandingSequence({ className = "" }: { className?: string }) {
     ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
   }
 
-  /* 3. scroll → frame */
+  /* 3. scroll → frame + panel soft-lock */
   useEffect(() => {
     if (!ready) return;
     draw(0);
 
-    function onScroll() {
+    // ── Soft-lock state ──────────────────────────────────────────────
+    // We intercept `wheel` events only when the user is hand-scrolling
+    // through the sequence. Programmatic scrollTo (navbar anchors) never
+    // fires wheel events, so anchor nav is completely unaffected.
+    //
+    // When the current frame is inside a non-last panel's "hold" window,
+    // we accumulate wheel delta into a bucket. The bucket must fill past
+    // LOCK_THRESHOLD before we allow scroll to advance. This creates the
+    // soft resistance / pause effect without touching window.scrollY at all.
+
+    const LOCK_THRESHOLD = 600; // px of wheel delta to absorb per panel hold
+    const PANEL_HOLD_FRAC = 0.73; // fraction of panel window that is "hold"
+
+    // For each non-last panel, compute the frame range of the hold window.
+    const holdWindows = PANELS.filter((p) => !p.isLast).map((p) => {
+      const [s, e] = p.frames;
+      const total = e - s;
+      const entryF = Math.floor(total * 0.15);
+      const exitF = Math.floor(total * 0.12);
+      return { holdStart: s + entryF, holdEnd: e - exitF, panelEnd: e };
+    });
+
+    // bucket: accumulated delta while locked on a panel
+    // unlockedPanel: index of panel whose lock has been paid off this pass
+    let bucket = 0;
+    let lockedPanel = -1; // index into holdWindows, or -1 if not locked
+    let isNavScroll = false; // true during programmatic scrolls
+
+    // Mark programmatic scrolls so we don't interfere
+    function markNavScroll() {
+      isNavScroll = true;
+      // Clear after scroll settles (~300 ms is enough for smooth-scroll anchors)
+      setTimeout(() => {
+        isNavScroll = false;
+      }, 350);
+    }
+
+    // Intercept anchor clicks on the page to mark them as nav scrolls
+    function onAnchorClick(e: MouseEvent) {
+      const target = (e.target as HTMLElement).closest("a[href^='#']");
+      if (target) markNavScroll();
+    }
+    document.addEventListener("click", onAnchorClick, true);
+
+    // Also mark any programmatic scrollTo/scrollBy
+    const _origScrollTo = window.scrollTo.bind(window);
+    (window as any).scrollTo = (...args: any[]) => {
+      markNavScroll();
+      (_origScrollTo as any)(...args);
+    };
+
+    function getFrameForScrollY(scrollY: number) {
       const wrap = wrapRef.current;
-      if (!wrap) return;
+      if (!wrap) return 0;
       const sectionTop = wrap.offsetTop;
       const sectionScrollable = wrap.offsetHeight - window.innerHeight;
-      if (sectionScrollable <= 0) return;
+      if (sectionScrollable <= 0) return 0;
       const tFull = Math.max(
         0,
-        Math.min(1, (window.scrollY - sectionTop) / sectionScrollable),
+        Math.min(1, (scrollY - sectionTop) / sectionScrollable),
       );
       const tFrames = Math.max(
         0,
         (tFull - ENTRY_FRACTION) / (1 - ENTRY_FRACTION),
       );
-      const frame = Math.min(
-        FRAME_COUNT - 1,
-        Math.floor(tFrames * FRAME_COUNT),
+      return Math.min(FRAME_COUNT - 1, Math.floor(tFrames * FRAME_COUNT));
+    }
+
+    function isInsideSection(scrollY: number) {
+      const wrap = wrapRef.current;
+      if (!wrap) return false;
+      return (
+        scrollY >= wrap.offsetTop &&
+        scrollY <= wrap.offsetTop + wrap.offsetHeight - window.innerHeight
       );
+    }
+
+    // Wheel handler — runs before the browser scrolls (passive: false)
+    function onWheel(e: WheelEvent) {
+      if (isNavScroll) return; // never interfere with anchor nav
+
+      const scrollY = window.scrollY;
+      if (!isInsideSection(scrollY)) return; // outside sequence — don't touch
+
+      const frame = getFrameForScrollY(scrollY);
+      const dy = e.deltaY;
+
+      // Find which hold window we're in (if any)
+      const hwIdx = holdWindows.findIndex(
+        (hw) => frame >= hw.holdStart && frame <= hw.holdEnd,
+      );
+
+      if (hwIdx === -1) {
+        // Not in any hold window — reset bucket and let scroll through
+        if (lockedPanel !== -1) {
+          bucket = 0;
+          lockedPanel = -1;
+        }
+        return;
+      }
+
+      // We're inside a hold window
+      if (lockedPanel !== hwIdx) {
+        // Entering a new panel hold — reset bucket
+        bucket = 0;
+        lockedPanel = hwIdx;
+      }
+
+      bucket += Math.abs(dy);
+
+      if (bucket < LOCK_THRESHOLD) {
+        // Absorb this wheel tick — prevent default scroll
+        e.preventDefault();
+      } else {
+        // Bucket full — release the lock so scroll advances freely
+        // Don't preventDefault: let this tick through normally
+        lockedPanel = -1;
+        bucket = 0;
+      }
+    }
+
+    // passive scroll listener just for frame → draw sync
+    function onScroll() {
+      const wrap = wrapRef.current;
+      if (!wrap) return;
+      const frame = getFrameForScrollY(window.scrollY);
       if (frame !== frameRef.current) {
         frameRef.current = frame;
         cancelAnimationFrame(rafRef.current);
@@ -1189,13 +1296,20 @@ export function LandingSequence({ className = "" }: { className?: string }) {
     }
 
     const onResize = () => draw(frameRef.current);
+
+    // wheel must be non-passive to allow preventDefault
+    window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     onScroll();
+
     return () => {
+      window.removeEventListener("wheel", onWheel);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
-      cancelAnimationFrame(rafRef.current);
+      document.removeEventListener("click", onAnchorClick, true);
+      // Restore original scrollTo
+      (window as any).scrollTo = _origScrollTo;
     };
   }, [ready]);
 
@@ -1268,7 +1382,6 @@ export function LandingSequence({ className = "" }: { className?: string }) {
           </div>
         )}
 
-        {/* canvas — z:1 */}
         <canvas
           ref={canvasRef}
           aria-hidden="true"
@@ -1284,16 +1397,11 @@ export function LandingSequence({ className = "" }: { className?: string }) {
           }}
         />
 
-        {/* annotations — z:22, always on top of canvas */}
         {ready && <SideAnnotations f={displayFrame} />}
-
-        {/* panel cards — z:25 */}
         {ready &&
           PANELS.map((p, i) => (
             <PanelCard key={i} panel={p} f={displayFrame} />
           ))}
-
-        {/* progress dots — z:30 */}
         {ready && <ProgressDots f={displayFrame} />}
       </div>
     </div>

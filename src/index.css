@@ -4,6 +4,8 @@
    =================================================================== */
 
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Courier+Prime&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap");
 
 /* ── Design tokens ─────────────────────────────── */
 :root {
@@ -30,6 +32,28 @@
 
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-gentle: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Font scheme tokens ──────────────────────────────────────────────
+     Three swappable roles. Override per scheme via [data-font="..."].
+     Default (Schoolme): Caveat display · Lora body · Courier Prime mono
+  ── */
+  --font-display: "Caveat", cursive;
+  --font-body:    "Lora", Georgia, serif;
+  --font-mono:    "Courier Prime", monospace;
+}
+
+/* Scholar: Merriweather headings + Source Serif 4 body + IBM Plex Mono */
+:root[data-font="scholar"] {
+  --font-display: "Merriweather", Georgia, serif;
+  --font-body:    "Source Serif 4", Georgia, serif;
+  --font-mono:    "IBM Plex Mono", monospace;
+}
+
+/* Clean: Inter headings + Crimson Pro body + JetBrains Mono */
+:root[data-font="clean"] {
+  --font-display: "Inter", system-ui, sans-serif;
+  --font-body:    "Crimson Pro", Georgia, serif;
+  --font-mono:    "JetBrains Mono", monospace;
 }
 
 /* ── Reset ────────────────────────────────────────── */
@@ -155,23 +179,32 @@ body::after {
    NAVIGATION
    =================================================================== */
 
+/* ===================================================================
+   NAVIGATION
+   =================================================================== */
+
 nav {
   position: fixed; top: 0; left: 0; right: 0;
   z-index: 600;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.1rem 2.5rem;
+  padding: 1rem 2.5rem;
   background: rgba(7,8,13,0.72);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-subtle);
   animation: fadeIn 0.8s ease-out forwards;
-  transition: background 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              background 0.3s ease,
+              border-color 0.3s ease;
 }
 nav.scrolled {
   background: rgba(7,8,13,0.92);
   border-bottom-color: var(--border-default);
+}
+nav.nav-hidden {
+  transform: translateY(-110%);
 }
 
 .nav-logo {
@@ -182,6 +215,7 @@ nav.scrolled {
   display: inline-block;
   transform: rotate(-0.5deg);
   transition: transform 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
 }
 .nav-logo:hover { transform: rotate(0deg) scale(1.04); color: var(--orange-bright); }
 
@@ -194,6 +228,7 @@ nav.scrolled {
   text-decoration: none;
   transition: color 0.15s;
   position: relative;
+  white-space: nowrap;
 }
 .nav-links a::after {
   content: "";
@@ -206,7 +241,186 @@ nav.scrolled {
 .nav-links a:hover { color: var(--text-primary); }
 .nav-links a:hover::after { width: 100%; }
 
-@media (max-width: 640px) { .nav-links { display: none; } }
+/* Right cluster: theme toggle + sign in + hamburger */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* Hamburger — mobile only */
+.nav-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  background: transparent;
+  border: 1.5px solid var(--border-default);
+  cursor: pointer;
+  color: var(--text-secondary);
+  clip-path: polygon(0.5% 4%,2% 0.5%,98% 1.5%,99.5% 0%,100% 96%,98.5% 99.5%,2% 98.5%,0% 100%);
+  transition: border-color 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+.nav-hamburger:hover { border-color: var(--orange); color: var(--orange); }
+
+/* Three-line icon */
+.ham { display: flex; flex-direction: column; gap: 4.5px; }
+.ham span {
+  display: block;
+  width: 18px; height: 1.5px;
+  background: currentColor;
+  border-radius: 2px;
+  transform-origin: center;
+  transition: transform 0.28s ease, opacity 0.2s ease;
+}
+.ham.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.ham.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.ham.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+@media (max-width: 640px) {
+  nav { padding: 0.85rem 1.25rem; }
+  .nav-links  { display: none; }
+  .nav-signin { display: none; }
+  .nav-hamburger { display: flex; }
+}
+
+/* ===================================================================
+   MOBILE DRAWER
+   =================================================================== */
+
+.nav-drawer {
+  position: fixed; inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  visibility: hidden;
+}
+.nav-drawer.open {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.nav-drawer-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.55);
+  opacity: 0;
+  transition: opacity 0.32s ease;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.nav-drawer.open .nav-drawer-backdrop { opacity: 1; }
+
+.nav-drawer-panel {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: min(85vw, 320px);
+  background: var(--bg-deep, #0d0f17);
+  border-left: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.nav-drawer.open .nav-drawer-panel { transform: translateX(0); }
+
+.nav-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.nav-drawer-close {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px;
+  background: transparent;
+  border: 1px solid var(--border-default);
+  cursor: pointer;
+  color: var(--text-secondary);
+  clip-path: polygon(1% 0%,100% 1%,99% 100%,0% 99%);
+  transition: color 0.15s, border-color 0.15s;
+}
+.nav-drawer-close:hover { color: var(--orange); border-color: var(--orange); }
+
+.nav-drawer-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.1rem 1.25rem 0.4rem;
+}
+.nav-drawer-eyebrow .eyebrow-rule {
+  height: 1px; background: var(--orange); opacity: 0.5; flex-shrink: 0;
+}
+
+.nav-drawer-links {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0;
+  flex: 1;
+}
+.nav-drawer-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.95rem 1.25rem;
+  font-family: "Caveat", cursive;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: color 0.15s, background 0.15s;
+}
+.nav-drawer-link:hover {
+  color: var(--text-primary);
+  background: rgba(242,116,13,0.04);
+}
+.nav-drawer-link svg { opacity: 0.35; flex-shrink: 0; transition: opacity 0.15s; }
+.nav-drawer-link:hover svg { opacity: 0.7; }
+
+.nav-drawer-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border-top: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.nav-drawer-theme-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: "Courier Prime", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  clip-path: polygon(1% 0%,100% 1%,99% 100%,0% 99%);
+  transition: color 0.18s, border-color 0.18s;
+}
+.nav-drawer-theme-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+.nav-drawer-theme-btn:hover { color: var(--orange); border-color: var(--orange); }
+
+.nav-drawer-footnote {
+  font-family: "Courier Prime", monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 0.75rem 1.25rem 1rem;
+  flex-shrink: 0;
+}
 
 /* ===================================================================
    SKETCH COMPONENTS
@@ -569,6 +783,12 @@ footer {
 }
 :root[data-theme="light"] nav.scrolled {
   background: rgba(246,246,242,0.96);
+}
+
+/* Light mode drawer */
+:root[data-theme="light"] .nav-drawer-panel {
+  background: var(--bg-deep, #f0efe9);
+  border-left-color: var(--border-default);
 }
 
 /* Light mode toggle icon border */
