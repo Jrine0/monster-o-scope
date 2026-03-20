@@ -25,12 +25,15 @@ import { Route as AppAdminRouteRouteImport } from './routes/_app/admin/route'
 import { Route as AppTeacherIndexRouteImport } from './routes/_app/teacher/index'
 import { Route as AppStudentIndexRouteImport } from './routes/_app/student/index'
 import { Route as AppAdminIndexRouteImport } from './routes/_app/admin/index'
+import { Route as AppTeacherSettingsRouteImport } from './routes/_app/teacher/settings'
 import { Route as AppTeacherMaterialsRouteImport } from './routes/_app/teacher/materials'
 import { Route as AppTeacherLibraryRouteImport } from './routes/_app/teacher/library'
 import { Route as AppTeacherGenerateRouteImport } from './routes/_app/teacher/generate'
 import { Route as AppStudentTutorRouteImport } from './routes/_app/student/tutor'
+import { Route as AppStudentSettingsRouteImport } from './routes/_app/student/settings'
 import { Route as AppStudentResultsRouteImport } from './routes/_app/student/results'
 import { Route as AppStudentQuizzesRouteImport } from './routes/_app/student/quizzes'
+import { Route as AppStudentProfileRouteImport } from './routes/_app/student/profile'
 import { Route as AppStudentMaterialsRouteImport } from './routes/_app/student/materials'
 import { Route as AppAdminStudentsRouteImport } from './routes/_app/admin/students'
 import { Route as AppAdminClassesRouteImport } from './routes/_app/admin/classes'
@@ -117,6 +120,11 @@ const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppAdminRouteRoute,
 } as any)
+const AppTeacherSettingsRoute = AppTeacherSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppTeacherRouteRoute,
+} as any)
 const AppTeacherMaterialsRoute = AppTeacherMaterialsRouteImport.update({
   id: '/materials',
   path: '/materials',
@@ -137,6 +145,11 @@ const AppStudentTutorRoute = AppStudentTutorRouteImport.update({
   path: '/tutor',
   getParentRoute: () => AppStudentRouteRoute,
 } as any)
+const AppStudentSettingsRoute = AppStudentSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppStudentRouteRoute,
+} as any)
 const AppStudentResultsRoute = AppStudentResultsRouteImport.update({
   id: '/results',
   path: '/results',
@@ -145,6 +158,11 @@ const AppStudentResultsRoute = AppStudentResultsRouteImport.update({
 const AppStudentQuizzesRoute = AppStudentQuizzesRouteImport.update({
   id: '/quizzes',
   path: '/quizzes',
+  getParentRoute: () => AppStudentRouteRoute,
+} as any)
+const AppStudentProfileRoute = AppStudentProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AppStudentRouteRoute,
 } as any)
 const AppStudentMaterialsRoute = AppStudentMaterialsRouteImport.update({
@@ -200,12 +218,15 @@ export interface FileRoutesByFullPath {
   '/admin/classes': typeof AppAdminClassesRoute
   '/admin/students': typeof AppAdminStudentsRoute
   '/student/materials': typeof AppStudentMaterialsRoute
+  '/student/profile': typeof AppStudentProfileRoute
   '/student/quizzes': typeof AppStudentQuizzesRoute
   '/student/results': typeof AppStudentResultsRoute
+  '/student/settings': typeof AppStudentSettingsRoute
   '/student/tutor': typeof AppStudentTutorRoute
   '/teacher/generate': typeof AppTeacherGenerateRoute
   '/teacher/library': typeof AppTeacherLibraryRoute
   '/teacher/materials': typeof AppTeacherMaterialsRoute
+  '/teacher/settings': typeof AppTeacherSettingsRoute
   '/admin/': typeof AppAdminIndexRoute
   '/student/': typeof AppStudentIndexRoute
   '/teacher/': typeof AppTeacherIndexRoute
@@ -226,12 +247,15 @@ export interface FileRoutesByTo {
   '/admin/classes': typeof AppAdminClassesRoute
   '/admin/students': typeof AppAdminStudentsRoute
   '/student/materials': typeof AppStudentMaterialsRoute
+  '/student/profile': typeof AppStudentProfileRoute
   '/student/quizzes': typeof AppStudentQuizzesRoute
   '/student/results': typeof AppStudentResultsRoute
+  '/student/settings': typeof AppStudentSettingsRoute
   '/student/tutor': typeof AppStudentTutorRoute
   '/teacher/generate': typeof AppTeacherGenerateRoute
   '/teacher/library': typeof AppTeacherLibraryRoute
   '/teacher/materials': typeof AppTeacherMaterialsRoute
+  '/teacher/settings': typeof AppTeacherSettingsRoute
   '/admin': typeof AppAdminIndexRoute
   '/student': typeof AppStudentIndexRoute
   '/teacher': typeof AppTeacherIndexRoute
@@ -258,12 +282,15 @@ export interface FileRoutesById {
   '/_app/admin/classes': typeof AppAdminClassesRoute
   '/_app/admin/students': typeof AppAdminStudentsRoute
   '/_app/student/materials': typeof AppStudentMaterialsRoute
+  '/_app/student/profile': typeof AppStudentProfileRoute
   '/_app/student/quizzes': typeof AppStudentQuizzesRoute
   '/_app/student/results': typeof AppStudentResultsRoute
+  '/_app/student/settings': typeof AppStudentSettingsRoute
   '/_app/student/tutor': typeof AppStudentTutorRoute
   '/_app/teacher/generate': typeof AppTeacherGenerateRoute
   '/_app/teacher/library': typeof AppTeacherLibraryRoute
   '/_app/teacher/materials': typeof AppTeacherMaterialsRoute
+  '/_app/teacher/settings': typeof AppTeacherSettingsRoute
   '/_app/admin/': typeof AppAdminIndexRoute
   '/_app/student/': typeof AppStudentIndexRoute
   '/_app/teacher/': typeof AppTeacherIndexRoute
@@ -289,12 +316,15 @@ export interface FileRouteTypes {
     | '/admin/classes'
     | '/admin/students'
     | '/student/materials'
+    | '/student/profile'
     | '/student/quizzes'
     | '/student/results'
+    | '/student/settings'
     | '/student/tutor'
     | '/teacher/generate'
     | '/teacher/library'
     | '/teacher/materials'
+    | '/teacher/settings'
     | '/admin/'
     | '/student/'
     | '/teacher/'
@@ -315,12 +345,15 @@ export interface FileRouteTypes {
     | '/admin/classes'
     | '/admin/students'
     | '/student/materials'
+    | '/student/profile'
     | '/student/quizzes'
     | '/student/results'
+    | '/student/settings'
     | '/student/tutor'
     | '/teacher/generate'
     | '/teacher/library'
     | '/teacher/materials'
+    | '/teacher/settings'
     | '/admin'
     | '/student'
     | '/teacher'
@@ -346,12 +379,15 @@ export interface FileRouteTypes {
     | '/_app/admin/classes'
     | '/_app/admin/students'
     | '/_app/student/materials'
+    | '/_app/student/profile'
     | '/_app/student/quizzes'
     | '/_app/student/results'
+    | '/_app/student/settings'
     | '/_app/student/tutor'
     | '/_app/teacher/generate'
     | '/_app/teacher/library'
     | '/_app/teacher/materials'
+    | '/_app/teacher/settings'
     | '/_app/admin/'
     | '/_app/student/'
     | '/_app/teacher/'
@@ -482,6 +518,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminIndexRouteImport
       parentRoute: typeof AppAdminRouteRoute
     }
+    '/_app/teacher/settings': {
+      id: '/_app/teacher/settings'
+      path: '/settings'
+      fullPath: '/teacher/settings'
+      preLoaderRoute: typeof AppTeacherSettingsRouteImport
+      parentRoute: typeof AppTeacherRouteRoute
+    }
     '/_app/teacher/materials': {
       id: '/_app/teacher/materials'
       path: '/materials'
@@ -510,6 +553,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppStudentTutorRouteImport
       parentRoute: typeof AppStudentRouteRoute
     }
+    '/_app/student/settings': {
+      id: '/_app/student/settings'
+      path: '/settings'
+      fullPath: '/student/settings'
+      preLoaderRoute: typeof AppStudentSettingsRouteImport
+      parentRoute: typeof AppStudentRouteRoute
+    }
     '/_app/student/results': {
       id: '/_app/student/results'
       path: '/results'
@@ -522,6 +572,13 @@ declare module '@tanstack/react-router' {
       path: '/quizzes'
       fullPath: '/student/quizzes'
       preLoaderRoute: typeof AppStudentQuizzesRouteImport
+      parentRoute: typeof AppStudentRouteRoute
+    }
+    '/_app/student/profile': {
+      id: '/_app/student/profile'
+      path: '/profile'
+      fullPath: '/student/profile'
+      preLoaderRoute: typeof AppStudentProfileRouteImport
       parentRoute: typeof AppStudentRouteRoute
     }
     '/_app/student/materials': {
@@ -602,16 +659,20 @@ const AppAdminRouteRouteWithChildren = AppAdminRouteRoute._addFileChildren(
 
 interface AppStudentRouteRouteChildren {
   AppStudentMaterialsRoute: typeof AppStudentMaterialsRoute
+  AppStudentProfileRoute: typeof AppStudentProfileRoute
   AppStudentQuizzesRoute: typeof AppStudentQuizzesRoute
   AppStudentResultsRoute: typeof AppStudentResultsRoute
+  AppStudentSettingsRoute: typeof AppStudentSettingsRoute
   AppStudentTutorRoute: typeof AppStudentTutorRoute
   AppStudentIndexRoute: typeof AppStudentIndexRoute
 }
 
 const AppStudentRouteRouteChildren: AppStudentRouteRouteChildren = {
   AppStudentMaterialsRoute: AppStudentMaterialsRoute,
+  AppStudentProfileRoute: AppStudentProfileRoute,
   AppStudentQuizzesRoute: AppStudentQuizzesRoute,
   AppStudentResultsRoute: AppStudentResultsRoute,
+  AppStudentSettingsRoute: AppStudentSettingsRoute,
   AppStudentTutorRoute: AppStudentTutorRoute,
   AppStudentIndexRoute: AppStudentIndexRoute,
 }
@@ -624,6 +685,7 @@ interface AppTeacherRouteRouteChildren {
   AppTeacherGenerateRoute: typeof AppTeacherGenerateRoute
   AppTeacherLibraryRoute: typeof AppTeacherLibraryRoute
   AppTeacherMaterialsRoute: typeof AppTeacherMaterialsRoute
+  AppTeacherSettingsRoute: typeof AppTeacherSettingsRoute
   AppTeacherIndexRoute: typeof AppTeacherIndexRoute
 }
 
@@ -631,6 +693,7 @@ const AppTeacherRouteRouteChildren: AppTeacherRouteRouteChildren = {
   AppTeacherGenerateRoute: AppTeacherGenerateRoute,
   AppTeacherLibraryRoute: AppTeacherLibraryRoute,
   AppTeacherMaterialsRoute: AppTeacherMaterialsRoute,
+  AppTeacherSettingsRoute: AppTeacherSettingsRoute,
   AppTeacherIndexRoute: AppTeacherIndexRoute,
 }
 

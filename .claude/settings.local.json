@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm run:*)",
+      "Bash(npx vite:*)",
+      "Bash(pnpm dev:*)",
+      "mcp__OpusCode__understand_image",
+      "mcp__OpusCode__web_search"
+    ]
+  }
+}

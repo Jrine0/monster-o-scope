@@ -124,9 +124,12 @@ export function useKaleidoscope(canvasId: string) {
       const INK_RGB = params._ink || getInkRGB();
       const light   = isLightMode();
 
-      const alphaCap = light ? 0.30 : 0.85;
+      // ── Unified opacity: visible in both light and dark modes
+      // Light mode: darker ink on light bg needs higher opacity to stand out
+      // Dark mode: lighter ink on dark bg needs good visibility too
+      const alphaCap = light ? 0.55 : 0.95;
       const alpha    = clamp(opacity, 0, alphaCap);
-      const LW       = light ? 1.0  : 1.4;
+      const LW       = light ? 1.2 : 1.6;
 
       // ── Layer 1: outer spokes + rings + polygons ──
       ctx!.save();
@@ -242,17 +245,18 @@ export function useKaleidoscope(canvasId: string) {
 
       const light = isLightMode();
 
-      // ── CHANGED: dark mode gets a strong floor so it's visible at sNorm=0 (hero)
-      // Light mode unchanged. opacityCurve removed for dark so it doesn't
-      // crush opacity at the top of the page.
+      // ── Unified visibility: kaleidoscope visible in both light and dark
+      // Light mode: higher opacity to stand out against cream/white backgrounds
+      // Dark mode: strong floor for hero section visibility
       let opacity: number;
       if (light) {
-        const opacityBase  = lerp(0.18, 0.28, sNorm);
-        const opacityCurve = 1 - Math.pow(Math.abs(sNorm - 0.5) * 2, 3) * 0.3;
-        opacity = opacityBase * opacityCurve + state.burst * 0.10;
+        // Light mode: raise opacity significantly so it's clearly visible
+        const opacityBase  = lerp(0.45, 0.65, sNorm);
+        const opacityCurve = 1 - Math.pow(Math.abs(sNorm - 0.5) * 2, 3) * 0.15;
+        opacity = opacityBase * opacityCurve + state.burst * 0.15;
       } else {
-        // Higher floor so it's clearly visible on dark backgrounds
-        opacity = lerp(0.75, 1.00, sNorm) + state.burst * 0.25;
+        // Dark mode: increase visibility further
+        opacity = lerp(0.85, 1.10, sNorm) + state.burst * 0.30;
       }
 
       return {
@@ -265,6 +269,11 @@ export function useKaleidoscope(canvasId: string) {
     function drawSatellites(t: number, sNorm: number) {
       const W = canvas!.width;
       const H = canvas!.height;
+      const light = isLightMode();
+
+      // Raise satellite opacity for light mode visibility
+      const satelliteOpacity = light ? 0.18 : 0.12;
+      const bloomOpacity = light ? 0.14 : 0.10;
 
       const midFade = clamp((sNorm - 0.25) / 0.2, 0, 1);
       if (midFade > 0) {
@@ -273,7 +282,7 @@ export function useKaleidoscope(canvasId: string) {
           baseRadius: sr, segments: 6, rings: 3, polygonSides: 6,
           outerRot: -(t * 0.01) - sNorm * 2,
           innerRot: t * 0.015, centerRot: -(t * 0.02),
-          opacity: 0.08 * midFade,
+          opacity: satelliteOpacity * midFade,
           burstScale: 1 + state.burst * 0.08, scrollNorm: sNorm,
         };
         params._ink = getInkRGB();
@@ -288,7 +297,7 @@ export function useKaleidoscope(canvasId: string) {
           baseRadius: br, segments: 16, rings: 6, polygonSides: 10,
           outerRot: t * 0.005 + sNorm,
           innerRot: -(t * 0.007) - sNorm * 0.5, centerRot: t * 0.011,
-          opacity: 0.06 * bloomFade,
+          opacity: bloomOpacity * bloomFade,
           burstScale: 1, scrollNorm: sNorm,
         };
         params._ink = getInkRGB();

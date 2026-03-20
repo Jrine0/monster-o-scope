@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Courier New", monospace; background: #f6f6f2; color: #1e1c18; padding: 2rem; }
+  
+  .ds-page { max-width: 900px; margin: 0 auto; }
+  
+  .ds-title {
+    font-family: Georgia, serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #9a9590;
+    margin-bottom: 0.3rem;
+  }
+  .ds-wordmark {
+    font-family: Georgia, serif;
+    font-size: 48px;
+    font-style: italic;
+    font-weight: 400;
+    color: #1e1c18;
+    transform: rotate(-0.4deg);
+    display: inline-block;
+    margin-bottom: 0.25rem;
+  }
+  .ds-subtitle {
+    font-size: 11px;
+    color: #9a9590;
+    letter-spacing: 0.12em;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1.5px solid #d4610a;
+  }
+
+  .ds-section { margin-bottom: 2.5rem; }
+  .ds-section-label {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #d4610a;
+    margin-bottom: 1rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid #e8e6de;
+  }
+
+  .ds-grid { display: grid; gap: 0.75rem; }
+  .ds-grid-2 { grid-template-columns: 1fr 1fr; }
+  .ds-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .ds-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+  .token-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: #f0efe9;
+    border-left: 2px solid #e8e6de;
+  }
+  .token-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  .token-name { font-size: 10px; color: #5a5750; flex: 1; }
+  .token-value { font-size: 10px; color: #1e1c18; font-weight: 600; }
+
+  .theme-col {
+    padding: 1rem;
+    border: 1px solid #e8e6de;
+  }
+  .theme-col-label {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .theme-col.light { background: #f6f6f2; }
+  .theme-col.dark  { background: #07080d; }
+
+  .swatch-row { display: flex; gap: 4px; margin-bottom: 0.5rem; align-items: center; }
+  .swatch-small { width: 22px; height: 22px; border-radius: 2px; }
+  .swatch-label { font-size: 9px; }
+
+  .font-specimen { padding: 0.75rem; background: #f0efe9; margin-bottom: 0.5rem; border-left: 2px solid #e8e6de; }
+  .font-meta { font-size: 9px; color: #9a9590; letter-spacing: 0.12em; margin-bottom: 0.3rem; text-transform: uppercase; }
+
+  .component-demo { padding: 1rem; border: 1px solid #e8e6de; background: #f6f6f2; }
+
+  .btn-sketch {
+    display: inline-flex;
+    align-items: center;
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 14px;
+    padding: 0.5rem 1.4rem;
+    background: transparent;
+    color: #1e1c18;
+    border: none;
+    cursor: default;
+    position: relative;
+    transform: rotate(-0.4deg);
+    display: inline-block;
+  }
+  .btn-sketch::before {
+    content: "";
+    position: absolute; inset: 0;
+    border: 1.5px solid rgba(30,28,24,0.35);
+    clip-path: polygon(0.5% 4%, 2% 0.5%, 98% 1.5%, 99.5% 0%, 100% 96%, 98.5% 99.5%, 2% 98.5%, 0% 100%);
+  }
+  .btn-sketch.filled {
+    background: #d4610a;
+    color: #f6f6f2;
+    font-weight: 700;
+    transform: rotate(-0.5deg);
+  }
+  .btn-sketch.filled::before { border-color: #d4610a; }
+
+  .card-demo {
+    padding: 1.25rem 1.1rem;
+    background: rgba(232,230,222,0.75);
+    position: relative;
+    transform: rotate(-0.5deg);
+  }
+  .card-demo::before {
+    content: "";
+    position: absolute; inset: 0;
+    border: 1.5px solid rgba(30,28,24,0.14);
+    clip-path: polygon(1% 1%, 99% 0.5%, 100% 99%, 0.5% 100%);
+    pointer-events: none;
+  }
+  .card-annot {
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 10px;
+    color: #d4610a;
+    opacity: 0.7;
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  .card-num { font-size: 9px; letter-spacing: 0.2em; color: #d4610a; margin-bottom: 0.3rem; opacity: 0.65; }
+  .card-title-t { font-family: Georgia, serif; font-style: italic; font-size: 18px; color: #1e1c18; }
+  .card-body-t { font-family: Georgia, serif; font-style: italic; font-size: 11px; color: #5a5750; line-height: 1.7; margin-top: 0.4rem; }
+
+  .nav-demo {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.7rem 1.2rem;
+    background: rgba(246,246,242,0.92);
+    border-bottom: 1px solid rgba(43,43,43,0.05);
+    margin-bottom: 0.5rem;
+  }
+  .nav-logo-t {
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 16px;
+    color: #1e1c18;
+    transform: rotate(-0.5deg);
+    display: inline-block;
+  }
+  .nav-links-t { display: flex; gap: 1.2rem; }
+  .nav-link-t {
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 11px;
+    color: #5a5750;
+    text-decoration: none;
+  }
+  .nav-toggle-t {
+    width: 26px; height: 26px;
+    border: 1.5px solid rgba(43,43,43,0.2);
+    border-radius: 4px;
+    clip-path: polygon(0.5% 4%, 2% 0.5%, 98% 1.5%, 99.5% 0%, 100% 96%, 98.5% 99.5%, 2% 98.5%, 0% 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #5a5750;
+  }
+
+  .box-demo {
+    margin-bottom: 0.5rem;
+    border-left: 4px solid #d4610a;
+    overflow: hidden;
+  }
+  .box-label {
+    padding: 0.3rem 0.6rem;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+  }
+  .box-body-t {
+    padding: 0.4rem 0.7rem 0.5rem;
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .grid-bg-demo {
+    width: 100%;
+    height: 60px;
+    background-image:
+      linear-gradient(rgba(43,43,43,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(43,43,43,0.04) 1px, transparent 1px);
+    background-size: 20px 20px;
+    border: 1px solid #e8e6de;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .grid-bg-demo-dark {
+    background-color: #07080d;
+    background-image:
+      linear-gradient(rgba(237,233,223,0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(237,233,223,0.022) 1px, transparent 1px);
+  }
+
+  .rule-line { height: 1px; background: #d4610a; opacity: 0.45; margin: 0.5rem 0; }
+
+  .spacing-row { display: flex; align-items: flex-end; gap: 0.5rem; margin-bottom: 0.4rem; }
+  .spacing-block { background: #dedad0; border-top: 2px solid #d4610a; display: flex; align-items: flex-end; justify-content: center; }
+  .spacing-meta { font-size: 9px; color: #9a9590; text-align: center; margin-top: 3px; }
+
+  .motion-item {
+    padding: 0.4rem 0.75rem;
+    background: #f0efe9;
+    border-left: 2px solid #e8e6de;
+    margin-bottom: 0.4rem;
+  }
+  .motion-name { font-size: 10px; color: #1e1c18; font-weight: 600; }
+  .motion-val  { font-size: 10px; color: #5a5750; margin-top: 2px; }
+
+  .dark-preview {
+    background: #07080d;
+    padding: 1rem;
+    border-radius: 4px;
+  }
+  .dark-preview .token-row { background: #12141e; border-left-color: #1f2230; }
+  .dark-preview .token-name { color: #8a8d9a; }
+  .dark-preview .token-value { color: #ede9df; }
+
+  .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+  .do-box { padding: 0.6rem; border-left: 3px solid #388a52; background: #f4faf5; font-size: 10px; color: #1e1c18; }
+  .dont-box { padding: 0.6rem; border-left: 3px solid #c4570a; background: #fef8f5; font-size: 10px; color: #1e1c18; }
+  .do-label { font-size: 9px; letter-spacing: 0.15em; color: #388a52; margin-bottom: 0.3rem; font-weight: 700; }
+  .dont-label { font-size: 9px; letter-spacing: 0.15em; color: #c4570a; margin-bottom: 0.3rem; font-weight: 700; }
+
+  hr.ds-rule { border: none; border-top: 1px solid #e8e6de; margin: 2rem 0; }
+
+  .eyebrow-demo {
+    display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;
+  }
+  .eyebrow-line { width: 2rem; height: 1px; background: #d4610a; opacity: 0.5; }
+  .eyebrow-text-t {
+    font-family: "Courier New", monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #d4610a;
+    opacity: 0.85;
+  }
+</style>
+</head>
+<body>
+<div class="ds-page">
+
+  <div class="ds-title">Design System</div>
+  <div class="ds-wordmark">Schoolme</div>
+  <div class="ds-subtitle">Dark Sketchbook · Light Paper &nbsp;—&nbsp; v1.0 &nbsp;·&nbsp; both themes documented below</div>
+
+  <!-- COLOUR SYSTEM -->
+  <div class="ds-section">
+    <div class="ds-section-label">01 &nbsp; Colour tokens</div>
+    <div class="ds-grid ds-grid-2" style="gap:1rem">
+
+      <div>
+        <div style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#5a5750;margin-bottom:.5rem">☀️  light mode  [data-theme="light"]</div>
+        <div class="token-row"><div class="token-swatch" style="background:#f6f6f2"></div><div class="token-name">--bg-deepest &nbsp; page</div><div class="token-value">#f6f6f2</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#f0efe9"></div><div class="token-name">--bg-deep &nbsp; sections</div><div class="token-value">#f0efe9</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#eceae3"></div><div class="token-name">--bg-surface</div><div class="token-value">#eceae3</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#e8e6de"></div><div class="token-name">--bg-elevated &nbsp; cards</div><div class="token-value">#e8e6de</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#dedad0"></div><div class="token-name">--bg-muted</div><div class="token-value">#dedad0</div></div>
+        <div style="height:.4rem"></div>
+        <div class="token-row"><div class="token-swatch" style="background:#1e1c18"></div><div class="token-name">--text-primary</div><div class="token-value">#1e1c18</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#5a5750"></div><div class="token-name">--text-secondary</div><div class="token-value">#5a5750</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#9a9590"></div><div class="token-name">--text-muted</div><div class="token-value">#9a9590</div></div>
+        <div style="height:.4rem"></div>
+        <div class="token-row"><div class="token-swatch" style="background:#d4610a"></div><div class="token-name">--orange &nbsp; primary accent</div><div class="token-value">#d4610a</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#f2740d"></div><div class="token-name">--orange-bright &nbsp; hover</div><div class="token-value">#f2740d</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:rgba(212,97,10,.12)"></div><div class="token-name">--orange-dim &nbsp; glow fill</div><div class="token-value">rgba(212,97,10,.12)</div></div>
+      </div>
+
+      <div class="dark-preview">
+        <div style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#8a8d9a;margin-bottom:.5rem">🌙  dark mode  (default)</div>
+        <div class="token-row"><div class="token-swatch" style="background:#07080d;border-color:rgba(255,255,255,.15)"></div><div class="token-name">--bg-deepest &nbsp; page</div><div class="token-value">#07080d</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#0d0f17;border-color:rgba(255,255,255,.1)"></div><div class="token-name">--bg-deep &nbsp; sections</div><div class="token-value">#0d0f17</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#12141e;border-color:rgba(255,255,255,.1)"></div><div class="token-name">--bg-surface</div><div class="token-value">#12141e</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#191c28;border-color:rgba(255,255,255,.1)"></div><div class="token-name">--bg-elevated &nbsp; cards</div><div class="token-value">#191c28</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#1f2230;border-color:rgba(255,255,255,.1)"></div><div class="token-name">--bg-muted</div><div class="token-value">#1f2230</div></div>
+        <div style="height:.4rem"></div>
+        <div class="token-row"><div class="token-swatch" style="background:#ede9df"></div><div class="token-name">--text-primary &nbsp; warm ivory</div><div class="token-value">#ede9df</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#8a8d9a"></div><div class="token-name">--text-secondary</div><div class="token-value">#8a8d9a</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#4e5060"></div><div class="token-name">--text-muted</div><div class="token-value">#4e5060</div></div>
+        <div style="height:.4rem"></div>
+        <div class="token-row"><div class="token-swatch" style="background:#f2740d"></div><div class="token-name">--orange</div><div class="token-value">#f2740d</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:#fb923c"></div><div class="token-name">--orange-bright</div><div class="token-value">#fb923c</div></div>
+        <div class="token-row"><div class="token-swatch" style="background:rgba(242,116,13,.15)"></div><div class="token-name">--orange-dim</div><div class="token-value">rgba(242,116,13,.15)</div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="ds-rule">
+
+  <!-- TYPOGRAPHY -->
+  <div class="ds-section">
+    <div class="ds-section-label">02 &nbsp; Typography</div>
+    <div style="margin-bottom:.75rem">
+      <div class="font-specimen">
+        <div class="font-meta">Caveat — display, headings, wordmark, buttons, labels &nbsp;·&nbsp; wght 400–700</div>
+        <div style="font-family:Georgia,serif;font-style:italic;font-size:36px;color:#1e1c18;transform:rotate(-.3deg);display:inline-block">Schoolme</div>
+        <span style="font-size:12px;font-family:Georgia,serif;font-style:italic;color:#5a5750;margin-left:1rem">Section headings &amp; CTAs</span>
+      </div>
+      <div class="font-specimen">
+        <div class="font-meta">Lora — body serif, subtitles, card copy &nbsp;·&nbsp; regular 400 + italic</div>
+        <div style="font-family:Georgia,serif;font-style:italic;font-size:15px;color:#1e1c18;line-height:1.75">Every subject. Every chapter. Taught the way kids actually learn.</div>
+      </div>
+      <div class="font-specimen">
+        <div class="font-meta">Courier Prime — labels, eyebrows, annotations, mono text &nbsp;·&nbsp; regular</div>
+        <div style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:.18em;color:#d4610a;text-transform:uppercase">Learning, for every kid</div>
+        <div style="font-family:'Courier New',monospace;font-size:10px;color:#9a9590;margin-top:.3rem">fig. 1 — landing &nbsp;·&nbsp; rev. 01 &nbsp;·&nbsp; schoolme / edu platform</div>
+      </div>
+    </div>
+    <div class="ds-grid" style="gap:.35rem">
+      <div style="display:flex;align-items:baseline;gap:1rem;padding:.3rem 0;border-bottom:1px solid #e8e6de">
+        <div style="width:120px;font-size:9px;color:#9a9590;letter-spacing:.1em">Hero title</div>
+        <div style="font-family:Georgia,serif;font-style:italic;font-size:32px;color:#1e1c18;line-height:1">Schoolme</div>
+        <div style="font-size:9px;color:#9a9590">clamp(5.5–10.5rem) · Caveat 400 · rotate –0.5deg</div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:1rem;padding:.3rem 0;border-bottom:1px solid #e8e6de">
+        <div style="width:120px;font-size:9px;color:#9a9590;letter-spacing:.1em">Section title</div>
+        <div style="font-family:Georgia,serif;font-style:italic;font-size:22px;color:#1e1c18">Built for educators</div>
+        <div style="font-size:9px;color:#9a9590">clamp(2.5–4rem) · Caveat · rotate –0.3deg</div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:1rem;padding:.3rem 0;border-bottom:1px solid #e8e6de">
+        <div style="width:120px;font-size:9px;color:#9a9590;letter-spacing:.1em">Eyebrow label</div>
+        <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#d4610a">Learning, for every kid</div>
+        <div style="font-size:9px;color:#9a9590">0.66rem · Courier Prime · ls 0.22em · orange</div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:1rem;padding:.3rem 0;border-bottom:1px solid #e8e6de">
+        <div style="width:120px;font-size:9px;color:#9a9590;letter-spacing:.1em">Body / subtitle</div>
+        <div style="font-family:Georgia,serif;font-style:italic;font-size:13px;color:#5a5750">Every chapter. Taught the way kids actually learn.</div>
+        <div style="font-size:9px;color:#9a9590">1rem · Lora italic · text-secondary</div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:1rem;padding:.3rem 0;border-bottom:1px solid #e8e6de">
+        <div style="width:120px;font-size:9px;color:#9a9590;letter-spacing:.1em">Annotation</div>
+        <div style="font-family:Georgia,serif;font-style:italic;font-size:11px;color:#9a9590;opacity:.6">fig. 1 — landing</div>
+        <div style="font-size:9px;color:#9a9590">0.82rem · Caveat (or Courier Prime) · opacity 0.5</div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:1rem;padding:.3rem 0">
+        <div style="width:120px;font-size:9px;color:#9a9590;letter-spacing:.1em">Card number</div>
+        <div style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:.2em;color:#d4610a;opacity:.65">01 ——</div>
+        <div style="font-size:9px;color:#9a9590">0.68rem · Courier Prime · orange · ls 0.2em · opacity 0.65</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="ds-rule">
+
+  <!-- GRID & TEXTURE -->
+  <div class="ds-section">
+    <div class="ds-section-label">03 &nbsp; Backgrounds & texture</div>
+    <div class="ds-grid ds-grid-2" style="gap:.75rem">
+      <div>
+        <div style="font-size:9px;color:#9a9590;margin-bottom:.3rem">Light grid paper</div>
+        <div class="grid-bg-demo">
+          <span style="font-family:Georgia,serif;font-style:italic;font-size:12px;color:#5a5750">grid-paper class</span>
+        </div>
+        <div style="font-size:9px;color:#9a9590;margin-top:.3rem">40×40px · rgba(43,43,43, 0.04)</div>
+      </div>
+      <div>
+        <div style="font-size:9px;color:#9a9590;margin-bottom:.3rem">Dark grid paper</div>
+        <div class="grid-bg-demo grid-bg-demo-dark">
+          <span style="font-family:Georgia,serif;font-style:italic;font-size:12px;color:#8a8d9a">grid-paper (dark)</span>
+        </div>
+        <div style="font-size:9px;color:#9a9590;margin-top:.3rem">40×40px · rgba(237,233,223, 0.022)</div>
+      </div>
+    </div>
+    <div style="margin-top:.75rem;font-size:10px;color:#5a5750;background:#f0efe9;padding:.6rem .8rem;border-left:2px solid #e8e6de;line-height:1.7">
+      <strong>Grain overlay</strong> — body::after, fixed inset 0, SVG feTurbulence noise, opacity 0.055, mix-blend-mode: soft-light, z-index 9000. Applies to all pages identically. Do not replicate — inherit from base styles.
+    </div>
+  </div>
+
+  <hr class="ds-rule">
+
+  <!-- BORDERS -->
+  <div class="ds-section">
+    <div class="ds-section-label">04 &nbsp; Borders</div>
+    <div class="ds-grid ds-grid-2" style="gap:.5rem">
+      <div>
+        <div style="font-size:9px;color:#9a9590;margin-bottom:.4rem">Light mode</div>
+        <div class="token-row"><div class="token-name">--border-default</div><div class="token-value">rgba(43,43,43, 0.10)</div></div>
+        <div class="token-row"><div class="token-name">--border-subtle</div><div class="token-value">rgba(43,43,43, 0.05)</div></div>
+        <div class="token-row"><div class="token-name">--border-strong</div><div class="token-value">rgba(43,43,43, 0.16)</div></div>
+      </div>
+      <div>
+        <div style="font-size:9px;color:#9a9590;margin-bottom:.4rem">Dark mode</div>
+        <div class="token-row" style="background:#12141e;border-left-color:#1f2230"><div class="token-name" style="color:#8a8d9a">--border-default</div><div class="token-value" style="color:#ede9df">rgba(255,255,255, 0.06)</div></div>
+        <div class="token-row" style="background:#12141e;border-left-color:#1f2230"><div class="token-name" style="color:#8a8d9a">--border-subtle</div><div class="token-value" style="color:#ede9df">rgba(255,255,255, 0.03)</div></div>
+        <div class="token-row" style="background:#12141e;border-left-color:#1f2230"><div class="token-name" style="color:#8a8d9a">--border-strong</div><div class="token-value" style="color:#ede9df">rgba(255,255,255, 0.10)</div></div>
+      </div>
+    </div>
+    <div style="margin-top:.6rem;font-size:10px;color:#5a5750;background:#f0efe9;padding:.5rem .8rem;border-left:2px solid #e8e6de">
+      Orange accent rule: 1.5px solid #d4610a (light) · #f2740d (dark) — used for scroll progress bar, section underlines, box left borders.
+    </div>
+  </div>
+
+  <hr class="ds-rule">
+
+  <!-- COMPONENTS -->
+  <div class="ds-section">
+    <div class="ds-section-label">05 &nbsp; Components</div>
+
+    <!-- Nav -->
+    <div style="font-size:9px;color:#9a9590;margin-bottom:.3rem">Navigation bar</div>
+    <div class="nav-demo">
+      <div class="nav-logo-t">SchoolMe</div>
+      <div class="nav-links-t">
+        <a class="nav-link-t">Platform</a>
+        <a class="nav-link-t">Features</a>
+        <a class="nav-link-t">Pricing</a>
+        <a class="nav-link-t">About</a>
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <div class="nav-toggle-t">☀</div>
+        <div style="padding:.3rem .9rem;border:1.5px solid rgba(30,28,24,.25);font-size:11px;font-family:Georgia,serif;font-style:italic;color:#1e1c18;clip-path:polygon(.5% 4%,2% .5%,98% 1.5%,99.5% 0,100% 96%,98.5% 99.5%,2% 98.5%,0 100%)">Sign in</div>
+      </div>
+    </div>
+    <div style="font-size:9px;color:#9a9590;margin-bottom:1rem">position: fixed · backdrop-filter: blur(12px) · border-bottom: 1px border-subtle · Lora italic nav links · Caveat logo</div>
+
+    <!-- Buttons -->
+    <div style="font-size:9px;color:#9a9590;margin-bottom:.3rem">Buttons (sketch-btn)</div>
+    <div style="display:flex;gap:1.5rem;align-items:center;padding:1rem;background:#f0efe9;margin-bottom:.3rem">
+      <div class="btn-sketch">View Demo</div>
+      <div class="btn-sketch filled">Get Started</div>
+    </div>
+    <div style="font-size:9px;color:#9a9590;margin-bottom:1rem">
+      Outline: Caveat font · clip-path wobbly border · rotate –0.4deg · hover: orange border + translateY(–2px)<br>
+      Filled: bg orange · dark text · rotate –0.5deg · cta-glow animation (3s cycle)
+    </div>
+
+    <!-- Eyebrow -->
+    <div style="font-size:9px;color:#9a9590;margin-bottom:.3rem">Section eyebrow</div>
+    <div style="padding:.75rem;background:#f0efe9;margin-bottom:1rem">
+      <div class="eyebrow-demo">
+        <div class="eyebrow-line"></div>
+        <div class="eyebrow-text-t">Learning, for every kid</div>
+        <div class="eyebrow-line"></div>
+      </div>
+      <div style="font-size:9px;color:#9a9590">Courier Prime · 0.66rem · ls 0.22em · uppercase · flanked by 1px orange rules (width: 3rem, opacity .5)</div>
+    </div>
+
+    <!-- Cards -->
+    <div style="font-size:9px;color:#9a9590;margin-bottom:.3rem">Feature card (sketch-card)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.3rem">
+      <div class="card-demo">
+        <span class="card-annot">fig. 2 — feature</span>
+        <div class="card-num">01 ——</div>
+        <div class="card-title-t">Learn visually</div>
+        <div class="card-body-t">Diagrams, animations, and step-by-step walkthroughs for every concept.</div>
+      </div>
+      <div class="card-demo" style="transform:rotate(.4deg)">
+        <div class="card-num">02 ——</div>
+        <div class="card-title-t">Test yourself</div>
+        <div class="card-body-t">Spaced repetition quizzes that adapt to what you actually need to practise.</div>
+      </div>
+    </div>
+    <div style="font-size:9px;color:#9a9590;margin-bottom:1rem">
+      clip-path wobbly border · rgba bg · small rotation (alternates –0.5 / +0.4 / –0.3deg) · hover: rotate(0) translateY(–5px) + orange glow
+    </div>
+
+    <!-- Note boxes -->
+    <div style="font-size:9px;color:#9a9590;margin-bottom:.3rem">Study note boxes (DOCX / content)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.3rem">
+      <div>
+        <div class="box-demo"><div class="box-label" style="background:#c8d9f8;color:#1a56b0">📘  DEFINITION</div><div class="box-body-t" style="background:#dde8fb;color:#1e1c18">A formal explanation of a key term.</div></div>
+        <div class="box-demo" style="border-left-color:#8b72d8"><div class="box-label" style="background:#d8d0f8;color:#5b21b6">📐  FORMULA</div><div class="box-body-t" style="background:#ebe6fc;color:#1e1c18;text-align:center;font-size:14px">6CO₂ + 6H₂O → C₆H₁₂O₆</div></div>
+        <div class="box-demo" style="border-left-color:#52a875"><div class="box-label" style="background:#c0e8d0;color:#166534">🌍  CONNECTION</div><div class="box-body-t" style="background:#d9f2e4;color:#1e1c18">Every meal you eat traces to photosynthesis.</div></div>
+      </div>
+      <div>
+        <div class="box-demo" style="border-left-color:#d4a017"><div class="box-label" style="background:#fae89a;color:#92600a">⚠️   REMEMBER</div><div class="box-body-t" style="background:#fef6d0;color:#1e1c18">Stomata close at night, not daytime.</div></div>
+        <div class="box-demo" style="border-left-color:#38a169"><div class="box-label" style="background:#b0eac8;color:#065f46">✅  CHECKLIST</div><div class="box-body-t" style="background:#d4f5e3;color:#1e1c18">☐  I can write the balanced equation</div></div>
+        <div class="box-demo" style="border-left-color:#d4610a"><div class="box-label" style="background:#fad4b0;color:#9a3412">🎬  WATCH</div><div class="box-body-t" style="background:#fde8d4;color:#1e1c18;font-size:10px">🔗  Photosynthesis step-by-step · scan QR</div></div>
+      </div>
+    </div>
+    <div style="font-size:9px;color:#9a9590;margin-bottom:1rem">
+      Thick orange left rule (4px) · label row uses stripe colour (10% darker than fill) · body row has outer border on right + bottom only.
+    </div>
+  </div>
+
+  <hr class="ds-rule">
+
+  <!-- MOTION -->
+  <div class="ds-section">
+    <div class="ds-section-label">06 &nbsp; Motion & easing</div>
+    <div class="ds-grid ds-grid-2" style="gap:.4rem">
+      <div class="motion-item"><div class="motion-name">--ease-spring</div><div class="motion-val">cubic-bezier(0.34, 1.56, 0.64, 1) — button hover, toggle icon</div></div>
+      <div class="motion-item"><div class="motion-name">--ease-gentle</div><div class="motion-val">cubic-bezier(0.16, 1, 0.3, 1) — cards, overlays</div></div>
+      <div class="motion-item"><div class="motion-name">fadeUp</div><div class="motion-val">translateY 28px → 0 · 1.3s ease-out · stagger 0.10 / 0.45 / 0.75 / 1.05s</div></div>
+      <div class="motion-item"><div class="motion-name">reveal (scroll)</div><div class="motion-val">opacity+translateY 32px · 0.8s ease · IntersectionObserver</div></div>
+      <div class="motion-item"><div class="motion-name">shimmer-sweep</div><div class="motion-val">22s cycle · 7s sweep + 15s pause · hero title only · dark mode only</div></div>
+      <div class="motion-item"><div class="motion-name">cta-glow</div><div class="motion-val">orange box-shadow 0→40px · 3s ease-in-out infinite · CTA button</div></div>
+      <div class="motion-item"><div class="motion-name">theme transition</div><div class="motion-val">background 0.4s ease · color 0.3s ease · border-color 0.3s ease</div></div>
+      <div class="motion-item"><div class="motion-name">prefers-reduced-motion</div><div class="motion-val">All durations → 0.01ms · shimmer::after opacity: 0</div></div>
+    </div>
+  </div>
+
+  <hr class="ds-rule">
+
+  <!-- SKETCH LANGUAGE -->
+  <div class="ds-section">
+    <div class="ds-section-label">07 &nbsp; Sketch language rules</div>
+    <div class="do-dont">
+      <div class="do-box"><div class="do-label">DO</div>
+        Rotate elements slightly (–0.5 to +0.4deg) — cards, titles, buttons, logo<br><br>
+        Use clip-path wobbly borders on buttons, cards, theme toggle<br><br>
+        Draw SVG annotations in <span style="font-family:'Courier New',monospace">#8a8d9a</span> with <span style="font-family:'Courier New',monospace">#f2740d</span> orange accents, opacity 0.45–0.55<br><br>
+        Eyebrow: Courier Prime + flanking orange rules<br><br>
+        Margin annotations use Courier Prime 6.5px labels, aria-hidden="true"
+      </div>
+      <div class="dont-box"><div class="dont-label">DON'T</div>
+        Use sharp 90° borders on interactive elements — always wobbly clip-path<br><br>
+        Use system fonts (Arial, Inter, Roboto) — Caveat / Lora / Courier Prime only<br><br>
+        Add coloured backgrounds to sections — all sections inherit canvas background<br><br>
+        Mix annotation subject matter — biology notes get biology/chemistry sketches only<br><br>
+        Use pure #000 or #fff — always use the token values
+      </div>
+    </div>
+  </div>
+
+  <hr class="ds-rule">
+
+  <!-- THEME SWITCH -->
+  <div class="ds-section">
+    <div class="ds-section-label">08 &nbsp; Theme switching implementation</div>
+    <div style="background:#f0efe9;padding:.75rem;border-left:2px solid #d4610a;font-size:10px;color:#1e1c18;line-height:1.8">
+      <strong>Storage:</strong> localStorage key <span style="font-family:'Courier New',monospace">'schoolme-theme'</span> · value <span style="font-family:'Courier New',monospace">'light'</span> or absent (default dark)<br>
+      <strong>Selector:</strong> <span style="font-family:'Courier New',monospace">:root[data-theme="light"]</span> overrides all tokens · set via <span style="font-family:'Courier New',monospace">document.documentElement.setAttribute('data-theme','light')</span><br>
+      <strong>Kaleidoscope:</strong> reads <span style="font-family:'Courier New',monospace">document.documentElement.hasAttribute('data-theme')</span> each frame to swap ink RGB<br>
+      &nbsp;&nbsp;— Dark ink on light: <span style="font-family:'Courier New',monospace">30,28,24</span> · Light ink on dark: <span style="font-family:'Courier New',monospace">237,233,223</span><br>
+      <strong>Scroll bar:</strong> 1.5px top bar, transform scaleX(scrollY / (body.scrollHeight – window.innerHeight)), orange in both modes<br>
+      <strong>Nav:</strong> adds <span style="font-family:'Courier New',monospace">.scrolled</span> class at scrollY > 20 to increase backdrop opacity
+    </div>
+  </div>
+
+  <hr class="ds-rule">
+
+  <!-- Z-INDEX STACK -->
+  <div class="ds-section">
+    <div class="ds-section-label">09 &nbsp; Z-index stack</div>
+    <div class="ds-grid" style="gap:.3rem">
+      <div class="token-row"><div class="token-name">Kaleidoscope canvas (#kscope-canvas)</div><div class="token-value">z: 0</div></div>
+      <div class="token-row"><div class="token-name">#page-content (all sections)</div><div class="token-value">z: 10</div></div>
+      <div class="token-row"><div class="token-name">Navigation bar</div><div class="token-value">z: 600</div></div>
+      <div class="token-row"><div class="token-name">Grain overlay (body::after)</div><div class="token-value">z: 9000</div></div>
+      <div class="token-row"><div class="token-name">Scroll progress bar (#scroll-progress)</div><div class="token-value">z: 9999</div></div>
+    </div>
+    <div style="font-size:9px;color:#9a9590;margin-top:.4rem">All section backgrounds must be transparent so the canvas shows through. Set background-color: transparent on every section.</div>
+  </div>
+
+  <div style="margin-top:2rem;padding-top:1rem;border-top:1px solid #e8e6de;display:flex;justify-content:space-between;align-items:center">
+    <div style="font-family:'Courier New',monospace;font-size:9px;color:#9a9590;letter-spacing:.15em">◦  schoolme.in  ·  design system v1.0</div>
+    <div style="font-family:'Courier New',monospace;font-size:9px;color:#d4610a;letter-spacing:.1em">Dark Sketchbook × Light Paper</div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -716,10 +716,8 @@ footer {
   .hero-title { -webkit-text-fill-color: var(--text-primary); }
 }
 
-/* ===================================================================
-   THEME TOGGLE BUTTON
-   =================================================================== */
-
+/* Theme toggle button */
+.theme-toggle,
 #theme-toggle {
   display: flex;
   align-items: center;
@@ -735,16 +733,19 @@ footer {
   clip-path: polygon(0.5% 4%, 2% 0.5%, 98% 1.5%, 99.5% 0%, 100% 96%, 98.5% 99.5%, 2% 98.5%, 0% 100%);
   flex-shrink: 0;
 }
+.theme-toggle svg,
 #theme-toggle svg {
   width: 16px;
   height: 16px;
   pointer-events: none;
 }
+.theme-toggle:hover,
 #theme-toggle:hover {
   color: var(--orange);
   border-color: var(--orange);
   transform: rotate(15deg) scale(1.08);
 }
+.theme-toggle:active,
 #theme-toggle:active { transform: scale(0.94); }
 
 /* ===================================================================
