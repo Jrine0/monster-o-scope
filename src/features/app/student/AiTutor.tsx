@@ -19,7 +19,8 @@ import type { VisualizerState } from "../../../components/AvatarVisualizer";
 
 // AvatarVisualizer — inline since we're adapting for Vite
 import AvatarVisualizer from "../../../components/AvatarVisualizer";
-import { PanelLeft, PanelRight } from "lucide-react";
+import { PanelLeft, PanelRight, Loader2 } from "lucide-react";
+import { motion } from "motion/react";
 
 interface AiTutorProps {
   /** Optional topic context passed from the lesson/material route */
@@ -46,6 +47,15 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
 
   // Track if user submitted a query
   const [userSubmittedQuery, setUserSubmittedQuery] = useState(false);
+
+  // Page loading state for smooth transition
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Smooth loading effect
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // ── GazeTrack ─────────────────────────────────────────────────────────────
   const handleReEngage = useCallback((prompt: string) => {
@@ -98,6 +108,31 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
 
   return (
     <>
+      {/* Smooth loading overlay */}
+      {isLoading && (
+        <motion.div
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          onAnimationComplete={() => setIsLoading(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background"
+        >
+          <div className="flex flex-col items-center gap-4">
+            <Loader2
+              size={40}
+              className="animate-spin text-orange-500"
+              strokeWidth={1.5}
+            />
+            <span
+              style={{ fontFamily: "var(--font-display)" }}
+              className="text-lg text-text-secondary"
+            >
+              Loading AI Tutor...
+            </span>
+          </div>
+        </motion.div>
+      )}
+
       {/* Tier-1: screen-edge pulse */}
       <AttentionPulse
         band={gazeState.band}
@@ -131,7 +166,12 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
       />
 
       {/* Layout: Chat (left, collapsible) | Avatar (bottom right, expandable) | Attention sidebar (right) */}
-      <div className="h-full w-full flex overflow-hidden bg-background relative">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="h-full w-full flex overflow-hidden bg-background relative"
+      >
         {/* Chat toggle button - only show when chat is collapsed */}
         {isChatCollapsed && (
           <button
@@ -224,8 +264,11 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
           )}
         </div>
 
-        {/* Right: attention sidebar */}
-        <div className="hidden lg:flex h-full shrink-0 p-4 pl-2">
+        {/* Right: attention sidebar - always visible when avatar is expanded */}
+        <div
+          className="hidden lg:flex h-full shrink-0 p-4 pl-2"
+          style={{ zIndex: 15 }}
+        >
           <AttentionSidebar
             frame={gazeState.frame}
             score={gazeState.score}
@@ -238,7 +281,7 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
             onStop={stopTracking}
           />
         </div>
-      </div>
+      </motion.div>
     </>
   );
 }

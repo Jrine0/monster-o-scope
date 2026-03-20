@@ -250,8 +250,8 @@ export function useKaleidoscope(canvasId: string) {
       // Dark mode: strong floor for hero section visibility
       let opacity: number;
       if (light) {
-        // Light mode: raise opacity significantly so it's clearly visible
-        const opacityBase  = lerp(0.45, 0.65, sNorm);
+        // Light mode: slightly reduced opacity for better readability
+        const opacityBase  = lerp(0.30, 0.50, sNorm);
         const opacityCurve = 1 - Math.pow(Math.abs(sNorm - 0.5) * 2, 3) * 0.15;
         opacity = opacityBase * opacityCurve + state.burst * 0.15;
       } else {

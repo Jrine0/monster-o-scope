@@ -671,14 +671,14 @@ function Annotations({ P }: { P: Palette }) {
   const ink = P.inkDim;
   const org = P.orange;
 
-  // We place 8 annotations — 2 per quadrant — using fixed positions
-  // relative to viewport corners so they never overlap the centred card.
+  // Scattered annotations with seemingly random placement, positioned to avoid the centered login card
+  // Keep most near middle (left/right corridors) with a few at edges
   const items = [
-    // Top-left
+    // Top-left area - closer to middle
     {
-      x: "3%",
-      y: "8%",
-      rot: "-2deg",
+      x: "12%",
+      y: "15%",
+      rot: "-3deg",
       svg: (
         <svg viewBox="0 0 90 22" width="110" height="27" fill="none">
           <path
@@ -699,9 +699,9 @@ function Annotations({ P }: { P: Palette }) {
       ),
     },
     {
-      x: "2%",
-      y: "22%",
-      rot: "1.5deg",
+      x: "8%",
+      y: "38%",
+      rot: "0.5deg",
       svg: (
         <svg viewBox="0 0 80 70" width="80" height="70" fill="none">
           <path d="M10 60 L10 10 L65 60 Z" stroke={ink} strokeWidth="0.7" />
@@ -749,11 +749,11 @@ function Annotations({ P }: { P: Palette }) {
         </svg>
       ),
     },
-    // Top-right
+    // Top-right area - closer to middle
     {
-      x: "76%",
-      y: "6%",
-      rot: "2deg",
+      x: "82%",
+      y: "10%",
+      rot: "4deg",
       svg: (
         <svg viewBox="0 0 80 72" width="80" height="72" fill="none">
           <line x1="4" y1="64" x2="76" y2="64" stroke={ink} strokeWidth="0.6" />
@@ -772,9 +772,9 @@ function Annotations({ P }: { P: Palette }) {
       ),
     },
     {
-      x: "78%",
-      y: "22%",
-      rot: "-1.5deg",
+      x: "90%",
+      y: "32%",
+      rot: "-0.8deg",
       svg: (
         <svg viewBox="0 0 100 56" width="110" height="62" fill="none">
           <text
@@ -826,11 +826,11 @@ function Annotations({ P }: { P: Palette }) {
         </svg>
       ),
     },
-    // Bottom-left
+    // Bottom-left area - closer to middle
     {
-      x: "2%",
-      y: "68%",
-      rot: "-1deg",
+      x: "6%",
+      y: "65%",
+      rot: "-2.5deg",
       svg: (
         <svg viewBox="0 0 110 70" width="110" height="70" fill="none">
           <ellipse
@@ -882,9 +882,9 @@ function Annotations({ P }: { P: Palette }) {
       ),
     },
     {
-      x: "3%",
+      x: "14%",
       y: "82%",
-      rot: "2deg",
+      rot: "1.2deg",
       svg: (
         <svg viewBox="0 0 120 44" width="120" height="44" fill="none">
           <text
@@ -926,11 +926,11 @@ function Annotations({ P }: { P: Palette }) {
         </svg>
       ),
     },
-    // Bottom-right
+    // Bottom-right area - closer to middle
     {
-      x: "74%",
-      y: "70%",
-      rot: "1.5deg",
+      x: "85%",
+      y: "68%",
+      rot: "0.8deg",
       svg: (
         <svg viewBox="0 0 130 52" width="130" height="52" fill="none">
           <path
@@ -961,9 +961,9 @@ function Annotations({ P }: { P: Palette }) {
       ),
     },
     {
-      x: "76%",
-      y: "84%",
-      rot: "-2deg",
+      x: "92%",
+      y: "85%",
+      rot: "-1.5deg",
       svg: (
         <svg viewBox="0 0 90 68" width="90" height="68" fill="none">
           <circle

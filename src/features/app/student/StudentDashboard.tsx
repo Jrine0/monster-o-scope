@@ -575,7 +575,7 @@ export function StudentDashboard() {
               textDecoration: "none",
               background: "var(--bg-surface)",
               border: "1px solid var(--border-default)",
-              clipPath: CLIP_CARD,
+              borderRadius: "12px",
             }}
           >
             <div
@@ -720,7 +720,7 @@ export function StudentDashboard() {
                     style={{
                       background: "var(--bg-surface)",
                       border: "1px solid var(--border-default)",
-                      clipPath: CLIP_CARD,
+                      borderRadius: "12px",
                       overflow: "hidden",
                     }}
                   >
@@ -853,7 +853,7 @@ export function StudentDashboard() {
                         background: "var(--bg-surface)",
                         border: `1px solid ${sub.border}`,
                         textDecoration: "none",
-                        clipPath: CLIP_BTN,
+                        borderRadius: "8px",
                       }}
                     >
                       <div
@@ -1023,7 +1023,7 @@ export function StudentDashboard() {
                         background: "var(--bg-surface)",
                         border: "1px solid var(--border-subtle)",
                         textDecoration: "none",
-                        clipPath: CLIP_CARD,
+                        borderRadius: "12px",
                       }}
                     >
                       <div
@@ -1130,7 +1130,7 @@ export function StudentDashboard() {
               textDecoration: "none",
               background: "var(--bg-surface)",
               border: "1px solid rgba(242,116,13,0.28)",
-              clipPath: CLIP_CARD,
+              borderRadius: "12px",
             }}
           >
             <div
@@ -1182,7 +1182,7 @@ export function StudentDashboard() {
                   fontSize: "1.05rem",
                   fontWeight: 700,
                   padding: "0.65rem 1.4rem",
-                  clipPath: CLIP_BTN,
+                  borderRadius: "8px",
                   transition: "all 0.2s",
                 }}
               >
