@@ -1,3 +1,4 @@
+// src/routes/_app/route.tsx
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import AppNavbar from "@/features/app/navbar";
 import AppSidebar from "@/features/app/sidebar";
@@ -11,34 +12,49 @@ export const Route = createFileRoute("/_app")({
 
 function RouteComponent() {
   const location = useLocation();
-  const isStudentRoute = location.pathname.startsWith("/student");
+  const pathname = location.pathname;
+
+  const isStudentRoute =
+    pathname.includes("/student") &&
+    !pathname.includes("/admin") &&
+    !pathname.includes("/teacher");
+
+  if (isStudentRoute) {
+    return (
+      <AuthHydrator>
+        {/*
+          Lenis hijacks html/body overflow so height:100vh on flex containers
+          breaks. Solution: sidebar is position:fixed (viewport-anchored,
+          Lenis-immune). Main content just needs marginLeft: 240.
+        */}
+        <div style={{ minHeight: "100vh" }}>
+          <StudentSidebar />
+          <main
+            style={{
+              marginLeft: 240,
+              minHeight: "100vh",
+              padding: "1.5rem 2rem 3rem",
+              boxSizing: "border-box",
+            }}
+          >
+            <Outlet />
+          </main>
+        </div>
+      </AuthHydrator>
+    );
+  }
 
   return (
-    <>
-      <SidebarProvider defaultOpen={!isStudentRoute}>
-        <AuthHydrator>
-          {isStudentRoute ? (
-            // Use custom student sidebar with design system
-            <div className="student-layout">
-              <StudentSidebar />
-              <main className="student-content">
-                <Outlet />
-              </main>
-            </div>
-          ) : (
-            // Use Shadcn sidebar for admin/teacher
-            <>
-              <AppSidebar />
-              <SidebarInset>
-                <main className="p-4">
-                  <AppNavbar />
-                  <Outlet />
-                </main>
-              </SidebarInset>
-            </>
-          )}
-        </AuthHydrator>
-      </SidebarProvider>
-    </>
+    <SidebarProvider>
+      <AuthHydrator>
+        <AppSidebar />
+        <SidebarInset>
+          <main className="p-4">
+            <AppNavbar />
+            <Outlet />
+          </main>
+        </SidebarInset>
+      </AuthHydrator>
+    </SidebarProvider>
   );
 }

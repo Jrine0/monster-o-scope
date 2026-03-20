@@ -1,5 +1,5 @@
 // StudentSidebar.tsx — Schoolme design system sidebar for student portal
-// Uses CSS variables, Caveat/Lora/Courier Prime fonts, wobbly clip-path borders
+// position:fixed so Lenis smooth-scroll on html/body doesn't affect it
 
 import { Link, useLocation } from "@tanstack/react-router";
 import {
@@ -12,7 +12,6 @@ import {
   User,
 } from "lucide-react";
 
-/* ── Fonts shorthand ── */
 const CAV: React.CSSProperties = { fontFamily: "Caveat, cursive" };
 const LOR: React.CSSProperties = { fontFamily: "Lora, Georgia, serif" };
 const COU: React.CSSProperties = { fontFamily: "Courier Prime, monospace" };
@@ -20,7 +19,6 @@ const COU: React.CSSProperties = { fontFamily: "Courier Prime, monospace" };
 const CLIP_SIDEBAR_ITEM =
   "polygon(0.5% 8%, 1.5% 0%, 99% 1%, 100% 7%, 99.5% 93%, 98% 100%, 1% 99%, 0% 92%)";
 
-/* ── Sidebar config for student ── */
 const sidebarConfig = {
   groups: [
     {
@@ -28,7 +26,11 @@ const sidebarConfig = {
       items: [
         { name: "Dashboard", to: "/student", icon: LayoutDashboardIcon },
         { name: "Study Materials", to: "/student/materials", icon: Book },
-        { name: "Practice Quizzes", to: "/student/quizzes", icon: ListChecksIcon },
+        {
+          name: "Practice Quizzes",
+          to: "/student/quizzes",
+          icon: ListChecksIcon,
+        },
         { name: "AI Tutor", to: "/student/tutor", icon: GraduationCapIcon },
         { name: "My Results", to: "/student/results", icon: NotebookText },
       ],
@@ -41,7 +43,6 @@ const footerItems = [
   { name: "Profile", to: "/student/profile" },
 ];
 
-/* ── Fixed-width sidebar component ── */
 export function StudentSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
@@ -49,32 +50,37 @@ export function StudentSidebar() {
   return (
     <aside
       style={{
+        // position:fixed pins to viewport — completely unaffected by Lenis
+        // hijacking html/body overflow. This is the correct approach when
+        // a smooth-scroll library is present.
         position: "fixed",
         top: 0,
         left: 0,
         width: 240,
-        height: "100vh",
-        background: "var(--bg-deep)",
+        // 100dvh handles mobile bars; falls back to 100vh on older browsers
+        height: "100dvh",
+        backgroundColor: "var(--bg-deep)",
         borderRight: "1px solid var(--border-subtle)",
         display: "flex",
         flexDirection: "column",
-        zIndex: 600,
+        zIndex: 50,
         overflow: "hidden",
+        boxSizing: "border-box",
       }}
     >
-      {/* Header */}
+      {/* ── Header ── never shrinks */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
           padding: "1rem 1.25rem",
           borderBottom: "1px solid var(--border-subtle)",
+          flexShrink: 0,
           minHeight: 56,
+          boxSizing: "border-box",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          {/* Logo */}
           <div
             style={{
               width: 32,
@@ -87,7 +93,16 @@ export function StudentSidebar() {
               flexShrink: 0,
             }}
           >
-            <span style={{ ...CAV, fontSize: "1.1rem", color: "#07080d", fontWeight: 700 }}>V</span>
+            <span
+              style={{
+                ...CAV,
+                fontSize: "1.1rem",
+                color: "#07080d",
+                fontWeight: 700,
+              }}
+            >
+              V
+            </span>
           </div>
           <span
             style={{
@@ -104,75 +119,88 @@ export function StudentSidebar() {
           </span>
         </div>
       </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "0.25rem",
+          padding: "1rem 0.75rem",
+          boxSizing: "border-box",
+        }}
+      >
+        <span
+          style={{
+            ...COU,
+            fontSize: "0.55rem",
+            letterSpacing: "0.12em",
+            color: "var(--text-muted)",
+            paddingLeft: "0.5rem",
+            marginBottom: "0.35rem",
+          }}
+        >
+          GENERAL
+        </span>
 
-      {/* Navigation */}
-      <nav style={{ flex: 1, overflowY: "auto", padding: "1rem 0.75rem" }}>
-        {sidebarConfig.groups.map((group) => (
-          <div key={group.name} style={{ marginBottom: "1.5rem" }}>
-            <div
+        {(
+          [
+            { name: "Dashboard", to: "/student", icon: LayoutDashboardIcon },
+            { name: "Study Materials", to: "/student/materials", icon: Book },
+            {
+              name: "Practice Quizzes",
+              to: "/student/quizzes",
+              icon: ListChecksIcon,
+            },
+            { name: "AI Tutor", to: "/student/tutor", icon: GraduationCapIcon },
+            { name: "My Results", to: "/student/results", icon: NotebookText },
+          ] as const
+        ).map(({ name, to, icon: Icon }) => {
+          const isActive = currentPath === to;
+          return (
+            <Link
+              key={name}
+              to={to}
               style={{
-                ...COU,
-                fontSize: "0.58rem",
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "var(--orange)",
-                opacity: 0.85,
-                padding: "0 0.5rem",
-                marginBottom: "0.75rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.6rem",
+                padding: "0.5rem 0.75rem",
+                borderRadius: "0.25rem",
+                textDecoration: "none",
+                background: isActive ? "var(--bg-surface)" : "transparent",
+                color: isActive
+                  ? "var(--text-primary)"
+                  : "var(--text-secondary)",
+                fontFamily: "Caveat, cursive",
+                fontSize: "0.95rem",
+                fontWeight: isActive ? 600 : 400,
+                transition: "background 0.15s ease, color 0.15s ease",
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive)
+                  (e.currentTarget as HTMLAnchorElement).style.background =
+                    "var(--bg-elevated)";
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive)
+                  (e.currentTarget as HTMLAnchorElement).style.background =
+                    "transparent";
               }}
             >
-              {group.name}
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-              {group.items.map((item) => {
-                const isActive =
-                  currentPath === item.to ||
-                  (item.to !== "/student" && currentPath.startsWith(item.to));
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.to}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.75rem",
-                      padding: "0.7rem 0.85rem",
-                      background: isActive ? "var(--bg-surface)" : "transparent",
-                      border: `1px solid ${isActive ? "var(--border-default)" : "transparent"}`,
-                      textDecoration: "none",
-                      clipPath: CLIP_SIDEBAR_ITEM,
-                      transition: "all 0.2s ease",
-                    }}
-                  >
-                    <Icon
-                      size={18}
-                      strokeWidth={1.5}
-                      style={{
-                        color: isActive ? "var(--orange)" : "var(--text-secondary)",
-                        flexShrink: 0,
-                      }}
-                    />
-                    <span
-                      style={{
-                        ...LOR,
-                        fontStyle: "italic",
-                        fontSize: "0.85rem",
-                        color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {item.name}
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </nav>
+              <Icon
+                size={15}
+                strokeWidth={1.5}
+                style={{
+                  color: isActive ? "var(--orange)" : "var(--text-secondary)",
+                  flexShrink: 0,
+                }}
+              />
+              {name}
+            </Link>
+          );
+        })}
+      </div>
 
-      {/* Footer */}
+      {/* ── Footer ── never shrinks */}
       <div
         style={{
           borderTop: "1px solid var(--border-subtle)",
@@ -180,16 +208,13 @@ export function StudentSidebar() {
           display: "flex",
           flexDirection: "column",
           gap: "0.75rem",
+          flexShrink: 0,
+          marginTop: "auto",
+          boxSizing: "border-box",
         }}
       >
         {/* User info */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.75rem",
-          }}
-        >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
           <div
             style={{
               width: 32,
@@ -203,7 +228,11 @@ export function StudentSidebar() {
               flexShrink: 0,
             }}
           >
-            <User size={16} strokeWidth={1.5} style={{ color: "var(--text-secondary)" }} />
+            <User
+              size={16}
+              strokeWidth={1.5}
+              style={{ color: "var(--text-secondary)" }}
+            />
           </div>
           <div style={{ minWidth: 0 }}>
             <div
@@ -261,14 +290,18 @@ export function StudentSidebar() {
                 <Icon
                   size={14}
                   strokeWidth={1.5}
-                  style={{ color: isActive ? "var(--orange)" : "var(--text-secondary)" }}
+                  style={{
+                    color: isActive ? "var(--orange)" : "var(--text-secondary)",
+                  }}
                 />
                 <span
                   style={{
                     ...COU,
                     fontSize: "0.55rem",
                     letterSpacing: "0.05em",
-                    color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
+                    color: isActive
+                      ? "var(--text-primary)"
+                      : "var(--text-secondary)",
                   }}
                 >
                   {item.name}

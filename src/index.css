@@ -1250,6 +1250,7 @@ body, nav, .sketch-card, footer, .features, .cta-section, #scroll-progress {
   display: flex;
   min-height: 100vh;
   background: var(--bg-deepest);
+  position: relative;
 }
 
 .student-content {
@@ -1257,7 +1258,8 @@ body, nav, .sketch-card, footer, .features, .cta-section, #scroll-progress {
   margin-left: 240px;
   padding: 1.5rem 2rem 3rem;
   min-height: 100vh;
-  transition: margin-left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 10;
 }
 
 /* Collapsed sidebar state - add class to body or use JS to toggle */
