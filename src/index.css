@@ -1241,3 +1241,26 @@ body, nav, .sketch-card, footer, .features, .cta-section, #scroll-progress {
   background: var(--orange);
   transform: scale(1.4);
 }
+
+/* ===================================================================
+   STUDENT LAYOUT
+   =================================================================== */
+
+.student-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-deepest);
+}
+
+.student-content {
+  flex: 1;
+  margin-left: 240px;
+  padding: 1.5rem 2rem 3rem;
+  min-height: 100vh;
+  transition: margin-left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Collapsed sidebar state - add class to body or use JS to toggle */
+.student-layout.collapsed .student-content {
+  margin-left: 72px;
+}

@@ -86,11 +86,19 @@ const sidebarConfig = {
   },
 } as const;
 
-const sidebarFooter = {
-  dropdown: [
+const sidebarFooterConfig = {
+  admin: [
     { name: "Payment", to: "/admin/billing" },
     { name: "Settings", to: "/admin/settings" },
     { name: "Profile", to: "/admin/settings" },
+  ],
+  teacher: [
+    { name: "Settings", to: "/teacher/settings" },
+    { name: "Profile", to: "/teacher/settings" },
+  ],
+  student: [
+    { name: "Settings", to: "/student/settings" },
+    { name: "Profile", to: "/student/profile" },
   ],
 } as const;
 
@@ -175,7 +183,7 @@ export default function AppSidebar() {
             <DropdownMenuContent>
               <DropdownMenuGroup>
                 <DropdownMenuLabel>Account</DropdownMenuLabel>
-                {sidebarFooter.dropdown.map((item, i) => {
+                {sidebarFooterConfig[CURRENT_USER].map((item, i) => {
                   return (
                     <DropdownMenuItem asChild key={i}>
                       <SmartLink variant="noColor" to={item.to}>

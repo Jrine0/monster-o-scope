@@ -5,7 +5,8 @@
       "Bash(npx vite:*)",
       "Bash(pnpm dev:*)",
       "mcp__OpusCode__understand_image",
-      "mcp__OpusCode__web_search"
+      "mcp__OpusCode__web_search",
+      "Bash(pnpm build:*)"
     ]
   }
 }
