@@ -539,9 +539,7 @@ export default function TutorChat({
   };
 
   /* ─── Schoolme style objects ─────────────────────────────────────────────── */
-  const CLIP =
-    "polygon(0.3% 0.5%,1% 0%,99% 0.3%,100% 1%,99.8% 99%,99% 100%,0.5% 99.8%,0% 99%)";
-  const CLIP_SM = "polygon(1% 0%,100% 1%,99% 100%,0% 99%)";
+  // Removed slanted CLIP definitions - using standard rounded rectangles
 
   const f = {
     caveat: { fontFamily: "Caveat, cursive" } as React.CSSProperties,
@@ -560,7 +558,7 @@ export default function TutorChat({
           ? "1px solid var(--orange)"
           : "1px solid var(--border-default)",
         background: "var(--bg-surface)",
-        clipPath: CLIP,
+        borderRadius: "12px",
         boxShadow: isDragging ? "0 0 0 2px rgba(242,116,13,0.25)" : "none",
         transition: "box-shadow 0.2s, border-color 0.2s",
       }}
@@ -598,7 +596,7 @@ export default function TutorChat({
             justifyContent: "center",
             background: "rgba(242,116,13,0.10)",
             border: "1px solid rgba(242,116,13,0.22)",
-            clipPath: CLIP_SM,
+            borderRadius: "8px",
           }}
         >
           <Bot size={16} strokeWidth={1.5} color="var(--orange)" />
@@ -691,7 +689,7 @@ export default function TutorChat({
               border: "1px solid var(--border-default)",
               cursor: "pointer",
               color: "var(--text-muted)",
-              clipPath: CLIP_SM,
+              borderRadius: "8px",
               transition: "color 0.15s, border-color 0.15s",
             }}
             onMouseEnter={(e) => {
@@ -996,10 +994,10 @@ export default function TutorChat({
                       msg.role === "user"
                         ? "none"
                         : "1px solid var(--border-default)",
-                    clipPath:
+                    borderRadius:
                       msg.role === "user"
-                        ? "polygon(0% 0%,100% 0.5%,99.5% 99%,0.3% 100%)"
-                        : "polygon(0% 0.5%,99.7% 0%,100% 100%,0.5% 99%)",
+                        ? "18px 18px 4px 18px"
+                        : "18px 18px 18px 4px",
                   }}
                 >
                   {msg.content}
@@ -1054,7 +1052,7 @@ export default function TutorChat({
                     padding: "0.6rem 0.85rem",
                     background: "var(--bg-elevated)",
                     border: "1px solid var(--border-default)",
-                    clipPath: "polygon(0% 0.5%,99.7% 0%,100% 100%,0.5% 99%)",
+                    borderRadius: "18px",
                   }}
                 >
                   <Loader2

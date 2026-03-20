@@ -17,8 +17,7 @@ import { ease } from "@/lib/animation";
 const CAV: React.CSSProperties = { fontFamily: "var(--font-display)" };
 const LOR: React.CSSProperties = { fontFamily: "var(--font-body)" };
 const COU: React.CSSProperties = { fontFamily: "var(--font-mono)" };
-const CLIP_CARD =
-  "polygon(0.3% 1%,1.5% 0%,99% 0.5%,100% 2%,99.7% 99%,98% 100%,0.5% 99.5%,0% 98%)";
+// Removed slanted CLIP_CARD - using standard rounded rectangles
 
 /* ── Mock settings data ── */
 const SETTINGS_SECTIONS = [
@@ -306,7 +305,7 @@ function SettingsItem({
         padding: "1rem 1.25rem",
         background: "var(--bg-surface)",
         border: "1px solid var(--border-subtle)",
-        clipPath: CLIP_CARD,
+        borderRadius: "12px",
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>

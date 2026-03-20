@@ -30,8 +30,7 @@ import {
 const CAV: React.CSSProperties = { fontFamily: "Caveat, cursive" };
 const LOR: React.CSSProperties = { fontFamily: "Lora, Georgia, serif" };
 const COU: React.CSSProperties = { fontFamily: "Courier Prime, monospace" };
-const CLIP_CARD =
-  "polygon(0.3% 1%,1.5% 0%,99% 0.5%,100% 2%,99.7% 99%,98% 100%,0.5% 99.5%,0% 98%)";
+// Removed slanted CLIP_CARD - using standard rounded rectangles
 
 /* ── Subject config (unchanged) ── */
 const SUBJECTS = [
@@ -525,7 +524,7 @@ export function StudyMaterials() {
             border: "1px solid var(--border-default)",
             padding: "0.7rem 1rem 0.7rem 2.6rem",
             outline: "none",
-            clipPath: CLIP_CARD,
+            borderRadius: "12px",
             transition: "border-color 0.18s, box-shadow 0.18s",
           }}
           onFocus={(e) => {
@@ -626,7 +625,7 @@ export function StudyMaterials() {
                   border: "1px solid var(--border-subtle)",
                   position: "relative",
                   overflow: "hidden",
-                  clipPath: CLIP_CARD,
+                  borderRadius: "12px",
                 }}
               >
                 {/* Chapter number */}

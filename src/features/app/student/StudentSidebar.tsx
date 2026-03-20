@@ -13,9 +13,7 @@ import {
 
 const CAV: React.CSSProperties = { fontFamily: "Caveat, cursive" };
 const COU: React.CSSProperties = { fontFamily: "Courier Prime, monospace" };
-
-const CLIP_SIDEBAR_ITEM =
-  "polygon(0.5% 8%, 1.5% 0%, 99% 1%, 100% 7%, 99.5% 93%, 98% 100%, 1% 99%, 0% 92%)";
+// Removed slanted CLIP_SIDEBAR_ITEM - using standard rounded rectangles
 
 const footerItems = [
   { name: "Settings", to: "/student/settings" },
@@ -258,7 +256,7 @@ export function StudentSidebar() {
                   background: isActive ? "var(--bg-surface)" : "transparent",
                   border: `1px solid ${isActive ? "var(--border-default)" : "var(--border-subtle)"}`,
                   textDecoration: "none",
-                  clipPath: CLIP_SIDEBAR_ITEM,
+                  borderRadius: "8px",
                   transition: "all 0.2s ease",
                 }}
               >

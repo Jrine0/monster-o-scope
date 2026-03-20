@@ -30,8 +30,7 @@ import {
 const CAV: React.CSSProperties = { fontFamily: "Caveat, cursive" };
 const LOR: React.CSSProperties = { fontFamily: "Lora, Georgia, serif" };
 const COU: React.CSSProperties = { fontFamily: "Courier Prime, monospace" };
-const CLIP_CARD =
-  "polygon(0.3% 1%,1.5% 0%,99% 0.5%,100% 2%,99.7% 99%,98% 100%,0.5% 99.5%,0% 98%)";
+// Removed slanted CLIP_CARD - using standard rounded rectangles
 
 /* ── Subject config (unchanged) ── */
 const SUBJECTS = [
@@ -394,7 +393,7 @@ export function MyResults() {
             padding: "1rem",
             background: "rgba(242,116,13,0.06)",
             border: "1px solid rgba(242,116,13,0.22)",
-            clipPath: CLIP_CARD,
+            borderRadius: "12px",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
@@ -458,7 +457,7 @@ export function MyResults() {
               padding: "0.85rem",
               background: "var(--bg-surface)",
               border: "1px solid var(--border-subtle)",
-              clipPath: CLIP_CARD,
+              borderRadius: "12px",
             }}
           >
             <div
@@ -650,7 +649,7 @@ export function MyResults() {
                       background: "var(--bg-surface)",
                       border: "1px solid var(--border-subtle)",
                       textDecoration: "none",
-                      clipPath: CLIP_CARD,
+                      borderRadius: "12px",
                     }}
                   >
                     {/* Quiz name */}

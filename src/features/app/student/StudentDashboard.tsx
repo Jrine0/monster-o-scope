@@ -27,10 +27,7 @@ import { ease, breatheLoop, pulseLoop } from "@/lib/animation";
 const CAV: React.CSSProperties = { fontFamily: "Caveat, cursive" };
 const LOR: React.CSSProperties = { fontFamily: "Lora, Georgia, serif" };
 const COU: React.CSSProperties = { fontFamily: "Courier Prime, monospace" };
-const CLIP_CARD =
-  "polygon(0.3% 1%,1.5% 0%,99% 0.5%,100% 2%,99.7% 99%,98% 100%,0.5% 99.5%,0% 98%)";
-const CLIP_BTN =
-  "polygon(0.5% 8%,1.5% 0%,99% 1%,100% 7%,99.5% 93%,98% 100%,1% 99%,0% 92%)";
+// Removed slanted CLIP_CARD and CLIP_BTN - using standard rounded rectangles
 
 /* ── Animated background (warm orange — identical logic, Schoolme colours) ── */
 function StudentAnimatedBackground() {
@@ -375,7 +372,7 @@ function QuizPerformanceChart() {
         background: "var(--bg-surface)",
         border: "1px solid var(--border-default)",
         padding: "1.75rem",
-        clipPath: CLIP_CARD,
+        borderRadius: "12px",
         position: "relative",
         overflow: "hidden",
       }}
@@ -681,7 +678,7 @@ export function StudentDashboard() {
                   background: "var(--orange)",
                   color: "#07080d",
                   padding: "0.65rem 1.4rem",
-                  clipPath: CLIP_BTN,
+                  borderRadius: "8px",
                 }}
               >
                 <Play size={15} strokeWidth={2} /> Continue Learning

@@ -36,8 +36,7 @@ const LOR: React.CSSProperties = {
 const COU: React.CSSProperties = {
   fontFamily: "var(--font-mono, 'Courier Prime', monospace)",
 };
-const CLIP_CARD =
-  "polygon(0.3% 1%,1.5% 0%,99% 0.5%,100% 2%,99.7% 99%,98% 100%,0.5% 99.5%,0% 98%)";
+// Removed slanted CLIP_CARD - using standard rounded rectangles
 
 /* ── Subject config (unchanged) ── */
 const SUBJECTS = [
@@ -205,7 +204,7 @@ function AnimatedStat({
         padding: "1rem",
         background: "var(--bg-surface)",
         border: "1px solid var(--border-subtle)",
-        clipPath: CLIP_CARD,
+        borderRadius: "12px",
       }}
     >
       <motion.div
@@ -502,7 +501,7 @@ export function QuizList() {
                     border: "1px solid var(--border-subtle)",
                     position: "relative",
                     overflow: "hidden",
-                    clipPath: CLIP_CARD,
+                    borderRadius: "12px",
                   }}
                 >
                   {/* Status icon */}
@@ -667,8 +666,7 @@ export function QuizList() {
                             color: "#07080d",
                             padding: "0.35rem 0.9rem",
                             textDecoration: "none",
-                            clipPath:
-                              "polygon(0.5% 8%,1.5% 0%,99% 1%,100% 7%,99.5% 93%,98% 100%,1% 99%,0% 92%)",
+                            borderRadius: "8px",
                             display: "inline-block",
                             transition: "background 0.15s",
                           }}

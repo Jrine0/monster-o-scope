@@ -41,7 +41,8 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
   const [isChatCollapsed, setIsChatCollapsed] = useState(false);
 
   // Avatar expansion state (expanded = full size, collapsed = small at bottom right)
-  const [isAvatarExpanded, setIsAvatarExpanded] = useState(true);
+  // Default to minimized
+  const [isAvatarExpanded, setIsAvatarExpanded] = useState(false);
 
   // Track if user submitted a query
   const [userSubmittedQuery, setUserSubmittedQuery] = useState(false);
@@ -131,14 +132,16 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
 
       {/* Layout: Chat (left, collapsible) | Avatar (bottom right, expandable) | Attention sidebar (right) */}
       <div className="h-full w-full flex overflow-hidden bg-background relative">
-        {/* Chat toggle button */}
-        <button
-          onClick={() => setIsChatCollapsed(!isChatCollapsed)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-md hover:bg-[var(--bg-elevated)] transition-colors"
-          title={isChatCollapsed ? "Expand chat" : "Collapse chat"}
-        >
-          <PanelLeft size={18} className="text-[var(--text-secondary)]" />
-        </button>
+        {/* Chat toggle button - only show when chat is collapsed */}
+        {isChatCollapsed && (
+          <button
+            onClick={() => setIsChatCollapsed(false)}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-md hover:bg-[var(--bg-elevated)] transition-colors"
+            title="Expand chat"
+          >
+            <PanelLeft size={18} className="text-[var(--text-secondary)]" />
+          </button>
+        )}
 
         {/* Left: chat - collapsible */}
         <div
@@ -146,6 +149,16 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
             isChatCollapsed ? "w-0 opacity-0 overflow-hidden" : "w-[400px] shrink-0"
           }`}
         >
+          {/* Chat toggle button when expanded */}
+          <div className="flex justify-end mb-2">
+            <button
+              onClick={() => setIsChatCollapsed(true)}
+              className="p-2 rounded-lg hover:bg-[var(--bg-elevated)] transition-colors"
+              title="Collapse chat"
+            >
+              <PanelLeft size={18} className="text-[var(--text-secondary)]" />
+            </button>
+          </div>
           <TutorChat
             onTalkingStateChange={setIsTalking}
             onMoodChange={setChatMood}
@@ -172,11 +185,11 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
         <div
           className={`absolute transition-all duration-300 ease-in-out ${
             isAvatarExpanded
-              ? "bottom-0 right-0 w-full h-full"
+              ? "inset-0 lg:left-[400px] lg:right-[300px]"
               : "bottom-8 right-8 w-[280px] h-[280px] cursor-pointer hover:scale-105"
           }`}
           onClick={() => !isAvatarExpanded && setIsAvatarExpanded(true)}
-          style={{ zIndex: isAvatarExpanded ? 1 : 10 }}
+          style={{ zIndex: isAvatarExpanded ? 5 : 10 }}
         >
           <TutorAvatar
             isTalking={isTalking}
