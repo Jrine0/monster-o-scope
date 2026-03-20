@@ -46,6 +46,7 @@ export interface TutorChatProps {
   onVisualizerStateChange: (s: "idle" | "thinking" | "speaking") => void;
   lipSyncRef: React.MutableRefObject<LipSyncData>;
   topicContext?: string;
+  onQuerySubmit?: () => void;
 }
 
 let pdfJsLoaded = false;
@@ -76,6 +77,7 @@ export default function TutorChat({
   onVisualizerStateChange,
   lipSyncRef,
   topicContext,
+  onQuerySubmit,
 }: TutorChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -499,6 +501,10 @@ export default function TutorChat({
     if (!input.trim() || (isLoading && !isSpeaking)) return;
     if (isSpeaking) interrupt();
     if (!pdf) setView("chat");
+
+    // Trigger eye tracking start
+    onQuerySubmit?.();
+
     let userText = input.trim();
     if (pdf?.selectedText) {
       userText = `About: "${pdf.selectedText.slice(0, 300)}…" — ${userText}`;

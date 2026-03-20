@@ -13,10 +13,10 @@ import {
 import { useTheme } from "next-themes";
 import { ease } from "@/lib/animation";
 
-/* ── Fonts shorthand ── */
-const CAV: React.CSSProperties = { fontFamily: "Caveat, cursive" };
-const LOR: React.CSSProperties = { fontFamily: "Lora, Georgia, serif" };
-const COU: React.CSSProperties = { fontFamily: "Courier Prime, monospace" };
+/* ── Fonts shorthand (use CSS vars for font selector to work) ── */
+const CAV: React.CSSProperties = { fontFamily: "var(--font-display)" };
+const LOR: React.CSSProperties = { fontFamily: "var(--font-body)" };
+const COU: React.CSSProperties = { fontFamily: "var(--font-mono)" };
 const CLIP_CARD =
   "polygon(0.3% 1%,1.5% 0%,99% 0.5%,100% 2%,99.7% 99%,98% 100%,0.5% 99.5%,0% 98%)";
 
@@ -346,6 +346,7 @@ function SettingsItem({
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            onClick={() => onChange("change-password")}
             style={{
               display: "flex",
               alignItems: "center",
@@ -372,6 +373,8 @@ function SettingsItem({
 /* ── Main component ── */
 export function StudentSettings() {
   const { theme, setTheme } = useTheme();
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
 
   // Get current font scheme from document
   const getCurrentFontScheme = () => {
@@ -398,6 +401,19 @@ export function StudentSettings() {
     if (key === "fontScheme" && typeof value === "string") {
       document.documentElement.setAttribute("data-font", value);
     }
+    if (key === "change-password") {
+      // Show password modal
+      setShowPasswordModal(true);
+    }
+  };
+
+  const handlePasswordChange = () => {
+    // Simulate password change - in real app would call API
+    setPasswordSuccess(true);
+    setTimeout(() => {
+      setShowPasswordModal(false);
+      setPasswordSuccess(false);
+    }, 2000);
   };
 
   return (
@@ -519,6 +535,111 @@ export function StudentSettings() {
           Vyasa v1.0 &middot; Schoolme Platform
         </p>
       </motion.div>
+
+      {/* Password Change Modal */}
+      {showPasswordModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => setShowPasswordModal(false)}
+        >
+          <div
+            style={{
+              background: "var(--bg-surface)",
+              border: "1px solid var(--border-default)",
+              borderRadius: "12px",
+              padding: "1.5rem",
+              width: "90%",
+              maxWidth: "400px",
+              boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ ...CAV, fontSize: "1.5rem", color: "var(--text-primary)", marginBottom: "1rem" }}>
+              Change Password
+            </h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1.5rem" }}>
+              <input
+                type="password"
+                placeholder="Current password"
+                style={{
+                  width: "100%",
+                  padding: "0.75rem",
+                  background: "var(--bg-elevated)",
+                  border: "1px solid var(--border-default)",
+                  borderRadius: "8px",
+                  color: "var(--text-primary)",
+                  fontSize: "0.9rem",
+                }}
+              />
+              <input
+                type="password"
+                placeholder="New password"
+                style={{
+                  width: "100%",
+                  padding: "0.75rem",
+                  background: "var(--bg-elevated)",
+                  border: "1px solid var(--border-default)",
+                  borderRadius: "8px",
+                  color: "var(--text-primary)",
+                  fontSize: "0.9rem",
+                }}
+              />
+              <input
+                type="password"
+                placeholder="Confirm new password"
+                style={{
+                  width: "100%",
+                  padding: "0.75rem",
+                  background: "var(--bg-elevated)",
+                  border: "1px solid var(--border-default)",
+                  borderRadius: "8px",
+                  color: "var(--text-primary)",
+                  fontSize: "0.9rem",
+                }}
+              />
+            </div>
+            <div style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setShowPasswordModal(false)}
+                style={{
+                  padding: "0.5rem 1rem",
+                  background: "transparent",
+                  border: "1px solid var(--border-default)",
+                  borderRadius: "8px",
+                  color: "var(--text-secondary)",
+                  cursor: "pointer",
+                  fontSize: "0.85rem",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handlePasswordChange}
+                style={{
+                  padding: "0.5rem 1rem",
+                  background: passwordSuccess ? "#22c55e" : "var(--orange)",
+                  border: "none",
+                  borderRadius: "8px",
+                  color: "#07080d",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: "0.85rem",
+                }}
+              >
+                {passwordSuccess ? "Password Updated!" : "Update Password"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

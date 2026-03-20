@@ -29,7 +29,6 @@ import {
   GraduationCapIcon,
   LayoutDashboardIcon,
   LibraryBig,
-  ListChecksIcon,
   NotebookText,
   School,
   Settings,
@@ -73,11 +72,7 @@ const sidebarConfig = {
         items: [
           { name: "Dashboard", to: "/student", icon: LayoutDashboardIcon },
           { name: "Study Materials", to: "/student/materials", icon: Book },
-          {
-            name: "Practice Quizzes",
-            to: "/student/quizzes",
-            icon: ListChecksIcon,
-          },
+          // { name: "Practice Quizzes", to: "/student/quizzes", icon: ListChecksIcon },
           { name: "AI Tutor", to: "/student/tutor", icon: GraduationCapIcon },
           { name: "My Results", to: "/student/results", icon: NotebookText },
         ],

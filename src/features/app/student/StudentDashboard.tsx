@@ -956,7 +956,8 @@ export function StudentDashboard() {
         <div
           style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}
         >
-          <QuizPerformanceChart />
+          {/* Quiz temporarily disabled */}
+          {/* <QuizPerformanceChart /> */}
 
           <section>
             <div
@@ -993,6 +994,7 @@ export function StudentDashboard() {
                 View all <ArrowRight size={12} />
               </Link>
             </div>
+            {/* Quiz temporarily disabled
             <Eyebrow label="latest attempts" />
             <div
               style={{
@@ -1111,6 +1113,7 @@ export function StudentDashboard() {
                 );
               })}
             </div>
+            */}
           </section>
         </div>
       </div>

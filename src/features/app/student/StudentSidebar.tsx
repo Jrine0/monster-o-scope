@@ -6,37 +6,16 @@ import {
   Book,
   GraduationCapIcon,
   LayoutDashboardIcon,
-  ListChecksIcon,
   NotebookText,
   Settings,
   User,
 } from "lucide-react";
 
 const CAV: React.CSSProperties = { fontFamily: "Caveat, cursive" };
-const LOR: React.CSSProperties = { fontFamily: "Lora, Georgia, serif" };
 const COU: React.CSSProperties = { fontFamily: "Courier Prime, monospace" };
 
 const CLIP_SIDEBAR_ITEM =
   "polygon(0.5% 8%, 1.5% 0%, 99% 1%, 100% 7%, 99.5% 93%, 98% 100%, 1% 99%, 0% 92%)";
-
-const sidebarConfig = {
-  groups: [
-    {
-      name: "GENERAL",
-      items: [
-        { name: "Dashboard", to: "/student", icon: LayoutDashboardIcon },
-        { name: "Study Materials", to: "/student/materials", icon: Book },
-        {
-          name: "Practice Quizzes",
-          to: "/student/quizzes",
-          icon: ListChecksIcon,
-        },
-        { name: "AI Tutor", to: "/student/tutor", icon: GraduationCapIcon },
-        { name: "My Results", to: "/student/results", icon: NotebookText },
-      ],
-    },
-  ],
-};
 
 const footerItems = [
   { name: "Settings", to: "/student/settings" },
@@ -145,11 +124,7 @@ export function StudentSidebar() {
           [
             { name: "Dashboard", to: "/student", icon: LayoutDashboardIcon },
             { name: "Study Materials", to: "/student/materials", icon: Book },
-            {
-              name: "Practice Quizzes",
-              to: "/student/quizzes",
-              icon: ListChecksIcon,
-            },
+            // { name: "Practice Quizzes", to: "/student/quizzes", icon: ListChecksIcon },
             { name: "AI Tutor", to: "/student/tutor", icon: GraduationCapIcon },
             { name: "My Results", to: "/student/results", icon: NotebookText },
           ] as const

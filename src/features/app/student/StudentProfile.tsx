@@ -152,7 +152,7 @@ export function StudentProfile() {
         transition={{ duration: 0.5, delay: 0.1, ease: ease.gentle }}
         whileHover={{ y: -3, boxShadow: "0 4px 20px rgba(242,116,13,0.06)" }}
         className="relative rounded-xl border border-border-subtle p-6 overflow-hidden transition-shadow"
-        style={{ backgroundColor: "var(--color-portal-student-surface)" }}
+        style={{ backgroundColor: "var(--bg-surface)" }}
       >
         {/* Hover glow overlay */}
         <div
@@ -224,7 +224,7 @@ export function StudentProfile() {
         transition={{ duration: 0.5, delay: 0.2, ease: ease.gentle }}
         whileHover={{ y: -3, boxShadow: "0 4px 20px rgba(242,116,13,0.06)" }}
         className="relative rounded-xl border border-border-subtle p-6 overflow-hidden transition-shadow"
-        style={{ backgroundColor: "var(--color-portal-student-surface)" }}
+        style={{ backgroundColor: "var(--bg-surface)" }}
       >
         <h2 className="text-heading-2 text-text-primary mb-1">Change Password</h2>
         <p className="text-body-sm text-text-secondary mb-5">

@@ -3,7 +3,7 @@
 // Composes: TutorChat + TutorAvatar + GazeTrack attention monitoring.
 // Pulls studentId from Vyasa's useAuthStore.
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useAuthStore } from "../../../stores/useAuthStore";
 import { apiClient } from "../../../lib/api-client";
 import TutorAvatar from "./tutor/TutorAvatar";
@@ -19,6 +19,7 @@ import type { VisualizerState } from "../../../components/AvatarVisualizer";
 
 // AvatarVisualizer — inline since we're adapting for Vite
 import AvatarVisualizer from "../../../components/AvatarVisualizer";
+import { PanelLeft, PanelRight } from "lucide-react";
 
 interface AiTutorProps {
   /** Optional topic context passed from the lesson/material route */
@@ -35,6 +36,15 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
   const [visualizerState, setVisualizerState] =
     useState<VisualizerState>("idle");
   const lipSyncRef = useLipSync();
+
+  // Chat collapse state
+  const [isChatCollapsed, setIsChatCollapsed] = useState(false);
+
+  // Avatar expansion state (expanded = full size, collapsed = small at bottom right)
+  const [isAvatarExpanded, setIsAvatarExpanded] = useState(true);
+
+  // Track if user submitted a query
+  const [userSubmittedQuery, setUserSubmittedQuery] = useState(false);
 
   // ── GazeTrack ─────────────────────────────────────────────────────────────
   const handleReEngage = useCallback((prompt: string) => {
@@ -61,6 +71,25 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
     onRecovered: (s) => console.info(`[GazeTrack] Recovered — ${s}`),
     onReEngageSpeak: handleReEngage,
   });
+
+  // Start eye tracking when user submits query or avatar starts speaking
+  useEffect(() => {
+    if (userSubmittedQuery && !isTracking) {
+      startTracking();
+      setUserSubmittedQuery(false);
+    }
+  }, [userSubmittedQuery, isTracking, startTracking]);
+
+  useEffect(() => {
+    if (isTalking && !isTracking) {
+      startTracking();
+    }
+  }, [isTalking, isTracking, startTracking]);
+
+  // Callback to signal user query submission
+  const handleUserQuerySubmit = useCallback(() => {
+    setUserSubmittedQuery(true);
+  }, []);
 
   // Avatar mood: attention overrides chat mood only during Tier-2
   const activeMood: AvatarMood =
@@ -100,16 +129,30 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
         onRetry={startTracking}
       />
 
-      {/* Layout: Chat | Avatar | Attention sidebar */}
-      <div className="h-full w-full flex overflow-hidden bg-background">
-        {/* Left: chat */}
-        <div className="hidden lg:flex flex-col h-full w-[400px] shrink-0 p-4 pr-2">
+      {/* Layout: Chat (left, collapsible) | Avatar (bottom right, expandable) | Attention sidebar (right) */}
+      <div className="h-full w-full flex overflow-hidden bg-background relative">
+        {/* Chat toggle button */}
+        <button
+          onClick={() => setIsChatCollapsed(!isChatCollapsed)}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-md hover:bg-[var(--bg-elevated)] transition-colors"
+          title={isChatCollapsed ? "Expand chat" : "Collapse chat"}
+        >
+          <PanelLeft size={18} className="text-[var(--text-secondary)]" />
+        </button>
+
+        {/* Left: chat - collapsible */}
+        <div
+          className={`hidden lg:flex flex-col h-full p-4 pr-2 transition-all duration-300 ease-in-out ${
+            isChatCollapsed ? "w-0 opacity-0 overflow-hidden" : "w-[400px] shrink-0"
+          }`}
+        >
           <TutorChat
             onTalkingStateChange={setIsTalking}
             onMoodChange={setChatMood}
             onVisualizerStateChange={setVisualizerState}
             lipSyncRef={lipSyncRef}
             topicContext={topicContext}
+            onQuerySubmit={handleUserQuerySubmit}
           />
         </div>
 
@@ -121,22 +164,51 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
             onVisualizerStateChange={setVisualizerState}
             lipSyncRef={lipSyncRef}
             topicContext={topicContext}
+            onQuerySubmit={handleUserQuerySubmit}
           />
         </div>
 
-        {/* Centre: avatar */}
-        <div className="flex-1 relative min-h-0 overflow-hidden">
+        {/* Avatar area - bottom right, expandable */}
+        <div
+          className={`absolute transition-all duration-300 ease-in-out ${
+            isAvatarExpanded
+              ? "bottom-0 right-0 w-full h-full"
+              : "bottom-8 right-8 w-[280px] h-[280px] cursor-pointer hover:scale-105"
+          }`}
+          onClick={() => !isAvatarExpanded && setIsAvatarExpanded(true)}
+          style={{ zIndex: isAvatarExpanded ? 1 : 10 }}
+        >
           <TutorAvatar
             isTalking={isTalking}
             mood={activeMood}
             lipSyncRef={lipSyncRef}
           />
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
+          {/* Visualizer always visible, but positioned differently */}
+          <div
+            className={`z-10 ${
+              isAvatarExpanded
+                ? "absolute bottom-8 left-1/2 -translate-x-1/2"
+                : "absolute -top-6 left-1/2 -translate-x-1/2"
+            }`}
+          >
             <AvatarVisualizer
               state={visualizerState}
               analyser={lipSyncRef.current.analyser}
             />
           </div>
+          {/* Collapse button when expanded */}
+          {isAvatarExpanded && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsAvatarExpanded(false);
+              }}
+              className="absolute top-4 right-4 p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-md hover:bg-[var(--bg-elevated)] transition-colors z-20"
+              title="Minimize avatar"
+            >
+              <PanelRight size={18} className="text-[var(--text-secondary)]" />
+            </button>
+          )}
         </div>
 
         {/* Right: attention sidebar */}
