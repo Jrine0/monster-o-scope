@@ -10,7 +10,7 @@ import { useEffect, useRef } from "react";
 import type {
   AttentionBand,
   EscalationTier,
-} from "../../../hooks/useGazeTrack";
+} from "@/hooks/useGazeTrack";
 
 interface AttentionPulseProps {
   band: AttentionBand;

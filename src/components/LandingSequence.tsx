@@ -1170,7 +1170,6 @@ export function LandingSequence({ className = "" }: { className?: string }) {
     // soft resistance / pause effect without touching window.scrollY at all.
 
     const LOCK_THRESHOLD = 600; // px of wheel delta to absorb per panel hold
-    const PANEL_HOLD_FRAC = 0.73; // fraction of panel window that is "hold"
 
     // For each non-last panel, compute the frame range of the hold window.
     const holdWindows = PANELS.filter((p) => !p.isLast).map((p) => {

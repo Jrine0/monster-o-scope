@@ -14,11 +14,9 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  MessageSquare,
   FileText,
   MessageSquareQuote,
 } from "lucide-react";
-import { ScrollArea } from "../../../../components/ui/scroll-area";
 import type { AvatarMood } from "../../../../hooks/useGazeTrack";
 import {
   type LipSyncData,
@@ -26,7 +24,8 @@ import {
   stretchTimeline,
   createAnalyserForAudio,
 } from "../../../../hooks/useLipSync";
-import { apiClient } from "../../../../lib/api-client";
+// Local tutor API server (run with: pnpm dev:server)
+const TUTOR_API_URL = "http://localhost:3001";
 
 type Message = { role: "user" | "assistant"; content: string };
 type ScriptItem = { text: string; mood: AvatarMood };
@@ -47,12 +46,16 @@ export interface TutorChatProps {
   lipSyncRef: React.MutableRefObject<LipSyncData>;
   topicContext?: string;
   onQuerySubmit?: () => void;
+  viewMode?: "chat" | "documents";
+  scrollTo?: "top" | "bottom" | null;
+  clearChat?: number;
+  onScrollHandled?: () => void;
 }
 
 let pdfJsLoaded = false;
 async function ensurePdfJs() {
-  if (pdfJsLoaded && (window as Window & { pdfjsLib?: unknown }).pdfjsLib)
-    return (window as Window & { pdfjsLib: unknown }).pdfjsLib;
+  if (pdfJsLoaded && (window as unknown as { pdfjsLib?: unknown }).pdfjsLib)
+    return (window as unknown as { pdfjsLib: unknown }).pdfjsLib;
   await new Promise<void>((resolve, reject) => {
     const s = document.createElement("script");
     s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
@@ -61,7 +64,7 @@ async function ensurePdfJs() {
     document.head.appendChild(s);
   });
   const lib = (
-    window as Window & {
+    window as unknown as {
       pdfjsLib: { GlobalWorkerOptions: { workerSrc: string } };
     }
   ).pdfjsLib;
@@ -78,6 +81,10 @@ export default function TutorChat({
   lipSyncRef,
   topicContext,
   onQuerySubmit,
+  viewMode = "chat",
+  scrollTo,
+  clearChat,
+  onScrollHandled,
 }: TutorChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -113,18 +120,42 @@ export default function TutorChat({
     }
   }, [messages]);
 
+  // Handle scrollTo commands
+  useEffect(() => {
+    if (!scrollTo || !scrollRef.current) return;
+    const vp = scrollRef.current.querySelector("[data-radix-scroll-area-viewport]");
+    if (vp) {
+      if (scrollTo === "top") {
+        (vp as HTMLElement).scrollTop = 0;
+      } else if (scrollTo === "bottom") {
+        (vp as HTMLElement).scrollTop = (vp as HTMLElement).scrollHeight;
+      }
+    }
+    onScrollHandled?.();
+  }, [scrollTo, onScrollHandled]);
+
+  // Handle clearChat
+  useEffect(() => {
+    if (clearChat && clearChat > 0) {
+      setMessages([]);
+    }
+  }, [clearChat]);
+
   useEffect(() => {
     const handler = async (e: Event) => {
       const { prompt } = (e as CustomEvent<{ prompt: string }>).detail;
       if (isSpeaking || isLoading) return;
       onVisualizerStateChange("speaking");
       try {
-        const res = await apiClient.post<{ audioBase64: string }>(
-          "/api/tutor/tts",
-          { text: prompt },
-        );
-        if (res.data?.audioBase64) {
-          const bytes = Uint8Array.from(atob(res.data.audioBase64), (c) =>
+        const res = await fetch(`${TUTOR_API_URL}/api/tts`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: prompt }),
+        });
+        if (!res.ok) throw new Error(`TTS failed: ${res.status}`);
+        const { audioBase64 } = await res.json();
+        if (audioBase64) {
+          const bytes = Uint8Array.from(atob(audioBase64), (c) =>
             c.charCodeAt(0),
           );
           const url = URL.createObjectURL(
@@ -211,7 +242,7 @@ export default function TutorChat({
       page as { getTextContent: () => Promise<unknown> }
     ).getTextContent();
     const lib = (
-      window as Window & { pdfjsLib: { renderTextLayer?: Function } }
+      window as unknown as { pdfjsLib: { renderTextLayer?: Function } }
     ).pdfjsLib;
     if (lib.renderTextLayer) {
       tl.style.setProperty("--scale-factor", String(cssScale));
@@ -356,9 +387,12 @@ export default function TutorChat({
     });
 
   const fetchTTS = (text: string) =>
-    apiClient
-      .post<{ audioBase64: string }>("/api/tutor/tts", { text })
-      .then((r) => r.data)
+    fetch(`${TUTOR_API_URL}/api/tts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    })
+      .then((r) => r.json())
       .catch(() => ({ error: "TTS failed" }));
 
   const playSingleItem = (
@@ -506,6 +540,44 @@ export default function TutorChat({
     onQuerySubmit?.();
 
     let userText = input.trim();
+
+    // Handle commands
+    if (userText.startsWith("/")) {
+      const cmd = userText.toLowerCase().trim();
+      if (cmd === "/clear") {
+        setMessages([]);
+        setInput("");
+        return;
+      }
+      if (cmd === "/save") {
+        const chatText = messages.map(m => `${m.role === "user" ? "You" : "AI"}: ${m.content}`).join("\n");
+        const blob = new Blob([chatText], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "chat-history.txt";
+        a.click();
+        URL.revokeObjectURL(url);
+        setInput("");
+        return;
+      }
+      if (cmd === "/top") {
+        const vp = scrollRef.current?.querySelector("[data-radix-scroll-area-viewport]");
+        if (vp) (vp as HTMLElement).scrollTop = 0;
+        setInput("");
+        return;
+      }
+      if (cmd === "/bottom") {
+        const vp = scrollRef.current?.querySelector("[data-radix-scroll-area-viewport]");
+        if (vp) (vp as HTMLElement).scrollTop = (vp as HTMLElement).scrollHeight;
+        setInput("");
+        return;
+      }
+      // Unknown command - show error
+      setMessages(prev => [...prev, { role: "assistant", content: `Unknown command: ${userText}. Available commands: /clear, /save, /top, /bottom` }]);
+      setInput("");
+      return;
+    }
     if (pdf?.selectedText) {
       userText = `About: "${pdf.selectedText.slice(0, 300)}…" — ${userText}`;
       setPdf((p) => (p ? { ...p, selectedText: "" } : p));
@@ -516,19 +588,24 @@ export default function TutorChat({
     setIsLoading(true);
     onVisualizerStateChange("thinking");
     try {
-      const chatRes = await apiClient.post<{ content: string }>(
-        "/api/tutor/chat",
-        { messages: buildMessages(messages, userMessage) },
-      );
-      const content = chatRes.data.content;
+      const chatRes = await fetch(`${TUTOR_API_URL}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: buildMessages(messages, userMessage), provider: "groq" }),
+      });
+      if (!chatRes.ok) throw new Error(`Chat failed: ${chatRes.status}`);
+      const { content } = await chatRes.json();
       if (!content) throw new Error("No response");
       setMessages((prev) => [...prev, { role: "assistant", content }]);
-      const narrateRes = await apiClient.post<{ script: string }>(
-        "/api/tutor/narrate",
-        { content },
-      );
-      const script = narrateRes.data?.script ?? content;
-      await playScript(analyzeText(script));
+
+      const narrateRes = await fetch(`${TUTOR_API_URL}/api/narrate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content, provider: "groq" }),
+      });
+      if (!narrateRes.ok) throw new Error(`Narrate failed: ${narrateRes.status}`);
+      const { script } = await narrateRes.json();
+      await playScript(analyzeText(script ?? content));
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Connection failed.";
       setMessages((prev) => [...prev, { role: "assistant", content: msg }]);
@@ -554,13 +631,9 @@ export default function TutorChat({
         flexDirection: "column",
         height: "100%",
         width: "100%",
-        border: isDragging
-          ? "1px solid var(--orange)"
-          : "1px solid var(--border-default)",
         background: "var(--bg-surface)",
-        borderRadius: "12px",
         boxShadow: isDragging ? "0 0 0 2px rgba(242,116,13,0.25)" : "none",
-        transition: "box-shadow 0.2s, border-color 0.2s",
+        transition: "box-shadow 0.2s",
       }}
       onDragOver={(e) => {
         e.preventDefault();
@@ -624,56 +697,10 @@ export default function TutorChat({
               whiteSpace: "nowrap",
             }}
           >
-            {pdf ? pdf.fileName : "Deepgram TTS · Ask me anything"}
+            {pdf ? pdf.fileName : viewMode === "documents" ? "Uploaded Documents" : "Deepgram TTS · Ask me anything"}
           </div>
         </div>
 
-        {/* View toggle */}
-        {pdf && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              background: "var(--bg-deep)",
-              borderRadius: 6,
-              padding: 2,
-              border: "1px solid var(--border-subtle)",
-              flexShrink: 0,
-            }}
-          >
-            {(["pdf", "chat"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setView(v)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.25rem",
-                  padding: "0.22rem 0.65rem",
-                  ...f.courier,
-                  fontSize: "0.6rem",
-                  letterSpacing: "0.08em",
-                  background: view === v ? "var(--bg-elevated)" : "transparent",
-                  color:
-                    view === v ? "var(--text-primary)" : "var(--text-muted)",
-                  border: "none",
-                  borderRadius: 4,
-                  cursor: "pointer",
-                  transition: "all 0.15s",
-                }}
-              >
-                {v === "pdf" ? (
-                  <FileText size={11} />
-                ) : (
-                  <MessageSquare size={11} />
-                )}
-                {v.toUpperCase()}
-              </button>
-            ))}
-          </div>
-        )}
         {pdf && (
           <button
             type="button"
@@ -717,8 +744,9 @@ export default function TutorChat({
           position: "relative",
         }}
       >
-        {/* PDF View */}
-        {view === "pdf" && pdf && (
+        {/* PDF View - shows when viewing documents and PDF is loaded */}
+        {((view === "pdf" && pdf) || (viewMode === "documents" && pdf)) && pdf && (
+
           <div
             style={{ height: "100%", display: "flex", flexDirection: "column" }}
           >
@@ -903,8 +931,192 @@ export default function TutorChat({
           </div>
         )}
 
+        {/* Documents View */}
+        {viewMode === "documents" && (
+          <div
+            style={{
+              height: "100%",
+              overflowY: "auto",
+              padding: "1rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.75rem",
+            }}
+          >
+            {/* Drop zone */}
+            <div
+              style={{
+                border: "2px dashed var(--border-default)",
+                borderRadius: 12,
+                padding: "2rem",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.5rem",
+                cursor: "pointer",
+                transition: "border-color 0.2s, background 0.2s",
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--orange)";
+                (e.currentTarget as HTMLElement).style.background = "rgba(242,116,13,0.05)";
+              }}
+              onDragLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--border-default)";
+                (e.currentTarget as HTMLElement).style.background = "transparent";
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--border-default)";
+                (e.currentTarget as HTMLElement).style.background = "transparent";
+                const f = e.dataTransfer.files[0];
+                if (f) loadPDF(f);
+              }}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <FileText size={32} strokeWidth={1} color="var(--text-muted)" />
+              <span
+                style={{
+                  ...f.lora,
+                  fontSize: "0.85rem",
+                  color: "var(--text-secondary)",
+                }}
+              >
+                Drop PDF files here or click to browse
+              </span>
+              <span
+                style={{
+                  ...f.courier,
+                  fontSize: "0.6rem",
+                  color: "var(--text-muted)",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                PDF, TXT, DOC supported
+              </span>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.txt,.doc,.docx"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) loadPDF(f);
+              }}
+            />
+
+            {/* Document list */}
+            {pdf && (
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.5rem",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: "0.25rem",
+                  }}
+                >
+                  <span
+                    style={{
+                      ...f.courier,
+                      fontSize: "0.65rem",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      color: "var(--text-muted)",
+                    }}
+                  >
+                    Current Document
+                  </span>
+                  <button
+                    onClick={closePDF}
+                    style={{
+                      ...f.courier,
+                      fontSize: "0.6rem",
+                      color: "var(--text-muted)",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                    padding: "0.75rem",
+                    background: "var(--bg-elevated)",
+                    border: "1px solid var(--border-subtle)",
+                    borderRadius: 8,
+                    cursor: "pointer",
+                    transition: "border-color 0.2s",
+                  }}
+                  onClick={() => setView("pdf")}
+                >
+                  <FileText size={20} color="var(--orange)" />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
+                      style={{
+                        ...f.caveat,
+                        fontSize: "0.95rem",
+                        fontWeight: 700,
+                        color: "var(--text-primary)",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {pdf.fileName}
+                    </div>
+                    <div
+                      style={{
+                        ...f.courier,
+                        fontSize: "0.6rem",
+                        color: "var(--text-muted)",
+                        letterSpacing: "0.08em",
+                      }}
+                    >
+                      {pdf.numPages} pages · Click to preview
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setView("pdf");
+                    }}
+                    style={{
+                      padding: "0.3rem 0.6rem",
+                      background: "var(--orange)",
+                      color: "#07080d",
+                      border: "none",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      ...f.courier,
+                      fontSize: "0.6rem",
+                      letterSpacing: "0.08em",
+                    }}
+                  >
+                    Preview
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Chat View */}
-        {view === "chat" && (
+        {view === "chat" && viewMode === "chat" && (
           <div
             ref={scrollRef}
             style={{

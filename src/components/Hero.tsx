@@ -6,7 +6,7 @@ export function Hero() {
   // Attach kaleidoscope hover to both .sketch-btn elements after mount
   useSketchBtn([]);
 
-  const { resolvedTheme, setTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme !== "light";
 
   // ── Theme tokens — only these four vars change between themes ──────

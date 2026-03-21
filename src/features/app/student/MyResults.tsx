@@ -236,41 +236,6 @@ function AnimatedBar({ value, color }: { value: number; color: string }) {
   );
 }
 
-/* ── Eyebrow ── */
-function Eyebrow({ label }: { label: string }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "0.5rem",
-        marginBottom: "0.85rem",
-      }}
-    >
-      <div
-        style={{
-          height: 1,
-          width: "2rem",
-          background: "var(--orange)",
-          opacity: 0.5,
-        }}
-      />
-      <span
-        style={{
-          ...COU,
-          fontSize: "0.6rem",
-          letterSpacing: "0.2em",
-          textTransform: "uppercase",
-          color: "var(--orange)",
-          opacity: 0.85,
-        }}
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
-
 export function MyResults() {
   const [activeSubject, setActiveSubject] = useState("all");
 

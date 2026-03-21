@@ -7,10 +7,7 @@ import {
   Bell,
   Moon,
   Sun,
-  Lock,
-  BookOpen,
   Users,
-  GraduationCap,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { ease } from "@/lib/animation";

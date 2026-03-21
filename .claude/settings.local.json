@@ -8,7 +8,10 @@
       "mcp__OpusCode__web_search",
       "Bash(pnpm build:*)",
       "Bash(pnpm vite:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(xxd)",
+      "Bash(pnpm install:*)"
     ]
   }
 }

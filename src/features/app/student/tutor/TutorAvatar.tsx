@@ -29,10 +29,10 @@ type ModelProps = {
   lipSyncRef: React.RefObject<LipSyncData>;
 };
 
-function Model({ externalIsTalking, currentMood, lipSyncRef }: ModelProps) {
+function Model({ currentMood, lipSyncRef }: ModelProps) {
   const { scene } = useGLTF(AVATAR_PATH);
   const clone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
-  const { nodes, materials } = useGraph(clone) as Record<string, unknown> & {
+  const { nodes, materials } = useGraph(clone) as unknown as Record<string, unknown> & {
     nodes: Record<string, THREE.SkinnedMesh>;
     materials: Record<string, THREE.Material>;
   };

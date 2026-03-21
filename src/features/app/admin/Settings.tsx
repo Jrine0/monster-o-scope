@@ -327,7 +327,7 @@ export function SettingsPage() {
     localStorage.setItem("schoolme-font", scheme);
   };
 
-  const toggleTheme = () => setTheme(isDark ? "light" : "dark");
+  void isDark; // theme toggle available if needed
 
   return (
     <>

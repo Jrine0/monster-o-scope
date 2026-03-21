@@ -247,73 +247,13 @@ export function StudentSidebar() {
           borderTop: "1px solid var(--border-subtle)",
           padding: isCollapsed ? "0.75rem 0.5rem" : "1rem",
           display: "flex",
-          flexDirection: isCollapsed ? "column" : "column",
+          flexDirection: "column",
           gap: isCollapsed ? "0.5rem" : "0.75rem",
           flexShrink: 0,
           marginTop: "auto",
           boxSizing: "border-box",
         }}
       >
-        {/* User info */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.75rem",
-            justifyContent: isCollapsed ? "center" : "flex-start",
-          }}
-        >
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border-default)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            <User
-              size={16}
-              strokeWidth={1.5}
-              style={{ color: "var(--text-secondary)" }}
-            />
-          </div>
-          {!isCollapsed && (
-            <div style={{ minWidth: 0 }}>
-              <div
-                style={{
-                  ...CAV,
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  color: "var(--text-primary)",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                Rahul Kumar
-              </div>
-              <div
-                style={{
-                  ...COU,
-                  fontSize: "0.55rem",
-                  color: "var(--text-muted)",
-                  letterSpacing: "0.05em",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                Class 10-A
-              </div>
-            </div>
-          )}
-        </div>
-
         {/* Footer links */}
         {isCollapsed ? (
           // Collapsed mode: only show profile icon with dropdown
@@ -335,15 +275,13 @@ export function StudentSidebar() {
             >
               <User size={18} strokeWidth={1.5} style={{ color: "var(--text-secondary)" }} />
             </button>
-            {/* Dropdown */}
+            {/* Dropdown — uses position:fixed to the right of the profile button */}
             {showProfileDropdown && (
               <div
                 style={{
-                  position: "absolute",
-                  bottom: "100%",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  marginBottom: "0.5rem",
+                  position: "fixed",
+                  left: "calc(72px + 0.5rem)",
+                  bottom: "1rem",
                   background: "var(--bg-surface)",
                   border: "1px solid var(--border-default)",
                   borderRadius: "8px",
@@ -402,8 +340,66 @@ export function StudentSidebar() {
             )}
           </div>
         ) : (
-          // Expanded mode: show both Settings and Profile as before
-          <div
+          <>
+            {/* User info — only shown when expanded */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.75rem",
+                justifyContent: "flex-start",
+              }}
+            >
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  background: "var(--bg-elevated)",
+                  border: "1px solid var(--border-default)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <User
+                  size={16}
+                  strokeWidth={1.5}
+                  style={{ color: "var(--text-secondary)" }}
+                />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    ...CAV,
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    color: "var(--text-primary)",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  Rahul Kumar
+                </div>
+                <div
+                  style={{
+                    ...COU,
+                    fontSize: "0.55rem",
+                    color: "var(--text-muted)",
+                    letterSpacing: "0.05em",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  Class 10-A
+                </div>
+              </div>
+            </div>
+            {/* Expanded mode: show both Settings and Profile */}
+            <div
             style={{
               display: "flex",
               gap: "0.5rem",
@@ -452,6 +448,7 @@ export function StudentSidebar() {
               );
             })}
           </div>
+          </>
         )}
       </div>
     </aside>

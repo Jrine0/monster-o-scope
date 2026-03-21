@@ -12,8 +12,6 @@ import {
   Brain,
   Activity,
   MapPin,
-  ChevronLeft,
-  ChevronRight,
   Play,
   Square,
   TrendingUp,
@@ -25,7 +23,7 @@ import type {
   AttentionBand,
   EscalationTier,
   AttentionFrame,
-} from "./useGazeTrack";
+} from "@/hooks/useGazeTrack";
 
 interface AttentionSidebarProps {
   frame: AttentionFrame | null;
@@ -34,6 +32,8 @@ interface AttentionSidebarProps {
   tier: EscalationTier;
   isTracking: boolean;
   gazeReady: boolean;
+  /** When true, the component takes full width from its parent (for floating mode) */
+  isFloating?: boolean;
   cameraPermission:
     | "idle"
     | "requesting"
@@ -307,11 +307,11 @@ export default function AttentionSidebar({
   tier,
   isTracking,
   gazeReady,
+  isFloating = false,
   cameraPermission,
   onStart,
   onStop,
 }: AttentionSidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
   const [showPermModal, setShowPermModal] = useState(false);
 
   const tierMeta = TIER_META[tier];
@@ -323,90 +323,17 @@ export default function AttentionSidebar({
         ? TrendingDown
         : Minus;
 
-  /* ── Collapsed ── */
-  if (collapsed) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "1rem 0.5rem",
-          gap: "0.75rem",
-          borderLeft: "1px solid var(--border-subtle)",
-          background: "var(--bg-surface)",
-          height: "100%",
-          width: 44,
-          flexShrink: 0,
-        }}
-      >
-        <button
-          onClick={() => setCollapsed(false)}
-          title="Open attention panel"
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            color: "var(--text-muted)",
-            display: "flex",
-          }}
-        >
-          <ChevronLeft size={16} strokeWidth={1.5} />
-        </button>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.5rem",
-            marginTop: "0.5rem",
-          }}
-        >
-          <div
-            style={{
-              width: 10,
-              height: 10,
-              borderRadius: "50%",
-              background: isTracking ? bandColor : "var(--text-muted)",
-              opacity: isTracking ? 1 : 0.3,
-              animation:
-                isTracking && (band === "DISTRACTED" || band === "ABSENT")
-                  ? "as-pulse 1.5s ease-in-out infinite"
-                  : "none",
-            }}
-          />
-          {isTracking && (
-            <span
-              style={{
-                ...f.caveat,
-                fontSize: "0.9rem",
-                fontWeight: 700,
-                color: bandColor,
-                transform: "rotate(-90deg)",
-                whiteSpace: "nowrap",
-                marginTop: "1rem",
-              }}
-            >
-              {score}
-            </span>
-          )}
-        </div>
-        <style>{`@keyframes as-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}`}</style>
-      </div>
-    );
-  }
-
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        width: 252,
         flexShrink: 0,
-        borderLeft: "1px solid var(--border-subtle)",
+        borderLeft: isFloating ? "none" : "1px solid var(--border-subtle)",
         background: "var(--bg-surface)",
         overflow: "hidden",
+        width: isFloating ? "100%" : 252,
       }}
     >
       <CameraPermissionModal
@@ -424,7 +351,6 @@ export default function AttentionSidebar({
           flexShrink: 0,
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
           padding: "0.75rem 1rem",
           borderBottom: "1px solid var(--border-subtle)",
           background: "var(--bg-elevated)",
@@ -443,28 +369,6 @@ export default function AttentionSidebar({
             GazeTrack
           </span>
         </div>
-        <button
-          onClick={() => setCollapsed(true)}
-          title="Collapse"
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            color: "var(--text-muted)",
-            display: "flex",
-            padding: "0.15rem",
-            transition: "color 0.15s",
-          }}
-          onMouseEnter={(e) =>
-            ((e.currentTarget as HTMLElement).style.color =
-              "var(--text-primary)")
-          }
-          onMouseLeave={(e) =>
-            ((e.currentTarget as HTMLElement).style.color = "var(--text-muted)")
-          }
-        >
-          <ChevronRight size={15} strokeWidth={1.5} />
-        </button>
       </div>
 
       {/* Scrollable body */}
@@ -640,7 +544,7 @@ export default function AttentionSidebar({
                 {frame.activityState
                   .replace(/_/g, " ")
                   .toLowerCase()
-                  .replace(/^\w/, (c) => c.toUpperCase())}
+                  .replace(/^\w/, (c: string) => c.toUpperCase())}
               </span>
               {frame.zone2Confirmed && (
                 <span

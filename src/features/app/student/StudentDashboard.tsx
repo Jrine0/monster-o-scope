@@ -11,12 +11,9 @@ import {
   Calculator,
   FlaskConical,
   BookOpen,
-  ChevronRight,
   TrendingUp,
   Flame,
   Trophy,
-  CheckCircle2,
-  XCircle,
   ArrowRight,
   Sparkles,
   Play,
@@ -241,40 +238,6 @@ const SUBJECTS = [
     border: "rgba(245,158,11,0.20)",
   },
 ] as const;
-const RECENT_QUIZZES = [
-  {
-    id: "q-101",
-    name: "Laws of Motion",
-    subject: "Physics",
-    score: 90,
-    date: "Today",
-    passed: true,
-  },
-  {
-    id: "q-98",
-    name: "Chemical Bonding",
-    subject: "Chemistry",
-    score: 72,
-    date: "Yesterday",
-    passed: true,
-  },
-  {
-    id: "q-95",
-    name: "Quadratic Equations",
-    subject: "Mathematics",
-    score: 85,
-    date: "2 days ago",
-    passed: true,
-  },
-  {
-    id: "q-91",
-    name: "Comprehension Passage 4",
-    subject: "English",
-    score: 45,
-    date: "3 days ago",
-    passed: false,
-  },
-] as const;
 const MOTIVATIONAL_LINES = [
   "Every expert was once a beginner. Keep going!",
   "Small steps every day lead to big results.",
@@ -282,11 +245,6 @@ const MOTIVATIONAL_LINES = [
   "Consistency beats intensity. You've got this!",
   "The best time to learn is now.",
 ] as const;
-const QUIZ_SCORES = [72, 85, 68, 90, 45, 88] as const;
-const QUIZ_LABELS = ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6"] as const;
-const QUIZ_AVERAGE = Math.round(
-  QUIZ_SCORES.reduce((a, b) => a + b, 0) / QUIZ_SCORES.length,
-);
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -294,9 +252,6 @@ function getGreeting() {
 }
 function getMotivationalLine() {
   return MOTIVATIONAL_LINES[new Date().getDate() % MOTIVATIONAL_LINES.length];
-}
-function getBarColor(s: number) {
-  return s >= 70 ? "#34d399" : s >= 50 ? "#fbbf24" : "#f87171";
 }
 
 /* ── Animated counter (logic unchanged) ── */
@@ -358,150 +313,6 @@ function GradientOrb() {
         <Sparkles size={18} strokeWidth={1.5} color="var(--orange)" />
       </div>
     </div>
-  );
-}
-
-/* ── Quiz Performance Chart (logic + motion unchanged) ── */
-function QuizPerformanceChart() {
-  const maxBarH = 140;
-  return (
-    <motion.div
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.25, ease: ease.gentle }}
-      style={{
-        background: "var(--bg-surface)",
-        border: "1px solid var(--border-default)",
-        padding: "1.75rem",
-        borderRadius: "12px",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      {/* Hover glow — rendered via CSS hover below, or just omit; keeping structure */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          marginBottom: "2rem",
-        }}
-      >
-        <div>
-          <h3
-            style={{
-              ...CAV,
-              fontSize: "1.5rem",
-              fontWeight: 700,
-              color: "var(--text-primary)",
-              lineHeight: 1,
-            }}
-          >
-            Quiz Performance
-          </h3>
-          <p
-            style={{
-              ...LOR,
-              fontStyle: "italic",
-              fontSize: "0.82rem",
-              color: "var(--text-secondary)",
-              marginTop: 4,
-            }}
-          >
-            Last 6 attempts
-          </p>
-        </div>
-        <span
-          style={{
-            ...COU,
-            fontSize: "0.62rem",
-            letterSpacing: "0.1em",
-            background: "rgba(242,116,13,0.10)",
-            border: "1px solid rgba(242,116,13,0.22)",
-            color: "var(--orange)",
-            padding: "0.3rem 0.7rem",
-            borderRadius: "999px",
-          }}
-        >
-          avg {QUIZ_AVERAGE}%
-        </span>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-end",
-          justifyContent: "center",
-          gap: "0.75rem",
-          height: `${maxBarH + 40}px`,
-        }}
-      >
-        {QUIZ_SCORES.map((score, i) => {
-          const barH = (score / 100) * maxBarH;
-          const col = getBarColor(score);
-          return (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "0.4rem",
-              }}
-            >
-              <motion.span
-                style={{ ...COU, fontSize: "0.58rem", color: col }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 + i * 0.1 }}
-              >
-                {score}
-              </motion.span>
-              <div style={{ height: maxBarH, width: 40, position: "relative" }}>
-                <motion.div
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    borderRadius: "3px 3px 0 0",
-                    backgroundColor: col,
-                    opacity: 0.88,
-                  }}
-                  initial={{ height: 0 }}
-                  whileInView={{ height: `${barH}px` }}
-                  viewport={{ once: true }}
-                  transition={{
-                    duration: 0.7,
-                    delay: 0.3 + i * 0.08,
-                    ease: ease.spring,
-                  }}
-                />
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: `${barH}px`,
-                    backgroundColor: col,
-                    opacity: 0.14,
-                    borderRadius: "3px 3px 0 0",
-                  }}
-                />
-              </div>
-              <span
-                style={{
-                  ...COU,
-                  fontSize: "0.58rem",
-                  color: "var(--text-secondary)",
-                }}
-              >
-                {QUIZ_LABELS[i]}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </motion.div>
   );
 }
 
@@ -956,7 +767,7 @@ export function StudentDashboard() {
           {/* Quiz temporarily disabled */}
           {/* <QuizPerformanceChart /> */}
 
-          <section>
+          {/* <section>
             <div
               style={{
                 display: "flex",
@@ -991,7 +802,7 @@ export function StudentDashboard() {
                 View all <ArrowRight size={12} />
               </Link>
             </div>
-            {/* Quiz temporarily disabled
+            Quiz temporarily disabled
             <Eyebrow label="latest attempts" />
             <div
               style={{
@@ -1110,8 +921,8 @@ export function StudentDashboard() {
                 );
               })}
             </div>
-            */}
-          </section>
+           
+          </section> */}
         </div>
       </div>
 

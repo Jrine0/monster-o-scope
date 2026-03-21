@@ -356,41 +356,6 @@ const container = staggerContainer(0.06);
 const item = fadeUp(12);
 const cardItem = cardReveal(16, duration.normal);
 
-/* ── Eyebrow ── */
-function Eyebrow({ label }: { label: string }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "0.5rem",
-        marginBottom: "1rem",
-      }}
-    >
-      <div
-        style={{
-          height: 1,
-          width: "2rem",
-          background: "var(--orange)",
-          opacity: 0.5,
-        }}
-      />
-      <span
-        style={{
-          ...COU,
-          fontSize: "0.6rem",
-          letterSpacing: "0.2em",
-          textTransform: "uppercase",
-          color: "var(--orange)",
-          opacity: 0.85,
-        }}
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
-
 export function StudyMaterials() {
   const [activeSubject, setActiveSubject] = useState("mathematics");
   const [searchQuery, setSearchQuery] = useState("");

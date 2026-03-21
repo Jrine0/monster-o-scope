@@ -9,12 +9,11 @@ import { Eye, EyeOff, X } from "lucide-react";
 import type {
   AttentionBand,
   EscalationTier,
-} from "../../../hooks/useGazeTrack";
+} from "@/hooks/useGazeTrack";
 
 interface AttentionToastProps {
   band: AttentionBand;
   tier: EscalationTier;
-  score: number;
   isTracking: boolean;
 }
 
@@ -42,7 +41,6 @@ const AUTO_DISMISS_MS = 6_000;
 export default function AttentionToast({
   band,
   tier,
-  score,
   isTracking,
 }: AttentionToastProps) {
   const [visible, setVisible] = useState(false);

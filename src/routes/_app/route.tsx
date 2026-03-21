@@ -3,7 +3,10 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import AppNavbar from "@/features/app/navbar";
 import AppSidebar from "@/features/app/sidebar";
 import { StudentSidebar } from "@/features/app/student/StudentSidebar";
-import { SidebarProvider as StudentSidebarProvider, useSidebar } from "@/features/app/student/SidebarContext";
+import {
+  SidebarProvider as StudentSidebarProvider,
+  useSidebar,
+} from "@/features/app/student/SidebarContext";
 import { AuthHydrator } from "@/features/auth/useAuth";
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 

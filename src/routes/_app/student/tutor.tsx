@@ -1,7 +1,3 @@
-// src/routes/_app/student/tutor.tsx
-// Replaces the existing tutor route.
-// Renders the AiTutor feature which includes avatar + chat + gaze tracking.
-
 import { createFileRoute } from "@tanstack/react-router";
 import AiTutor from "../../../features/app/student/AiTutor";
 
@@ -15,10 +11,7 @@ function TutorPage() {
   const search = Route.useSearch() as { lessonId?: string; topic?: string };
 
   return (
-    <div
-      className="w-full overflow-hidden -mx-4 -mt-4"
-      style={{ height: "calc(100dvh - 56px)" }}
-    >
+    <div className="w-full h-full" style={{ height: "calc(100dvh - 56px)" }}>
       <AiTutor lessonId={search.lessonId} topicContext={search.topic} />
     </div>
   );

@@ -7,7 +7,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Camera, X, ExternalLink, RefreshCw } from "lucide-react";
+import { Camera, X, RefreshCw } from "lucide-react";
 
 interface CameraPermissionModalProps {
   visible: boolean;

@@ -11,6 +11,7 @@ dist-ssr/
 .env
 .env.local
 .env.*.local
+!.env.example
 
 # Vite
 vite.config.ts.timestamp-*
@@ -39,4 +40,7 @@ pnpm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude
+.claude/
 

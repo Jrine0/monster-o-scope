@@ -7,7 +7,7 @@
 "use client";
 
 import { Bot } from "lucide-react";
-import type { AttentionBand } from "../../../hooks/useGazeTrack";
+import type { AttentionBand } from "@/hooks/useGazeTrack";
 
 interface AttentionModalProps {
   visible: boolean;
