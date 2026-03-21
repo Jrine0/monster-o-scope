@@ -17,15 +17,16 @@ import { useLipSync } from "../../../hooks/useLipSync";
 import { useGazeTrack, type AvatarMood } from "../../../hooks/useGazeTrack";
 import type { VisualizerState } from "../../../components/AvatarVisualizer";
 import AvatarVisualizer from "../../../components/AvatarVisualizer";
-import { Eye, EyeOff, MessageSquare, Bot, FileText, Settings, Loader2, ChevronDown, ArrowDown, ArrowUp, Save, Trash2, Minimize2 } from "lucide-react";
+import { Eye, EyeOff, MessageSquare, Bot, FileText, Settings, Loader2, ArrowDown, ArrowUp, Save, Trash2, Minimize2 } from "lucide-react";
 import { motion } from "motion/react";
 
 interface AiTutorProps {
   topicContext?: string;
   lessonId?: string;
+  children?: React.ReactNode;
 }
 
-export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
+export default function AiTutor({ topicContext, lessonId, children }: AiTutorProps) {
   const { user } = useAuthStore();
   const studentId = user?.id ?? "anonymous";
 
@@ -47,7 +48,7 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
   // Chat clear control
   const [clearChat, setClearChat] = useState(0);
 
-  // Avatar expansion state
+  // Avatar expansion state (default: minimized/floating)
   const [isAvatarExpanded, setIsAvatarExpanded] = useState(false);
 
   // Attention panel state
@@ -238,9 +239,13 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
           <button
             onClick={() => setIsAvatarExpanded(!isAvatarExpanded)}
             className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] hover:bg-[var(--bg-deep)] transition-colors"
-            title={isAvatarExpanded ? "Collapse avatar" : "Expand avatar"}
+            title={isAvatarExpanded ? "Minimize avatar" : "Expand avatar"}
           >
-            <Bot size={16} className={isAvatarExpanded ? "text-[var(--orange)]" : "text-[var(--text-muted)]"} />
+            {isAvatarExpanded ? (
+              <Minimize2 size={16} className="text-orange-500" />
+            ) : (
+              <Bot size={16} className="text-orange-500" />
+            )}
           </button>
 
           {/* Eye tracking toggle */}
@@ -342,7 +347,7 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
                   className="flex items-center justify-center w-7 h-7 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
                   title="Collapse chat"
                 >
-                  <ChevronDown size={12} />
+                  <Minimize2 size={12} />
                 </button>
               </div>
             </div>
@@ -417,54 +422,63 @@ export default function AiTutor({ topicContext, lessonId }: AiTutorProps) {
           </div>
         )}
 
-        {/* Avatar Area */}
-        <div
-          className={`flex-1 flex flex-col items-center justify-center relative transition-all duration-300 ${
-            isAvatarExpanded ? "cursor-default" : "cursor-pointer"
-          }`}
-          onClick={() => !isAvatarExpanded && setIsAvatarExpanded(true)}
-        >
-          <div
-            className="transition-all duration-300"
-            style={{
-              width: isAvatarExpanded ? "400px" : "200px",
-              height: isAvatarExpanded ? "400px" : "200px",
-            }}
-          >
-            <TutorAvatar isTalking={isTalking} mood={activeMood} lipSyncRef={lipSyncRef} />
-          </div>
-          <div
-            className="absolute z-10 transition-all duration-300"
-            style={{
-              bottom: isAvatarExpanded ? "8px" : "-30px",
-              left: "50%",
-              transform: "translateX(-50%)",
-            }}
-          >
-            <AvatarVisualizer state={visualizerState} analyser={lipSyncRef.current.analyser} />
-          </div>
-          {isAvatarExpanded && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsAvatarExpanded(false);
-              }}
-              className="absolute top-4 right-4 p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-md hover:bg-[var(--bg-elevated)] transition-colors z-20"
-              title="Minimize avatar"
-            >
-              <Minimize2 size={16} className="text-[var(--text-secondary)]" />
-            </button>
-          )}
+        {/* Main content area - shows page content or expanded avatar */}
+        <div className="flex-1 relative">
+          {/* Page content - hidden when avatar is expanded */}
           {!isAvatarExpanded && (
-            <span
-              className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[var(--text-muted)]"
-              style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem" }}
-            >
-              Click to expand
-            </span>
+            <div className="w-full h-full">
+              {children}
+            </div>
+          )}
+
+          {/* Expanded Avatar - takes up the content area */}
+          {isAvatarExpanded && (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-background relative">
+              {/* Exit button at top right */}
+              <button
+                onClick={() => setIsAvatarExpanded(false)}
+                className="absolute top-4 right-4 flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-md hover:bg-[var(--bg-elevated)] transition-colors"
+                title="Minimize avatar"
+              >
+                <Minimize2 size={16} className="text-[var(--text-secondary)]" />
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "var(--text-secondary)" }}>
+                  Minimize
+                </span>
+              </button>
+
+              {/* Full size Avatar */}
+              <div className="relative" style={{ width: "400px", height: "400px" }}>
+                <TutorAvatar isTalking={isTalking} mood={activeMood} lipSyncRef={lipSyncRef} />
+                {/* Visualizer at bottom */}
+                <div
+                  className="absolute z-10"
+                  style={{ bottom: "8px", left: "50%", transform: "translateX(-50%)" }}
+                >
+                  <AvatarVisualizer state={visualizerState} analyser={lipSyncRef.current.analyser} />
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
+
+      {/* ── Minimized Avatar: Floating at Bottom Right ─────────────────── */}
+      {!isAvatarExpanded && (
+        <button
+          onClick={() => setIsAvatarExpanded(true)}
+          className="fixed bottom-4 right-4 z-40 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer"
+          style={{
+            width: "clamp(120px, 25vw, 180px)",
+            height: "clamp(120px, 25vw, 180px)",
+          }}
+          title="Expand AI Tutor Avatar"
+        >
+          {/* Use the actual TutorAvatar component at small size */}
+          <div className="w-full h-full rounded-full overflow-hidden border-2 border-orange-500/30 hover:border-orange-500 transition-colors">
+            <TutorAvatar isTalking={isTalking} mood={activeMood} lipSyncRef={lipSyncRef} />
+          </div>
+        </button>
+      )}
 
       {/* Floating attention panel */}
       {showAttentionPanel && (

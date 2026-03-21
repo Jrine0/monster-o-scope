@@ -110,6 +110,45 @@ export default function TutorChat({
   const pdfContainerRef = useRef<HTMLDivElement>(null);
   const canvasWrapperRef = useRef<HTMLDivElement>(null);
   const renderTaskRef = useRef<unknown>(null);
+  const captionScrollRef = useRef<HTMLDivElement>(null);
+
+  // ── Hover scroll (smooth momentum on wheel) ──────────────────────────────
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      const target = e.currentTarget as HTMLElement;
+      if (!target) return;
+      e.preventDefault();
+      target.scrollBy({ top: e.deltaY, behavior: "smooth" });
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
+  // ── Live caption word tracking ─────────────────────────────────────────────
+  const [caption, setCaption] = useState<{ text: string; currentWord: number } | null>(null);
+
+  const trackCaption = useCallback(
+    (text: string, duration: number, audioEl: HTMLAudioElement) => {
+      const words = text.split(/\s+/).filter(Boolean);
+      if (words.length === 0) return;
+      let wordIdx = 0;
+      setCaption({ text, currentWord: 0 });
+      const tick = () => {
+        if (!captionScrollRef.current) return;
+        wordIdx = Math.min(Math.floor(((audioEl.currentTime / duration) * words.length)), words.length - 1);
+        setCaption({ text, currentWord: wordIdx });
+        if (!audioEl.ended && !audioEl.paused) {
+          requestAnimationFrame(tick);
+        } else {
+          setTimeout(() => setCaption(null), 400);
+        }
+      };
+      requestAnimationFrame(tick);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -167,6 +206,7 @@ export default function TutorChat({
             onMoodChange("surprise");
           };
           audio.onended = () => {
+            setCaption(null);
             onTalkingStateChange(false);
             onMoodChange("neutral");
             onVisualizerStateChange("idle");
@@ -364,6 +404,7 @@ export default function TutorChat({
       currentAudioRef.current.pause();
       currentAudioRef.current = null;
     }
+    setCaption(null);
     lipSyncRef.current.isActive = false;
     lipSyncRef.current.audioElement = null;
     lipSyncRef.current.analyser = null;
@@ -440,6 +481,7 @@ export default function TutorChat({
           isFinite(audio.duration) && audio.duration > 0
             ? audio.duration
             : totalDuration;
+        trackCaption(item.text, dur, audio);
         lipSyncRef.current = {
           timeline: stretchTimeline(timeline, totalDuration, dur),
           totalDuration: dur,
@@ -451,6 +493,7 @@ export default function TutorChat({
         };
       };
       const cleanup = () => {
+        setCaption(null);
         onTalkingStateChange(false);
         onVisualizerStateChange("idle");
         lipSyncRef.current.isActive = false;
@@ -1499,6 +1542,63 @@ export default function TutorChat({
         />
       </div>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+
+      {/* ── Live Caption (center bottom, above chat input) ── */}
+      {caption && (
+        <div
+          ref={captionScrollRef}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 30,
+            display: "flex",
+            justifyContent: "center",
+            padding: "0.6rem 1rem",
+            background: "rgba(7,8,13,0.88)",
+            backdropFilter: "blur(8px)",
+            borderTop: "1px solid rgba(242,116,13,0.25)",
+          }}
+        >
+          <div
+            style={{
+              maxWidth: "640px",
+              width: "100%",
+              textAlign: "center",
+              ...f.lora,
+              fontSize: "1.05rem",
+              lineHeight: 1.7,
+              color: "rgba(255,255,255,0.65)",
+              letterSpacing: "0.01em",
+            }}
+          >
+            {caption.text.split(/\s+/).map((word, i) => {
+              const isActive = i === caption.currentWord;
+              const isSpoken = i < caption.currentWord;
+              return (
+                <span
+                  key={i}
+                  style={{
+                    marginRight: "0.28em",
+                    display: "inline-block",
+                    transition: "color 0.15s, transform 0.15s",
+                    color: isActive
+                      ? "var(--orange)"
+                      : isSpoken
+                        ? "rgba(255,255,255,0.85)"
+                        : "rgba(255,255,255,0.45)",
+                    transform: isActive ? "scale(1.08)" : "scale(1)",
+                    fontWeight: isActive ? 700 : 400,
+                  }}
+                >
+                  {word}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

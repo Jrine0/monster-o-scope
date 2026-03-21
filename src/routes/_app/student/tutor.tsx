@@ -12,7 +12,14 @@ function TutorPage() {
 
   return (
     <div className="w-full h-full" style={{ height: "calc(100dvh - 56px)" }}>
-      <AiTutor lessonId={search.lessonId} topicContext={search.topic} />
+      <AiTutor lessonId={search.lessonId} topicContext={search.topic}>
+        {/* This is where the actual page content goes */}
+        <div className="w-full h-full flex items-center justify-center">
+          <span style={{ fontFamily: "var(--font-display)", color: "var(--text-secondary)" }}>
+            Page content goes here
+          </span>
+        </div>
+      </AiTutor>
     </div>
   );
 }

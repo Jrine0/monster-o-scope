@@ -105,6 +105,7 @@ export function useGazeTrack(options: UseGazeTrackOptions) {
   })
 
   const gazeAPIRef      = useRef<Record<string, unknown> | null>(null)
+  const streamRef        = useRef<MediaStream | null>(null)
   const sessionIdRef    = useRef(sessionId ?? crypto.randomUUID())
   const softTimerRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
   const hardTimerRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -199,9 +200,8 @@ export function useGazeTrack(options: UseGazeTrackOptions) {
     }
 
     setCameraPermission('requesting')
-    let permissionStream: MediaStream | null = null
     try {
-      permissionStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false })
+      streamRef.current = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false })
       setCameraPermission('granted')
     } catch (err: unknown) {
       setCameraPermission('previously_denied')
@@ -211,13 +211,14 @@ export function useGazeTrack(options: UseGazeTrackOptions) {
 
     try {
       const GazeAPI = await loadModules()
-      await GazeAPI.start({ studentId, sessionId: sessionIdRef.current, lessonId: lessonId ?? 'default', webhookUrl: webhookUrl ?? undefined, videoStream: permissionStream })
+      await GazeAPI.start({ studentId, sessionId: sessionIdRef.current, lessonId: lessonId ?? 'default', webhookUrl: webhookUrl ?? undefined, videoStream: streamRef.current })
       GazeAPI.subscribe('score', handleScore)
       GazeAPI.subscribe('frame', handleFrame)
       GazeAPI.subscribe('ready', () => setGazeReady(true))
       setIsTracking(true)
     } catch (err) {
-      permissionStream?.getTracks().forEach(t => t.stop())
+      streamRef.current?.getTracks().forEach(t => t.stop())
+      streamRef.current = null
       console.error('[GazeTrack] start failed:', err)
       setCameraPermission('idle')
     }
@@ -230,6 +231,11 @@ export function useGazeTrack(options: UseGazeTrackOptions) {
     const summary = (gazeAPIRef.current as { finaliseSession: Function }).finaliseSession()
     if (summary && apiClient) {
       apiClient.post('/api/gaze/sessions', summary).catch((e: unknown) => console.warn('[GazeTrack] Session save failed:', e))
+    }
+    // Stop the camera stream
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop())
+      streamRef.current = null
     }
     sessionIdRef.current = crypto.randomUUID()
     setIsTracking(false); setGazeReady(false); setCameraPermission('idle')
