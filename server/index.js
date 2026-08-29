@@ -147,9 +147,9 @@ app.post("/api/narrate", async (req, res) => {
 const DEFAULT_TTS_MODEL = "aura-2-apollo-en";
 
 app.post("/api/tts", async (req, res) => {
-  const apiKey = process.env.SCHOOLME_API_KEY;
+  const apiKey = process.env.EDACTLY_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: "SCHOOLME_API_KEY is not set." });
+    return res.status(500).json({ error: "EDACTLY_API_KEY is not set." });
   }
 
   const { text, model } = req.body;

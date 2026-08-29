@@ -5,6 +5,7 @@ import { cva, VariantProps } from "class-variance-authority";
 interface SmartLinkProps extends LinkProps {
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 const notToPreload = ["/"];
@@ -24,6 +25,7 @@ const smartLinkVariants = cva("transition-colors duration-200", {
 export default function SmartLink({
   prefetch,
   className,
+  style,
   variant,
   to,
   ...props
@@ -37,6 +39,7 @@ export default function SmartLink({
   return (
     <Link
       className={cn(smartLinkVariants({ variant }), className)}
+      style={style}
       preload={
         prefetch || (to && !notToPreload.includes(to) ? "intent" : false)
       }

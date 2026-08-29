@@ -1,4 +1,4 @@
-# Vyasa Frontend
+# Edactly Frontend
 
 An AI-powered educational platform with an interactive AI tutor featuring eye-tracking attention monitoring.
 
@@ -18,7 +18,7 @@ An AI-powered educational platform with an interactive AI tutor featuring eye-tr
 ## Project Structure
 
 ```
-vyasa-frontend/
+edactly-frontend/
 ├── src/
 │   ├── components/           # Shared UI components
 │   │   ├── ui/              # Shadcn-style UI primitives

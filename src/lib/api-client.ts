@@ -32,7 +32,7 @@ export class ApiRequestError extends Error {
 /* Single Axios instance — the only HTTP client used in the app      */
 /* ------------------------------------------------------------------ */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "https://vyasa-api.zoodleme.in";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "https://edactly-api.zoodleme.in";
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

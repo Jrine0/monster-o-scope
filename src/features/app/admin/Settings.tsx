@@ -1,7 +1,7 @@
-// SettingsPage.tsx — Schoolme design system
+// SettingsPage.tsx — Edactly design system
 // All logic from original preserved exactly.
 // Added: functional theme toggle (next-themes) + font family picker (data-font on <html>).
-// className tokens → Schoolme CSS vars + Caveat/Lora/Courier Prime fonts.
+// className tokens → Edactly CSS vars + Caveat/Lora/Courier Prime fonts.
 
 import { useState } from "react";
 import { motion } from "motion/react";
@@ -51,7 +51,7 @@ const FONT_OPTIONS: {
 }[] = [
   {
     key: "default",
-    label: "Schoolme",
+    label: "Edactly",
     display: "Caveat",
     body: "Lora",
     mono: "Courier Prime",
@@ -152,7 +152,7 @@ function Toggle({ defaultChecked = false }: { defaultChecked?: boolean }) {
   );
 }
 
-/* ── Animated background (adapted to orange, Schoolme palette) ── */
+/* ── Animated background (adapted to orange, Edactly palette) ── */
 function AnimatedBackground() {
   return (
     <div

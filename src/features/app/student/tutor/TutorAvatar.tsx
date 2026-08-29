@@ -1,5 +1,5 @@
 // src/features/app/student/tutor/TutorAvatar.tsx
-// 3D professor avatar adapted from schoolme's professor.tsx for Vyasa (Vite).
+// 3D professor avatar adapted from edactly's professor.tsx for Edactly (Vite).
 // Identical Three.js / React Three Fiber logic — just different import paths.
 
 import { useRef, useEffect, useMemo } from "react";

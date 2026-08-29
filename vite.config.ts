@@ -14,8 +14,8 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["/fav/favicon.ico", "/fav/apple-touch-icon.png"],
       manifest: {
-        name: "Vyasa",
-        short_name: "Vyasa",
+        name: "Edactly",
+        short_name: "Edactly",
         description: "An AI-powered educational platform.",
         theme_color: "#f2740d",
         background_color: "#ffffff",

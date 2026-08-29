@@ -17,10 +17,10 @@ function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ThemeProvider
-          attribute="data-theme"
+          attribute="class"
           defaultTheme="dark"
           themes={["light", "dark"]}
-          storageKey="schoolme-theme"
+          storageKey="edactly-theme"
         >
           <Outlet />
         </ThemeProvider>

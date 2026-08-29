@@ -1,6 +1,6 @@
-// QuizList.tsx — Schoolme design system
+// QuizList.tsx — Edactly design system
 // All logic, animation variants, counters from original preserved exactly.
-// className tokens → Schoolme CSS vars + Caveat/Lora/Courier Prime fonts.
+// className tokens → Edactly CSS vars + Caveat/Lora/Courier Prime fonts.
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";

@@ -1,5 +1,5 @@
 // StudentSettings.tsx — Student settings page
-// Uses Schoolme design system with Caveat/Lora/Courier Prime fonts
+// Uses Edactly design system with Caveat/Lora/Courier Prime fonts
 
 import { useState } from "react";
 import { motion } from "motion/react";
@@ -66,7 +66,7 @@ const SETTINGS_SECTIONS = [
         label: "Font Style",
         description: "Choose your preferred typography",
         type: "font",
-        defaultValue: "schoolme",
+        defaultValue: "edactly",
       },
     ],
   },
@@ -224,7 +224,7 @@ function FontSelector({
   onChange: (v: string) => void;
 }) {
   const fonts = [
-    { id: "schoolme", label: "Schoolme", displayFont: "Caveat", bodyFont: "Lora" },
+    { id: "edactly", label: "Edactly", displayFont: "Caveat", bodyFont: "Lora" },
     { id: "modern", label: "Modern", displayFont: "Instrument Serif", bodyFont: "Figtree" },
     { id: "scholar", label: "Scholar", displayFont: "Merriweather", bodyFont: "Source Serif 4" },
     { id: "clean", label: "Clean", displayFont: "Inter", bodyFont: "Crimson Pro" },
@@ -254,7 +254,7 @@ function FontSelector({
             }}
           >
             <span style={{
-              fontFamily: f.id === "schoolme" ? "Caveat, cursive" :
+              fontFamily: f.id === "edactly" ? "Caveat, cursive" :
                           f.id === "modern" ? '"Instrument Serif", Georgia, serif' :
                           f.id === "scholar" ? '"Merriweather", Georgia, serif' :
                           '"Inter", system-ui, sans-serif',
@@ -379,9 +379,9 @@ export function StudentSettings() {
   const getCurrentFontScheme = () => {
     if (typeof document !== "undefined") {
       const dataFont = document.documentElement.getAttribute("data-font");
-      return dataFont || "schoolme";
+      return dataFont || "edactly";
     }
-    return "schoolme";
+    return "edactly";
   };
 
   const [settings, setSettings] = useState({
@@ -531,7 +531,7 @@ export function StudentSettings() {
             color: "var(--text-muted)",
           }}
         >
-          Vyasa v1.0 &middot; Schoolme Platform
+          Edactly v1.0 &middot; Edactly Platform
         </p>
       </motion.div>
 

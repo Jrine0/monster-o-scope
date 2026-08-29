@@ -1,5 +1,5 @@
 /* ===================================================================
-   SCHOOLME — Dark Sketchbook CSS
+   EDACTLY — Dark Sketchbook CSS
    Fusion: hand-drawn sketchbook × dark scholarly
    =================================================================== */
 
@@ -36,7 +36,7 @@
 
   /* ── Font scheme tokens ──────────────────────────────────────────────
      Three swappable roles. Override per scheme via [data-font="..."].
-     Default (Schoolme): Caveat display · Lora body · Courier Prime mono
+     Default (Edactly): Caveat display · Lora body · Courier Prime mono
   ── */
   --font-display: "Caveat", cursive;
   --font-body:    "Lora", Georgia, serif;
@@ -757,10 +757,12 @@ footer {
 #theme-toggle:active { transform: scale(0.94); }
 
 /* ===================================================================
-   LIGHT MODE  [data-theme="light"]
+   LIGHT MODE  [data-theme="light"] and .light
+   Supports both attribute (legacy) and class (shadcn/Tailwind v4) selectors.
    =================================================================== */
 
-:root[data-theme="light"] {
+:root[data-theme="light"],
+:root.light {
   --bg-deepest:   #f6f6f2;
   --bg-deep:      #f0efe9;
   --bg-surface:   #eceae3;
@@ -782,69 +784,83 @@ footer {
 }
 
 /* Light mode body */
-:root[data-theme="light"] body {
+:root[data-theme="light"] body,
+:root.light body {
   background: var(--bg-deepest);
 }
 
 /* Light mode nav */
-:root[data-theme="light"] nav {
+:root[data-theme="light"] nav,
+:root.light nav {
   background: rgba(246,246,242,0.82);
 }
-:root[data-theme="light"] nav.scrolled {
+:root[data-theme="light"] nav.scrolled,
+:root.light nav.scrolled {
   background: rgba(246,246,242,0.96);
 }
 
 /* Light mode drawer */
-:root[data-theme="light"] .nav-drawer-panel {
+:root[data-theme="light"] .nav-drawer-panel,
+:root.light .nav-drawer-panel {
   background: var(--bg-deep, #f0efe9);
   border-left-color: var(--border-default);
 }
 
 /* Light mode toggle icon border */
-:root[data-theme="light"] #theme-toggle {
+:root[data-theme="light"] #theme-toggle,
+:root.light #theme-toggle {
   border-color: rgba(43,43,43,0.20);
   color: var(--text-secondary);
 }
 
 /* Light mode sketch cards */
-:root[data-theme="light"] .sketch-card {
+:root[data-theme="light"] .sketch-card,
+:root.light .sketch-card {
   background: rgba(232,230,222,0.75);
 }
-:root[data-theme="light"] .sketch-card::before {
+:root[data-theme="light"] .sketch-card::before,
+:root.light .sketch-card::before {
   border-color: rgba(43,43,43,0.14);
 }
-:root[data-theme="light"] .sketch-card:hover {
+:root[data-theme="light"] .sketch-card:hover,
+:root.light .sketch-card:hover {
   background: rgba(220,218,210,0.92);
   box-shadow: 0 12px 40px rgba(43,43,43,0.1), var(--orange-glow);
 }
 
 /* Light mode sections */
-:root[data-theme="light"] .features {
+:root[data-theme="light"] .features,
+:root.light .features {
   background-color: rgba(240,239,233,0.6);
 }
-:root[data-theme="light"] .cta-section {
+:root[data-theme="light"] .cta-section,
+:root.light .cta-section {
   background-color: rgba(240,239,233,0.5);
 }
 
 /* Light mode footer */
-:root[data-theme="light"] footer {
+:root[data-theme="light"] footer,
+:root.light footer {
   background: rgba(246,246,242,0.95);
   border-top-color: rgba(43,43,43,0.10);
 }
 
 /* Light mode hero title — ink on paper (no shimmer in light) */
-:root[data-theme="light"] .hero-title {
+:root[data-theme="light"] .hero-title,
+:root.light .hero-title {
   color: var(--text-primary);
   -webkit-text-fill-color: var(--text-primary);
 }
 
 /* Light mode scroll progress bar */
-:root[data-theme="light"] #scroll-progress {
+:root[data-theme="light"] #scroll-progress,
+:root.light #scroll-progress {
   background: var(--orange);
 }
 
 /* Light mode grid paper lines */
-:root[data-theme="light"] .grid-paper {
+:root[data-theme="light"] .grid-paper,
+:root.light .grid-paper {
   background-image:
     linear-gradient(rgba(43,43,43,0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(43,43,43,0.04) 1px, transparent 1px);
@@ -852,15 +868,18 @@ footer {
 }
 
 /* Light mode sketch button outline */
-:root[data-theme="light"] .sketch-btn:not(.filled)::before {
+:root[data-theme="light"] .sketch-btn:not(.filled)::before,
+:root.light .sketch-btn:not(.filled)::before {
   border-color: rgba(43,43,43,0.35);
 }
-:root[data-theme="light"] .sketch-btn:not(.filled) {
+:root[data-theme="light"] .sketch-btn:not(.filled),
+:root.light .sketch-btn:not(.filled) {
   color: var(--text-primary);
 }
 
 /* Light mode annotation SVG colors — handled via CSS currentColor trick where possible */
-:root[data-theme="light"] .sketch-divider .label {
+:root[data-theme="light"] .sketch-divider .label,
+:root.light .sketch-divider .label {
   color: var(--text-muted);
 }
 
@@ -1105,7 +1124,8 @@ body, nav, .sketch-card, footer, .features, .cta-section, #scroll-progress {
 }
 
 /* Light mode overrides */
-:root[data-theme="light"] .scroll-story__visual {
+:root[data-theme="light"] .scroll-story__visual,
+:root.light .scroll-story__visual {
   background: var(--bg-elevated);
 }
 

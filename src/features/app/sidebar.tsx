@@ -117,7 +117,7 @@ export default function AppSidebar() {
       >
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 bg-gray-500 rounded-full shrink-0"></div>
-          {open ? "Vyasa" : null}
+          {open ? "Edactly" : null}
         </div>
         <SidebarTrigger variant="outline" size="icon-sm" className="m-0.5" />
       </SidebarHeader>

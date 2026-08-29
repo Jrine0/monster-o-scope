@@ -21,6 +21,7 @@ import {
 import { useAuthStore } from "@/stores/useAuthStore";
 import { apiClient } from "@/lib/api-client";
 import { ease } from "@/lib/animation";
+import { useTheme } from "next-themes";
 
 /* ─────────────────────────────────────────────────────────────────────
    TYPES & CONSTANTS
@@ -137,40 +138,20 @@ function useLockBodyScroll() {
 }
 
 /**
- * Reads the landing page's theme from localStorage and watches
- * MutationObserver on <html data-theme> so both stay in sync.
- * Returns [theme, toggleFn].
+ * Reads the theme from next-themes via useTheme hook.
+ * Returns [theme, toggleFn] — both in sync with the ThemeProvider.
  */
 function useThemeSync(): [ThemeId, () => void] {
-  const getTheme = (): ThemeId =>
-    document.documentElement.getAttribute("data-theme") === "light"
-      ? "light"
-      : "dark";
+  const { resolvedTheme, setTheme: nextSetTheme } = useTheme() as {
+    resolvedTheme: ThemeId;
+    setTheme: (t: string) => void;
+  };
 
-  const [theme, setTheme] = useState<ThemeId>(() =>
-    typeof document !== "undefined" ? getTheme() : "dark",
-  );
-
-  useEffect(() => {
-    // Stay in sync with landing-page mutations
-    const obs = new MutationObserver(() => setTheme(getTheme()));
-    obs.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-    return () => obs.disconnect();
-  }, []);
+  const theme = (resolvedTheme ?? "dark") as ThemeId;
 
   const toggle = useCallback(() => {
-    const next = theme === "dark" ? "light" : "dark";
-    if (next === "light") {
-      document.documentElement.setAttribute("data-theme", "light");
-    } else {
-      document.documentElement.removeAttribute("data-theme");
-    }
-    localStorage.setItem("schoolme-theme", next);
-    setTheme(next);
-  }, [theme]);
+    nextSetTheme(theme === "dark" ? "light" : "dark");
+  }, [theme, nextSetTheme]);
 
   return [theme, toggle];
 }
@@ -429,7 +410,7 @@ export function KaleidoscopeLoader({
               lineHeight: 1,
             }}
           >
-            Schoolme
+            Edactly
           </span>
           <span
             style={{
@@ -1279,7 +1260,7 @@ export function LoginPage() {
                   opacity: 0.7,
                 }}
               >
-                Schoolme
+                Edactly
               </span>
 
               <div
@@ -1405,7 +1386,7 @@ export function LoginPage() {
                   display: "inline-block",
                 }}
               >
-                Schoolme
+                Edactly
               </motion.h1>
 
               {/* ── FORM CARD ─────────────────────────────────────── */}
@@ -1902,7 +1883,7 @@ export function LoginPage() {
                   textAlign: "center",
                 }}
               >
-                ◦ &nbsp;schoolme.in &nbsp;·&nbsp; secure login
+                ◦ &nbsp;edactly.in &nbsp;·&nbsp; secure login
               </p>
             </div>
           </motion.div>

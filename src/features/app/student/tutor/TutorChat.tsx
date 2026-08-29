@@ -1,6 +1,6 @@
-// TutorChat.tsx — Schoolme design system
+// TutorChat.tsx — Edactly design system
 // All logic from original preserved exactly.
-// className-based styling replaced with inline styles using Schoolme CSS vars.
+// className-based styling replaced with inline styles using Edactly CSS vars.
 // Fonts: Caveat (headings/labels), Lora (body/messages), Courier Prime (meta).
 
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -658,7 +658,7 @@ export default function TutorChat({
     }
   };
 
-  /* ─── Schoolme style objects ─────────────────────────────────────────────── */
+  /* ─── Edactly style objects ─────────────────────────────────────────────── */
   // Removed slanted CLIP definitions - using standard rounded rectangles
 
   const f = {
@@ -870,7 +870,7 @@ export default function TutorChat({
                 />
                 <div
                   ref={textLayerRef}
-                  className="schoolme-text-layer select-text"
+                  className="edactly-text-layer select-text"
                   style={{
                     position: "absolute",
                     top: 0,

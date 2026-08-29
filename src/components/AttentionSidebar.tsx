@@ -1,6 +1,6 @@
-// AttentionSidebar.tsx — Schoolme design system
+// AttentionSidebar.tsx — Edactly design system
 // All logic from original preserved exactly.
-// className-based styling → Schoolme inline CSS vars + Caveat/Lora/Courier Prime fonts.
+// className-based styling → Edactly inline CSS vars + Caveat/Lora/Courier Prime fonts.
 
 "use client";
 

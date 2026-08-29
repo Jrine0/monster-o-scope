@@ -1,7 +1,5 @@
-// StudentSidebar.tsx — Schoolme design system sidebar for student portal
-// position:fixed so Lenis smooth-scroll on html/body doesn't affect it
-
-import { Link, useLocation } from "@tanstack/react-router";
+// StudentSidebar.tsx — Tailwind CSS migration from inline styles
+import { useLocation } from "@tanstack/react-router";
 import {
   Book,
   GraduationCapIcon,
@@ -14,9 +12,7 @@ import {
 } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
 import { useState, useRef, useEffect } from "react";
-
-const CAV: React.CSSProperties = { fontFamily: "Caveat, cursive" };
-const COU: React.CSSProperties = { fontFamily: "Courier Prime, monospace" };
+import SmartLink from "@/components/smart-link";
 
 const navItems = [
   { name: "Dashboard", to: "/student", icon: LayoutDashboardIcon },
@@ -37,7 +33,6 @@ export function StudentSidebar() {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -48,93 +43,42 @@ export function StudentSidebar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Close dropdown on route change
+  useEffect(() => {
+    setShowProfileDropdown(false);
+  }, [location.pathname]);
+
   return (
     <aside
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: isCollapsed ? 72 : 240,
-        height: "100dvh",
-        backgroundColor: "var(--bg-deep)",
-        borderRight: "1px solid var(--border-subtle)",
-        display: "flex",
-        flexDirection: "column",
-        zIndex: 50,
-        overflow: "hidden",
-        boxSizing: "border-box",
-        transition: "width 0.3s ease",
-      }}
+      className={`
+        fixed top-0 left-0 h-dvh flex flex-col z-50 overflow-hidden
+        border-r border-border bg-deep transition-[width] duration-300 ease-in-out
+        ${isCollapsed ? "w-[72px]" : "w-60"}
+      `}
     >
-      {/* ── Header ── */}
+      {/* Header */}
       <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: isCollapsed ? "center" : "space-between",
-          padding: isCollapsed ? "1rem 0.5rem" : "1rem 1.25rem",
-          borderBottom: "1px solid var(--border-subtle)",
-          flexShrink: 0,
-          minHeight: 56,
-          boxSizing: "border-box",
-        }}
+        className={`
+          flex items-center border-b border-border flex-shrink-0 min-h-14 box-border
+          ${isCollapsed ? "justify-center px-1 py-3" : "justify-between px-5 py-3"}
+        `}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              background: "var(--orange)",
-              display: "flex",
-              flexShrink: 0,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <span
-              style={{
-                ...CAV,
-                fontSize: "1.1rem",
-                color: "#07080d",
-                fontWeight: 700,
-              }}
-            >
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-orange flex items-center justify-center flex-shrink-0">
+            <span className="text-lg font-bold text-[#07080d] font-[Caveat,cursive] leading-none">
               V
             </span>
           </div>
           {!isCollapsed && (
-            <span
-              style={{
-                ...CAV,
-                fontSize: "1.35rem",
-                fontWeight: 700,
-                color: "var(--text-primary)",
-                transform: "rotate(-0.5deg)",
-                display: "inline-block",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Vyasa
+            <span className="font-[Caveat,cursive] text-xl font-bold text-foreground -rotate-0.5 whitespace-nowrap">
+              Edactly
             </span>
           )}
         </div>
-        {/* Collapse toggle button in header */}
         {!isCollapsed && (
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: "6px",
-              backgroundColor: "transparent",
-              border: "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              color: "var(--text-secondary)",
-            }}
+            className="w-7 h-7 rounded-md bg-transparent border-none flex items-center justify-center cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
             title="Collapse sidebar"
           >
             <ChevronLeft size={18} strokeWidth={1.5} />
@@ -144,28 +88,10 @@ export function StudentSidebar() {
 
       {/* Expand button when collapsed */}
       {isCollapsed && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            padding: "0.5rem",
-            borderBottom: "1px solid var(--border-subtle)",
-          }}
-        >
+        <div className="flex justify-center p-2 border-b border-border">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: "6px",
-              backgroundColor: "transparent",
-              border: "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              color: "var(--text-secondary)",
-            }}
+            className="w-7 h-7 rounded-md bg-transparent border-none flex items-center justify-center cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
             title="Expand sidebar"
           >
             <ChevronRight size={18} strokeWidth={1.5} />
@@ -173,26 +99,18 @@ export function StudentSidebar() {
         </div>
       )}
 
-      {/* ── Nav Items ── */}
+      {/* Nav Items */}
       <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "0.25rem",
-          padding: isCollapsed ? "0.75rem 0.25rem" : "1rem 0.75rem",
-          boxSizing: "border-box",
-        }}
+        className={`
+          flex flex-col gap-1 box-border
+          ${isCollapsed ? "p-2 px-1" : "p-4 px-3"}
+        `}
       >
         <span
-          style={{
-            ...COU,
-            fontSize: "0.55rem",
-            letterSpacing: "0.12em",
-            color: "var(--text-muted)",
-            paddingLeft: isCollapsed ? "0" : "0.5rem",
-            marginBottom: "0.35rem",
-            textAlign: isCollapsed ? "center" : "left",
-          }}
+          className={`
+            font-[Courier_Prime,monospace] text-[0.55rem] tracking-widest text-muted uppercase
+            ${isCollapsed ? "text-center mb-1" : "pl-2 mb-1"}
+          `}
         >
           {isCollapsed ? "" : "GENERAL"}
         </span>
@@ -200,254 +118,118 @@ export function StudentSidebar() {
         {navItems.map(({ name, to, icon: Icon }) => {
           const isActive = currentPath === to;
           return (
-            <Link
+            <SmartLink
               key={name}
               to={to}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: isCollapsed ? "center" : "flex-start",
-                gap: isCollapsed ? 0 : "0.6rem",
-                padding: isCollapsed ? "0.6rem" : "0.5rem 0.75rem",
-                borderRadius: "0.5rem",
-                textDecoration: "none",
-                background: isActive ? "var(--bg-surface)" : "transparent",
-                color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-                fontFamily: "Caveat, cursive",
-                fontSize: isCollapsed ? "0" : "0.95rem",
-                fontWeight: isActive ? 600 : 400,
-                transition: "background 0.15s ease, color 0.15s ease",
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive)
-                  (e.currentTarget as HTMLAnchorElement).style.background = "var(--bg-elevated)";
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive)
-                  (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
-              }}
+              className={`
+                flex items-center no-underline rounded-lg transition-colors duration-150
+                font-[Caveat,cursive] text-base
+                ${isCollapsed ? "justify-center p-2.5" : "px-3 py-2"}
+                ${isActive
+                  ? "bg-surface text-foreground font-semibold"
+                  : "text-muted-foreground hover:bg-elevated"
+                }
+              `}
             >
               <Icon
                 size={18}
                 strokeWidth={1.5}
-                style={{
-                  color: isActive ? "var(--orange)" : "var(--text-secondary)",
-                  flexShrink: 0,
-                }}
+                className={`flex-shrink-0 ${isActive ? "text-orange" : "text-muted-foreground"}`}
               />
               {!isCollapsed && <span>{name}</span>}
-            </Link>
+            </SmartLink>
           );
         })}
       </div>
 
-      {/* ── Footer ── */}
+      {/* Footer */}
       <div
-        style={{
-          borderTop: "1px solid var(--border-subtle)",
-          padding: isCollapsed ? "0.75rem 0.5rem" : "1rem",
-          display: "flex",
-          flexDirection: "column",
-          gap: isCollapsed ? "0.5rem" : "0.75rem",
-          flexShrink: 0,
-          marginTop: "auto",
-          boxSizing: "border-box",
-        }}
+        className={`
+          border-t border-border flex flex-col flex-shrink-0 mt-auto box-border
+          ${isCollapsed ? "p-2 gap-2" : "p-4 gap-3"}
+        `}
       >
-        {/* Footer links */}
         {isCollapsed ? (
-          // Collapsed mode: only show profile icon with dropdown
-          <div ref={dropdownRef} style={{ position: "relative", display: "flex", justifyContent: "center" }}>
+          <div ref={dropdownRef} className="relative flex justify-center">
             <button
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: "50%",
-                background: "var(--bg-elevated)",
-                border: "1px solid var(--border-default)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-              }}
+              className="w-9 h-9 rounded-full bg-elevated border border-border flex items-center justify-center cursor-pointer transition-all hover:border-foreground/20"
             >
-              <User size={18} strokeWidth={1.5} style={{ color: "var(--text-secondary)" }} />
+              <User size={18} strokeWidth={1.5} className="text-muted-foreground" />
             </button>
-            {/* Dropdown — uses position:fixed to the right of the profile button */}
             {showProfileDropdown && (
-              <div
-                style={{
-                  position: "fixed",
-                  left: "calc(72px + 0.5rem)",
-                  bottom: "1rem",
-                  background: "var(--bg-surface)",
-                  border: "1px solid var(--border-default)",
-                  borderRadius: "8px",
-                  padding: "0.75rem",
-                  minWidth: 160,
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                  zIndex: 100,
-                }}
-              >
-                {/* Name and Class */}
-                <div style={{ padding: "0.5rem", borderBottom: "1px solid var(--border-subtle)", marginBottom: "0.5rem" }}>
-                  <div style={{ ...CAV, fontSize: "1rem", fontWeight: 600, color: "var(--text-primary)" }}>Rahul Kumar</div>
-                  <div style={{ ...COU, fontSize: "0.55rem", color: "var(--text-muted)", letterSpacing: "0.05em" }}>Class 10-A</div>
+              <div className="fixed left-[calc(72px+0.5rem)] bottom-4 bg-surface border border-border rounded-lg p-3 min-w-40 shadow-lg z-100">
+                <div className="p-2 border-b border-border-subtle mb-2">
+                  <div className="font-[Caveat,cursive] text-base font-semibold text-foreground">Rahul Kumar</div>
+                  <div className="font-[Courier_Prime,monospace] text-[0.55rem] text-muted tracking-wide">Class 10-A</div>
                 </div>
-                {/* Settings Link */}
-                <Link
+                <SmartLink
                   to="/student/settings"
-                  onClick={() => setShowProfileDropdown(false)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    padding: "0.5rem",
-                    borderRadius: "6px",
-                    textDecoration: "none",
-                    color: "var(--text-secondary)",
-                    transition: "background 0.15s ease",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-elevated)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  className="flex items-center gap-2 p-2 rounded-md no-underline text-muted-foreground hover:bg-elevated transition-colors"
                 >
                   <Settings size={14} strokeWidth={1.5} />
-                  <span style={{ ...COU, fontSize: "0.6rem", letterSpacing: "0.03em" }}>Settings</span>
-                </Link>
-                {/* Profile Link */}
-                <Link
+                  <span className="font-[Courier_Prime,monospace] text-[0.6rem] tracking-wide">Settings</span>
+                </SmartLink>
+                <SmartLink
                   to="/student/profile"
-                  onClick={() => setShowProfileDropdown(false)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    padding: "0.5rem",
-                    borderRadius: "6px",
-                    textDecoration: "none",
-                    color: "var(--text-secondary)",
-                    transition: "background 0.15s ease",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-elevated)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  className="flex items-center gap-2 p-2 rounded-md no-underline text-muted-foreground hover:bg-elevated transition-colors"
                 >
                   <User size={14} strokeWidth={1.5} />
-                  <span style={{ ...COU, fontSize: "0.6rem", letterSpacing: "0.03em" }}>Profile</span>
-                </Link>
+                  <span className="font-[Courier_Prime,monospace] text-[0.6rem] tracking-wide">Profile</span>
+                </SmartLink>
               </div>
             )}
           </div>
         ) : (
           <>
-            {/* User info — only shown when expanded */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.75rem",
-                justifyContent: "flex-start",
-              }}
-            >
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: "50%",
-                  background: "var(--bg-elevated)",
-                  border: "1px solid var(--border-default)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <User
-                  size={16}
-                  strokeWidth={1.5}
-                  style={{ color: "var(--text-secondary)" }}
-                />
+            {/* User info */}
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-elevated border border-border flex items-center justify-center flex-shrink-0">
+                <User size={16} strokeWidth={1.5} className="text-muted-foreground" />
               </div>
-              <div style={{ minWidth: 0 }}>
-                <div
-                  style={{
-                    ...CAV,
-                    fontSize: "1rem",
-                    fontWeight: 600,
-                    color: "var(--text-primary)",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
+              <div className="min-w-0">
+                <div className="font-[Caveat,cursive] text-base font-semibold text-foreground truncate overflow-hidden text-ellipsis whitespace-nowrap">
                   Rahul Kumar
                 </div>
-                <div
-                  style={{
-                    ...COU,
-                    fontSize: "0.55rem",
-                    color: "var(--text-muted)",
-                    letterSpacing: "0.05em",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
+                <div className="font-[Courier_Prime,monospace] text-[0.55rem] text-muted tracking-wide truncate overflow-hidden text-ellipsis whitespace-nowrap">
                   Class 10-A
                 </div>
               </div>
             </div>
-            {/* Expanded mode: show both Settings and Profile */}
-            <div
-            style={{
-              display: "flex",
-              gap: "0.5rem",
-              justifyContent: "stretch",
-            }}
-          >
-            {footerItems.map((item) => {
-              const isActive = currentPath === item.to;
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.to}
-                  style={{
-                    flex: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "0.4rem",
-                    padding: "0.5rem",
-                    background: isActive ? "var(--bg-surface)" : "transparent",
-                    border: isActive ? "1px solid var(--border-default)" : "1px solid var(--border-subtle)",
-                    borderRadius: "0.5rem",
-                    textDecoration: "none",
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <Icon
-                    size={16}
-                    strokeWidth={1.5}
-                    style={{
-                      color: isActive ? "var(--orange)" : "var(--text-secondary)",
-                    }}
-                  />
-                  <span
-                    style={{
-                      ...COU,
-                      fontSize: "0.55rem",
-                      letterSpacing: "0.05em",
-                      color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-                    }}
+            {/* Settings and Profile */}
+            <div className="flex gap-2">
+              {footerItems.map((item) => {
+                const isActive = currentPath === item.to;
+                const Icon = item.icon;
+                return (
+                  <SmartLink
+                    key={item.name}
+                    to={item.to}
+                    className={`
+                      flex-1 flex items-center justify-center gap-1 p-2 no-underline rounded-lg transition-all duration-200
+                      ${isActive
+                        ? "bg-surface border border-border"
+                        : "border border-border-subtle"
+                      }
+                    `}
                   >
-                    {item.name}
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
+                    <Icon
+                      size={16}
+                      strokeWidth={1.5}
+                      className={isActive ? "text-orange" : "text-muted-foreground"}
+                    />
+                    <span
+                      className={`
+                        font-[Courier_Prime,monospace] text-[0.55rem] tracking-wide
+                        ${isActive ? "text-foreground" : "text-muted-foreground"}
+                      `}
+                    >
+                      {item.name}
+                    </span>
+                  </SmartLink>
+                );
+              })}
+            </div>
           </>
         )}
       </div>

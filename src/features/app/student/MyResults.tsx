@@ -1,7 +1,3 @@
-// MyResults.tsx — Schoolme design system
-// All logic, animation variants, filter state, animated counters from original preserved.
-// className tokens → Schoolme CSS vars + Caveat/Lora/Courier Prime fonts.
-
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Link } from "@tanstack/react-router";
@@ -16,6 +12,7 @@ import {
   Languages,
   ChevronRight,
   BarChart3,
+  Loader2,
 } from "lucide-react";
 import {
   staggerContainer,
@@ -26,176 +23,36 @@ import {
   ease,
   duration,
 } from "@/lib/animation";
+import {
+  listAccessedContent,
+  type StudentAccessedContent,
+} from "./api/student.api";
 
-const CAV: React.CSSProperties = { fontFamily: "Caveat, cursive" };
-const LOR: React.CSSProperties = { fontFamily: "Lora, Georgia, serif" };
-const COU: React.CSSProperties = { fontFamily: "Courier Prime, monospace" };
-// Removed slanted CLIP_CARD - using standard rounded rectangles
-
-/* ── Subject config (unchanged) ── */
 const SUBJECTS = [
   { key: "all", label: "All", icon: BookOpen, color: "#f2740d" },
-  {
-    key: "mathematics",
-    label: "Mathematics",
-    icon: Calculator,
-    color: "#3b82f6",
-  },
+  { key: "mathematics", label: "Mathematics", icon: Calculator, color: "#3b82f6" },
   { key: "physics", label: "Physics", icon: Atom, color: "#a855f7" },
-  {
-    key: "chemistry",
-    label: "Chemistry",
-    icon: FlaskConical,
-    color: "#22c55e",
-  },
+  { key: "chemistry", label: "Chemistry", icon: FlaskConical, color: "#22c55e" },
   { key: "biology", label: "Biology", icon: Leaf, color: "#ec4899" },
   { key: "english", label: "English", icon: BookOpen, color: "#f59e0b" },
   { key: "hindi", label: "Hindi", icon: Languages, color: "#f97316" },
 ] as const;
 
-/* ── Mock results (unchanged) ── */
-const RESULTS = [
-  {
-    id: "r1",
-    quiz: "Real Numbers",
-    subject: "mathematics",
-    score: 8,
-    total: 10,
-    date: "2 Mar 2026",
-  },
-  {
-    id: "r2",
-    quiz: "Light \u2014 Reflection and Refraction",
-    subject: "physics",
-    score: 9,
-    total: 10,
-    date: "1 Mar 2026",
-  },
-  {
-    id: "r3",
-    quiz: "Chemical Reactions and Equations",
-    subject: "chemistry",
-    score: 7,
-    total: 10,
-    date: "28 Feb 2026",
-  },
-  {
-    id: "r4",
-    quiz: "Polynomials",
-    subject: "mathematics",
-    score: 9,
-    total: 10,
-    date: "27 Feb 2026",
-  },
-  {
-    id: "r5",
-    quiz: "Life Processes",
-    subject: "biology",
-    score: 8,
-    total: 10,
-    date: "26 Feb 2026",
-  },
-  {
-    id: "r6",
-    quiz: "Quadratic Equations",
-    subject: "mathematics",
-    score: 7,
-    total: 10,
-    date: "25 Feb 2026",
-  },
-  {
-    id: "r7",
-    quiz: "Electricity",
-    subject: "physics",
-    score: 6,
-    total: 10,
-    date: "24 Feb 2026",
-  },
-  {
-    id: "r8",
-    quiz: "Acids, Bases and Salts",
-    subject: "chemistry",
-    score: 8,
-    total: 10,
-    date: "23 Feb 2026",
-  },
-  {
-    id: "r9",
-    quiz: "A Letter to God",
-    subject: "english",
-    score: 9,
-    total: 10,
-    date: "22 Feb 2026",
-  },
-  {
-    id: "r10",
-    quiz: "Magnetic Effects of Electric Current",
-    subject: "physics",
-    score: 6,
-    total: 10,
-    date: "21 Feb 2026",
-  },
-  {
-    id: "r11",
-    quiz: "Control and Coordination",
-    subject: "biology",
-    score: 5,
-    total: 10,
-    date: "20 Feb 2026",
-  },
-  {
-    id: "r12",
-    quiz: "Pair of Linear Equations",
-    subject: "mathematics",
-    score: 8,
-    total: 10,
-    date: "19 Feb 2026",
-  },
-];
-
-/* ── Helpers (unchanged) ── */
-function getSubjectAverages() {
-  const map: Record<
-    string,
-    { total: number; count: number; color: string; label: string }
-  > = {};
-  for (const r of RESULTS) {
-    const sub = SUBJECTS.find((s) => s.key === r.subject);
-    if (!sub) continue;
-    if (!map[r.subject])
-      map[r.subject] = {
-        total: 0,
-        count: 0,
-        color: sub.color,
-        label: sub.label,
-      };
-    map[r.subject].total += r.score;
-    map[r.subject].count += 1;
-  }
-  return Object.entries(map).map(([key, val]) => ({
-    key,
-    label: val.label,
-    color: val.color,
-    average: Math.round((val.total / val.count) * 10),
-    quizCount: val.count,
-  }));
-}
 function getSubjectColor(key: string) {
   return SUBJECTS.find((s) => s.key === key)?.color ?? "#f2740d";
 }
+
 function getSubjectLabel(key: string) {
   return SUBJECTS.find((s) => s.key === key)?.label ?? key;
 }
+
 function scoreColor(pct: number) {
   return pct >= 70 ? "#34d399" : pct >= 50 ? "#fb923c" : "#f87171";
 }
 
-/* ── Animation variants (unchanged) ── */
 const container = staggerContainer(staggerDelay.tight + 0.01);
-const item = fadeUp(10, 0.45);
 const cardItem = cardReveal(12, duration.normal);
 
-/* ── Animated counter (logic unchanged) ── */
 function useAnimatedCounter(target: number, ms = 800) {
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -213,21 +70,15 @@ function useAnimatedCounter(target: number, ms = 800) {
   return count;
 }
 
-/* ── Animated bar ── */
 function AnimatedBar({ value, color }: { value: number; color: string }) {
   return (
     <div
-      style={{
-        height: 3,
-        width: "100%",
-        borderRadius: "999px",
-        background: "var(--bg-elevated)",
-        marginTop: "0.5rem",
-        overflow: "hidden",
-      }}
+      className="mt-2 h-[3px] w-full overflow-hidden rounded-full"
+      style={{ background: "var(--bg-elevated)" }}
     >
       <motion.div
-        style={{ height: "100%", background: color, borderRadius: "999px" }}
+        className="h-full rounded-full"
+        style={{ background: color }}
         initial={{ width: 0 }}
         animate={{ width: `${value}%` }}
         transition={{ type: "spring", stiffness: 60, damping: 15, delay: 0.4 }}
@@ -236,38 +87,120 @@ function AnimatedBar({ value, color }: { value: number; color: string }) {
   );
 }
 
+function formatDate(iso: string | null) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
 export function MyResults() {
   const [activeSubject, setActiveSubject] = useState("all");
+  const [results, setResults] = useState<StudentAccessedContent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    listAccessedContent({ source_type: "quiz", per_page: 50 })
+      .then((res) => setResults(res.data))
+      .catch(() => setError("Failed to load results."))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Compute quiz items from accessed content
+  const quizItems = results.filter((r) => r.library_item || r.material);
+
+  // Normalize to display format
+  const displayItems = quizItems.map((r) => {
+    const item = r.library_item ?? r.material!;
+    // Try to derive score from progress
+    const progress = r.progress as { score?: number; total?: number } | null;
+    const score = progress?.score ?? 0;
+    const total = progress?.total ?? 10;
+    // Extract subject from subtopic_title or title
+    const title = item.title;
+    const subtopicTitle = "subtopic_title" in item ? item.subtopic_title : null;
+    const subject = subtopicTitle?.split(" ")[0]?.toLowerCase() ?? "mathematics";
+    const matchedSubject = SUBJECTS.find(
+      (s) => s.key !== "all" && title.toLowerCase().includes(s.key.toLowerCase()),
+    )?.key ?? subject;
+    return {
+      id: r.access_id,
+      quiz: title,
+      subject: matchedSubject,
+      score,
+      total,
+      date: formatDate(r.last_accessed_at),
+    };
+  });
 
   const filtered =
     activeSubject === "all"
-      ? RESULTS
-      : RESULTS.filter((r) => r.subject === activeSubject);
+      ? displayItems
+      : displayItems.filter((r) => r.subject === activeSubject);
+
+  // Compute averages
+  function getSubjectAverages() {
+    const map: Record<string, { total: number; count: number; color: string; label: string }> = {};
+    for (const r of displayItems) {
+      const sub = SUBJECTS.find((s) => s.key === r.subject);
+      if (!sub) continue;
+      if (!map[r.subject]) {
+        map[r.subject] = { total: 0, count: 0, color: sub.color, label: sub.label };
+      }
+      map[r.subject].total += r.score;
+      map[r.subject].count += 1;
+    }
+    return Object.entries(map).map(([key, val]) => ({
+      key,
+      label: val.label,
+      color: val.color,
+      average: val.count ? Math.round((val.total / val.count) * 10) : 0,
+      quizCount: val.count,
+    }));
+  }
+
   const subjectAverages = getSubjectAverages();
-  const overallAvg = RESULTS.length
-    ? Math.round(
-        (RESULTS.reduce((a, r) => a + r.score, 0) / RESULTS.length) * 10,
-      )
-    : 0;
+  const overallAvg =
+    displayItems.length
+      ? Math.round((displayItems.reduce((a, r) => a + (r.score / r.total) * 100, 0) / displayItems.length) * 10)
+      : 0;
   const animatedOverall = useAnimatedCounter(overallAvg);
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center" style={{ minHeight: 320 }}>
+        <Loader2 size={28} className="animate-spin" style={{ color: "var(--orange)" }} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center gap-3 pt-12" style={{ color: "var(--text-muted)" }}>
+        <p className="font-[Caveat,cursive] text-2xl">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="rounded-full px-5 py-2 text-sm transition-colors"
+          style={{
+            background: "var(--bg-elevated)",
+            border: "1px solid var(--border-default)",
+            color: "var(--text-secondary)",
+          }}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div
-      style={{
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        gap: "1.5rem",
-        paddingBottom: "3rem",
-      }}
-    >
-      {/* Background blob */}
+    <div className="flex flex-col gap-6 pb-12" style={{ position: "relative" }}>
+      {/* Background */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <motion.div
           className="absolute -top-32 -right-20 h-[500px] w-[500px] rounded-full"
           style={{
-            background:
-              "radial-gradient(circle,#f2740d 0%,#fb923c 40%,transparent 70%)",
+            background: "radial-gradient(circle,#f2740d 0%,#fb923c 40%,transparent 70%)",
             filter: "blur(100px)",
             opacity: 0.05,
           }}
@@ -277,8 +210,7 @@ export function MyResults() {
         <motion.div
           className="absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full"
           style={{
-            background:
-              "radial-gradient(circle,#fb923c 0%,#f59e0b 40%,transparent 70%)",
+            background: "radial-gradient(circle,#fb923c 0%,#f59e0b 40%,transparent 70%)",
             filter: "blur(100px)",
             opacity: 0.04,
           }}
@@ -288,8 +220,7 @@ export function MyResults() {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage:
-              "radial-gradient(circle,#f2740d 1px,transparent 1px)",
+            backgroundImage: "radial-gradient(circle,#f2740d 1px,transparent 1px)",
             backgroundSize: "32px 32px",
             opacity: 0.03,
           }}
@@ -303,24 +234,14 @@ export function MyResults() {
         transition={{ duration: 0.6, ease: ease.gentle }}
       >
         <h1
-          style={{
-            ...CAV,
-            fontSize: "clamp(2rem,5vw,3rem)",
-            fontWeight: 400,
-            color: "var(--text-primary)",
-            lineHeight: 1,
-          }}
+          className="font-[Caveat,cursive] font-normal"
+          style={{ fontSize: "clamp(2rem,5vw,3rem)", color: "var(--text-primary)", lineHeight: 1 }}
         >
           My Results
         </h1>
         <p
-          style={{
-            ...LOR,
-            fontStyle: "italic",
-            fontSize: "0.95rem",
-            color: "var(--text-secondary)",
-            marginTop: "0.4rem",
-          }}
+          className="font-[Lora,Georgia,serif] italic"
+          style={{ fontSize: "0.95rem", color: "var(--text-secondary)", marginTop: "0.4rem" }}
         >
           Track your quiz performance across subjects
         </p>
@@ -328,8 +249,7 @@ export function MyResults() {
           style={{
             height: 1,
             marginTop: "1rem",
-            background:
-              "linear-gradient(90deg,transparent,#f2740d,#fb923c,transparent)",
+            background: "linear-gradient(90deg,transparent,#f2740d,#fb923c,transparent)",
           }}
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ scaleX: 1, opacity: 1 }}
@@ -340,65 +260,38 @@ export function MyResults() {
       {/* Average score cards */}
       <motion.div
         {...fadeUpProps(8, 0.1, 0.4)}
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill,minmax(130px,1fr))",
-          gap: "0.75rem",
-        }}
+        className="grid gap-3"
+        style={{ gridTemplateColumns: "repeat(auto-fill,minmax(130px,1fr))" }}
       >
         {/* Overall */}
         <motion.div
           whileHover={{ y: -4 }}
           transition={{ duration: 0.25, ease: ease.gentle }}
+          className="col-span-2 flex flex-col gap-2 rounded-xl p-4"
           style={{
-            gridColumn: "span 2",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.5rem",
-            padding: "1rem",
             background: "rgba(242,116,13,0.06)",
             border: "1px solid rgba(242,116,13,0.22)",
-            borderRadius: "12px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+          <div className="flex items-center gap-1">
             <motion.div
               animate={{ rotate: [0, 5, -5, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             >
-              <BarChart3 size={15} strokeWidth={1.5} color="var(--orange)" />
+              <BarChart3 size={15} strokeWidth={1.5} style={{ color: "var(--orange)" }} />
             </motion.div>
             <span
-              style={{
-                ...COU,
-                fontSize: "0.58rem",
-                letterSpacing: "0.1em",
-                color: "var(--orange)",
-              }}
+              className="font-[Courier_Prime,monospace]"
+              style={{ fontSize: "0.58rem", letterSpacing: "0.1em", color: "var(--orange)" }}
             >
               Overall
             </span>
           </div>
-          <p
-            style={{
-              ...CAV,
-              fontSize: "2rem",
-              fontWeight: 700,
-              color: "var(--text-primary)",
-              lineHeight: 1,
-            }}
-          >
+          <p className="font-[Caveat,cursive] text-4xl font-bold" style={{ color: "var(--text-primary)", lineHeight: 1 }}>
             {animatedOverall}%
           </p>
-          <p
-            style={{
-              ...LOR,
-              fontStyle: "italic",
-              fontSize: "0.78rem",
-              color: "var(--text-secondary)",
-            }}
-          >
-            {RESULTS.length} quizzes
+          <p className="font-[Lora,Georgia,serif] italic" style={{ fontSize: "0.78rem", color: "var(--text-secondary)" }}>
+            {displayItems.length} quizzes
           </p>
           <AnimatedBar value={overallAvg} color="var(--orange)" />
         </motion.div>
@@ -409,78 +302,40 @@ export function MyResults() {
             key={sa.key}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: 0.2 + i * 0.08,
-              duration: 0.4,
-              ease: ease.gentle,
-            }}
+            transition={{ delay: 0.2 + i * 0.08, duration: 0.4, ease: ease.gentle }}
             whileHover={{ y: -4 }}
+            className="flex flex-col gap-2 rounded-xl p-3"
             style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.4rem",
-              padding: "0.85rem",
               background: "var(--bg-surface)",
               border: "1px solid var(--border-subtle)",
-              borderRadius: "12px",
             }}
           >
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}
-            >
+            <div className="flex items-center gap-1">
               <motion.div
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: "50%",
-                  background: sa.color,
-                  flexShrink: 0,
-                }}
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{ background: sa.color }}
                 animate={{ scale: [1, 1.3, 1] }}
-                transition={{
-                  duration: 2,
-                  delay: i * 0.3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
+                transition={{ duration: 2, delay: i * 0.3, repeat: Infinity, ease: "easeInOut" }}
               />
               <span
-                style={{
-                  ...COU,
-                  fontSize: "0.55rem",
-                  letterSpacing: "0.08em",
-                  color: "var(--text-muted)",
-                }}
+                className="font-[Courier_Prime,monospace] truncate"
+                style={{ fontSize: "0.55rem", letterSpacing: "0.08em", color: "var(--text-muted)" }}
               >
                 {sa.label}
               </span>
             </div>
-            <p
-              style={{
-                ...CAV,
-                fontSize: "1.55rem",
-                fontWeight: 700,
-                color: "var(--text-primary)",
-                lineHeight: 1,
-              }}
-            >
+            <p className="font-[Caveat,cursive] text-2xl font-bold" style={{ color: "var(--text-primary)", lineHeight: 1 }}>
               {sa.average}%
             </p>
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}
-            >
+            <div className="flex items-center gap-1">
               {sa.average >= 75 ? (
-                <TrendingUp size={12} strokeWidth={1.5} color="#34d399" />
+                <TrendingUp size={12} strokeWidth={1.5} style={{ color: "#34d399" }} />
               ) : (
-                <TrendingDown size={12} strokeWidth={1.5} color="#f87171" />
+                <TrendingDown size={12} strokeWidth={1.5} style={{ color: "#f87171" }} />
               )}
               <span
-                style={{
-                  ...COU,
-                  fontSize: "0.56rem",
-                  letterSpacing: "0.06em",
-                  color: "var(--text-secondary)",
-                }}
+                className="font-[Courier_Prime,monospace]"
+                style={{ fontSize: "0.56rem", letterSpacing: "0.06em", color: "var(--text-secondary)" }}
               >
                 {sa.quizCount} quiz{sa.quizCount > 1 ? "zes" : ""}
               </span>
@@ -491,15 +346,7 @@ export function MyResults() {
       </motion.div>
 
       {/* Subject filter */}
-      <motion.div
-        {...fadeUpProps(0, 0.2)}
-        style={{
-          display: "flex",
-          gap: "0.4rem",
-          overflowX: "auto",
-          paddingBottom: "0.25rem",
-        }}
-      >
+      <motion.div {...fadeUpProps(0, 0.2)} className="flex gap-1 overflow-x-auto pb-1">
         {SUBJECTS.map((sub) => {
           const isActive = sub.key === activeSubject;
           const Icon = sub.icon;
@@ -509,29 +356,24 @@ export function MyResults() {
               onClick={() => setActiveSubject(sub.key)}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
+              className="flex shrink-0 cursor-pointer items-center gap-1 rounded-full border transition-all"
               style={{
-                display: "flex",
-                flexShrink: 0,
-                alignItems: "center",
-                gap: "0.3rem",
-                ...COU,
+                fontFamily: "Courier Prime, monospace",
                 fontSize: "0.65rem",
                 letterSpacing: "0.08em",
                 padding: "0.38rem 0.8rem",
-                cursor: "pointer",
-                border: "1px solid",
                 borderColor: isActive ? "transparent" : "var(--border-subtle)",
                 background: isActive ? sub.color : "transparent",
-                color: isActive
-                  ? sub.color === "#f2740d"
-                    ? "#07080d"
-                    : "white"
-                  : "var(--text-secondary)",
-                borderRadius: "999px",
-                transition: "all 0.18s",
+                color:
+                  isActive
+                    ? sub.color === "#f2740d"
+                      ? "#07080d"
+                      : "white"
+                    : "var(--text-secondary)",
               }}
             >
-              <Icon size={13} strokeWidth={1.5} /> {sub.label}
+              <Icon size={13} strokeWidth={1.5} />
+              {sub.label}
             </motion.button>
           );
         })}
@@ -548,19 +390,14 @@ export function MyResults() {
         >
           {/* Table header */}
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "5fr 2fr 2fr 2fr 1fr",
-              gap: "1rem",
-              padding: "0.4rem 1rem 0.6rem",
-              marginBottom: "0.25rem",
-            }}
+            className="mb-1 grid gap-4 px-4 py-1"
+            style={{ gridTemplateColumns: "5fr 2fr 2fr 2fr 1fr" }}
           >
             {["Quiz", "Subject", "Score", "Date", ""].map((h, i) => (
               <span
                 key={i}
+                className="font-[Courier_Prime,monospace]"
                 style={{
-                  ...COU,
                   fontSize: "0.58rem",
                   letterSpacing: "0.15em",
                   textTransform: "uppercase",
@@ -573,89 +410,43 @@ export function MyResults() {
             ))}
           </div>
 
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
-          >
+          <div className="flex flex-col gap-2">
             {filtered.length === 0 && (
-              <motion.div
-                variants={item}
-                style={{ textAlign: "center", padding: "4rem 0" }}
-              >
-                <p
-                  style={{
-                    ...CAV,
-                    fontSize: "2rem",
-                    color: "var(--text-muted)",
-                  }}
-                >
+              <motion.div variants={fadeUp(10, 0.45)} style={{ textAlign: "center", padding: "4rem 0" }}>
+                <p className="font-[Caveat,cursive] text-2xl" style={{ color: "var(--text-muted)" }}>
                   No results yet
                 </p>
               </motion.div>
             )}
             {filtered.map((r) => {
-              const pct = (r.score / r.total) * 100;
+              const pct = r.total > 0 ? (r.score / r.total) * 100 : 0;
               const sc = scoreColor(pct);
               const subc = getSubjectColor(r.subject);
               return (
-                <motion.div
-                  key={r.id}
-                  variants={cardItem}
-                  whileHover={{ y: -3 }}
-                  transition={{ duration: 0.2 }}
-                >
+                <motion.div key={r.id} variants={cardItem} whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
                   <Link
                     to="/student/quizzes"
+                    className="grid items-center gap-4 rounded-xl border p-3 no-underline"
                     style={{
-                      display: "grid",
                       gridTemplateColumns: "5fr 2fr 2fr 2fr 1fr",
-                      alignItems: "center",
-                      gap: "1rem",
-                      padding: "0.85rem 1rem",
                       background: "var(--bg-surface)",
-                      border: "1px solid var(--border-subtle)",
-                      textDecoration: "none",
-                      borderRadius: "12px",
+                      borderColor: "var(--border-subtle)",
                     }}
                   >
                     {/* Quiz name */}
                     <p
-                      style={{
-                        ...CAV,
-                        fontSize: "1.05rem",
-                        fontWeight: 700,
-                        color: "var(--text-primary)",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
+                      className="font-[Caveat,cursive] truncate font-bold"
+                      style={{ fontSize: "1.05rem", color: "var(--text-primary)" }}
                     >
                       {r.quiz}
                     </p>
 
                     {/* Subject */}
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.4rem",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: "50%",
-                          background: subc,
-                          flexShrink: 0,
-                        }}
-                      />
+                    <div className="flex items-center gap-1">
+                      <div className="h-2 w-2 shrink-0 rounded-full" style={{ background: subc }} />
                       <span
-                        style={{
-                          ...COU,
-                          fontSize: "0.62rem",
-                          letterSpacing: "0.06em",
-                          color: "var(--text-secondary)",
-                        }}
+                        className="font-[Courier_Prime,monospace] truncate"
+                        style={{ fontSize: "0.62rem", letterSpacing: "0.06em", color: "var(--text-secondary)" }}
                       >
                         {getSubjectLabel(r.subject)}
                       </span>
@@ -663,23 +454,12 @@ export function MyResults() {
 
                     {/* Score */}
                     <div style={{ textAlign: "right" }}>
-                      <span
-                        style={{
-                          ...CAV,
-                          fontSize: "1.1rem",
-                          fontWeight: 700,
-                          color: sc,
-                        }}
-                      >
+                      <span className="font-[Caveat,cursive] text-lg font-bold" style={{ color: sc }}>
                         {r.score}/{r.total}
                       </span>
                       <p
-                        style={{
-                          ...COU,
-                          fontSize: "0.56rem",
-                          letterSpacing: "0.08em",
-                          color: "var(--text-muted)",
-                        }}
+                        className="font-[Courier_Prime,monospace]"
+                        style={{ fontSize: "0.56rem", letterSpacing: "0.08em", color: "var(--text-muted)" }}
                       >
                         {pct}%
                       </p>
@@ -687,26 +467,15 @@ export function MyResults() {
 
                     {/* Date */}
                     <span
-                      style={{
-                        ...COU,
-                        fontSize: "0.62rem",
-                        letterSpacing: "0.06em",
-                        color: "var(--text-muted)",
-                        textAlign: "right",
-                      }}
+                      className="font-[Courier_Prime,monospace] text-right"
+                      style={{ fontSize: "0.62rem", letterSpacing: "0.06em", color: "var(--text-muted)" }}
                     >
                       {r.date}
                     </span>
 
                     {/* Chevron */}
-                    <div
-                      style={{ display: "flex", justifyContent: "flex-end" }}
-                    >
-                      <ChevronRight
-                        size={16}
-                        strokeWidth={1.5}
-                        color="var(--text-muted)"
-                      />
+                    <div className="flex justify-end">
+                      <ChevronRight size={16} strokeWidth={1.5} style={{ color: "var(--text-muted)" }} />
                     </div>
                   </Link>
                 </motion.div>

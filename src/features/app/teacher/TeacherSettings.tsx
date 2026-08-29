@@ -1,5 +1,5 @@
 // TeacherSettings.tsx — Teacher settings page
-// Uses Schoolme design system with Caveat/Lora/Courier Prime fonts
+// Uses Edactly design system with Caveat/Lora/Courier Prime fonts
 
 import { useState } from "react";
 import { motion } from "motion/react";
@@ -391,7 +391,7 @@ export function TeacherSettings() {
         style={{ textAlign: "center", padding: "1rem" }}
       >
         <p style={{ ...COU, fontSize: "0.58rem", letterSpacing: "0.15em", color: "var(--text-muted)" }}>
-          Vyasa v1.0 &middot; Schoolme Platform
+          Edactly v1.0 &middot; Edactly Platform
         </p>
       </motion.div>
     </div>

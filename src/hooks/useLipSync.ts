@@ -1,6 +1,6 @@
 // src/hooks/useLipSync.ts
-// Lip sync state management extracted from schoolme's lib/lipSync.ts
-// for use in the Vyasa Vite project.
+// Lip sync state management extracted from edactly's lib/lipSync.ts
+// for use in the Edactly Vite project.
 
 import { useRef } from 'react'
 

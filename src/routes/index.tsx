@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Nav } from "@/components/Nav";
-import { Hero } from "@/components/Hero";
-import { Features } from "@/components/Features";
-import { ScrollStory } from "@/components/ScrollStory";
-import { Stats } from "@/components/Stats";
-import { CTA } from "@/components/CTA";
-import { Footer } from "@/components/Footer";
-import { useKaleidoscope } from "@/hooks/useKaleidoscope";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { Nav } from "@/features/landing/components/Nav";
+import { Hero } from "@/features/landing/components/Hero";
+import { Features } from "@/features/landing/components/Features";
+import { ScrollStory } from "@/features/landing/components/ScrollStory";
+import { Stats } from "@/features/landing/components/Stats";
+import { CTA } from "@/features/landing/components/CTA";
+import { Footer } from "@/features/landing/components/Footer";
+import { useKaleidoscope } from "@/features/landing/hooks/useKaleidoscope";
+import { useScrollReveal } from "@/features/landing/hooks/useScrollReveal";
 
 export const Route = createFileRoute("/")({
   component: HomePage,

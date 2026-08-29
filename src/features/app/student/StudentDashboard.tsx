@@ -1,11 +1,6 @@
-// StudentDashboard.tsx — Schoolme design system
-// All logic, animations, motion variants from original preserved exactly.
-// className tokens (text-display-md, bg-card, color-portal-student-surface, etc.)
-// replaced with Schoolme CSS vars + Caveat/Lora/Courier Prime fonts.
-
+// StudentDashboard.tsx — Tailwind CSS migration from inline styles
 import { useState, useEffect } from "react";
 import { motion, useMotionValue, useTransform, animate } from "motion/react";
-import { Link } from "@tanstack/react-router";
 import {
   Atom,
   Calculator,
@@ -17,151 +12,14 @@ import {
   ArrowRight,
   Sparkles,
   Play,
+  Loader2,
 } from "lucide-react";
 import { ease, breatheLoop, pulseLoop } from "@/lib/animation";
+import SmartLink from "@/components/smart-link";
+import AccentLine from "@/components/accent-line";
+import { fetchMe, type StudentUser } from "./api/student.api";
 
-/* ── Fonts shorthand ── */
-const CAV: React.CSSProperties = { fontFamily: "Caveat, cursive" };
-const LOR: React.CSSProperties = { fontFamily: "Lora, Georgia, serif" };
-const COU: React.CSSProperties = { fontFamily: "Courier Prime, monospace" };
-// Removed slanted CLIP_CARD and CLIP_BTN - using standard rounded rectangles
-
-/* ── Animated background (warm orange — identical logic, Schoolme colours) ── */
-function StudentAnimatedBackground() {
-  return (
-    <div
-      className="pointer-events-none fixed inset-0 overflow-hidden"
-      aria-hidden
-    >
-      <motion.div
-        className="absolute -top-28 right-[10%] h-[450px] w-[450px] rounded-full"
-        style={{
-          background: "radial-gradient(circle,#f2740d 0%,transparent 70%)",
-          filter: "blur(100px)",
-          opacity: 0.05,
-        }}
-        animate={{
-          x: [0, 20, -15, 0],
-          y: [0, -18, 12, 0],
-          scale: [1, 1.04, 0.97, 1],
-        }}
-        transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div
-        className="absolute bottom-[8%] left-[5%] h-[350px] w-[350px] rounded-full"
-        style={{
-          background: "radial-gradient(circle,#fb923c 0%,transparent 70%)",
-          filter: "blur(100px)",
-          opacity: 0.04,
-        }}
-        animate={{
-          x: [0, -15, 18, 0],
-          y: [0, 15, -12, 0],
-          scale: [1, 0.96, 1.03, 1],
-        }}
-        transition={{ duration: 26, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div
-        className="absolute top-[40%] left-1/2 h-[350px] w-[350px] -translate-x-1/2 rounded-full"
-        style={{
-          background: "radial-gradient(circle,#f2740d 0%,transparent 70%)",
-          filter: "blur(120px)",
-        }}
-        animate={{ scale: [1, 1.18, 1], opacity: [0.02, 0.06, 0.02] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle,rgba(242,116,13,0.032) 1px,transparent 1px)",
-          backgroundSize: "32px 32px",
-        }}
-      />
-      {[...Array(10)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full"
-          style={{
-            width: i % 3 === 0 ? 3 : 2,
-            height: i % 3 === 0 ? 3 : 2,
-            left: `${12 + ((i * 7.9) % 76)}%`,
-            top: `${22 + ((i * 9.1) % 56)}%`,
-            background:
-              i % 3 === 0
-                ? "rgba(242,116,13,0.4)"
-                : i % 3 === 1
-                  ? "rgba(251,146,60,0.3)"
-                  : "rgba(168,85,247,0.25)",
-          }}
-          animate={{
-            y: [0, -90 - i * 5],
-            x: [0, i % 2 === 0 ? 12 : -12],
-            opacity: [0, 0.55, 0],
-          }}
-          transition={{
-            duration: 5 + (i % 3) * 1.5,
-            repeat: Infinity,
-            delay: i * 0.45,
-            ease: "easeOut",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-/* ── Accent divider ── */
-function AccentLine() {
-  return (
-    <div
-      style={{
-        height: 1,
-        marginTop: "0.5rem",
-        width: "4rem",
-        background: "linear-gradient(to right,var(--orange),transparent)",
-      }}
-    />
-  );
-}
-
-/* ── Eyebrow ── */
-function Eyebrow({ label }: { label: string }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "0.5rem",
-        marginBottom: "0.5rem",
-      }}
-    >
-      <div
-        style={{
-          height: 1,
-          width: "2rem",
-          background: "var(--orange)",
-          opacity: 0.5,
-        }}
-      />
-      <span
-        style={{
-          ...COU,
-          fontSize: "0.6rem",
-          letterSpacing: "0.2em",
-          textTransform: "uppercase",
-          color: "var(--orange)",
-          opacity: 0.85,
-        }}
-      >
-        {label}
-      </span>
-      <div style={{ height: 1, flex: 1, background: "var(--border-subtle)" }} />
-    </div>
-  );
-}
-
-/* ── Mock data (unchanged) ── */
+/* ── Mock data ── */
 const CONTINUE_MATERIAL = {
   id: "phys-ch5",
   title: "Chapter 5: Laws of Motion",
@@ -171,73 +29,20 @@ const CONTINUE_MATERIAL = {
   color: "#a855f7",
   bg: "rgba(168,85,247,0.10)",
 };
+
 const STATS = [
-  {
-    label: "Quizzes Completed",
-    value: 24,
-    suffix: "",
-    icon: Trophy,
-    color: "#f2740d",
-    bg: "rgba(242,116,13,0.10)",
-    isStreak: false,
-  },
-  {
-    label: "Average Score",
-    value: 76,
-    suffix: "%",
-    icon: TrendingUp,
-    color: "#34d399",
-    bg: "rgba(52,211,153,0.10)",
-    isStreak: false,
-  },
-  {
-    label: "Day Streak",
-    value: 5,
-    suffix: "",
-    icon: Flame,
-    color: "#fb923c",
-    bg: "rgba(251,146,60,0.10)",
-    isStreak: true,
-  },
+  { label: "Quizzes Completed", value: 24, suffix: "", icon: Trophy, color: "#f2740d", bg: "rgba(242,116,13,0.10)", isStreak: false },
+  { label: "Average Score", value: 76, suffix: "%", icon: TrendingUp, color: "#34d399", bg: "rgba(52,211,153,0.10)", isStreak: false },
+  { label: "Day Streak", value: 5, suffix: "", icon: Flame, color: "#fb923c", bg: "rgba(251,146,60,0.10)", isStreak: true },
 ] as const;
+
 const SUBJECTS = [
-  {
-    name: "Physics",
-    icon: Atom,
-    chapters: 12,
-    completed: 7,
-    color: "#a855f7",
-    bg: "rgba(168,85,247,0.08)",
-    border: "rgba(168,85,247,0.20)",
-  },
-  {
-    name: "Mathematics",
-    icon: Calculator,
-    chapters: 14,
-    completed: 8,
-    color: "#3b82f6",
-    bg: "rgba(59,130,246,0.08)",
-    border: "rgba(59,130,246,0.20)",
-  },
-  {
-    name: "Chemistry",
-    icon: FlaskConical,
-    chapters: 16,
-    completed: 6,
-    color: "#22c55e",
-    bg: "rgba(34,197,94,0.08)",
-    border: "rgba(34,197,94,0.20)",
-  },
-  {
-    name: "English",
-    icon: BookOpen,
-    chapters: 10,
-    completed: 7,
-    color: "#f59e0b",
-    bg: "rgba(245,158,11,0.08)",
-    border: "rgba(245,158,11,0.20)",
-  },
+  { name: "Physics", icon: Atom, chapters: 12, completed: 7, color: "#a855f7", bg: "rgba(168,85,247,0.08)", border: "rgba(168,85,247,0.20)" },
+  { name: "Mathematics", icon: Calculator, chapters: 14, completed: 8, color: "#3b82f6", bg: "rgba(59,130,246,0.08)", border: "rgba(59,130,246,0.20)" },
+  { name: "Chemistry", icon: FlaskConical, chapters: 16, completed: 6, color: "#22c55e", bg: "rgba(34,197,94,0.08)", border: "rgba(34,197,94,0.20)" },
+  { name: "English", icon: BookOpen, chapters: 10, completed: 7, color: "#f59e0b", bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.20)" },
 ] as const;
+
 const MOTIVATIONAL_LINES = [
   "Every expert was once a beginner. Keep going!",
   "Small steps every day lead to big results.",
@@ -250,67 +55,95 @@ function getGreeting() {
   const h = new Date().getHours();
   return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
 }
+
 function getMotivationalLine() {
   return MOTIVATIONAL_LINES[new Date().getDate() % MOTIVATIONAL_LINES.length];
 }
 
-/* ── Animated counter (logic unchanged) ── */
-function AnimatedNumber({
-  target,
-  suffix = "",
-}: {
-  target: number;
-  suffix?: string;
-}) {
+/* ── Animated background ── */
+function StudentAnimatedBackground() {
+  return (
+    <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
+      <motion.div
+        className="absolute -top-28 right-[10%] h-[450px] w-[450px] rounded-full"
+        style={{ background: "radial-gradient(circle,#f2740d 0%,transparent 70%)", filter: "blur(100px)", opacity: 0.05 }}
+        animate={{ x: [0, 20, -15, 0], y: [0, -18, 12, 0], scale: [1, 1.04, 0.97, 1] }}
+        transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.div
+        className="absolute bottom-[8%] left-[5%] h-[350px] w-[350px] rounded-full"
+        style={{ background: "radial-gradient(circle,#fb923c 0%,transparent 70%)", filter: "blur(100px)", opacity: 0.04 }}
+        animate={{ x: [0, -15, 18, 0], y: [0, 15, -12, 0], scale: [1, 0.96, 1.03, 1] }}
+        transition={{ duration: 26, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.div
+        className="absolute top-[40%] left-1/2 h-[350px] w-[350px] -translate-x-1/2 rounded-full"
+        style={{ background: "radial-gradient(circle,#f2740d 0%,transparent 70%)", filter: "blur(120px)" }}
+        animate={{ scale: [1, 1.18, 1], opacity: [0.02, 0.06, 0.02] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <div
+        className="absolute inset-0"
+        style={{ backgroundImage: "radial-gradient(circle,rgba(242,116,13,0.032) 1px,transparent 1px)", backgroundSize: "32px 32px" }}
+      />
+      {[...Array(10)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: i % 3 === 0 ? 3 : 2,
+            height: i % 3 === 0 ? 3 : 2,
+            left: `${12 + ((i * 7.9) % 76)}%`,
+            top: `${22 + ((i * 9.1) % 56)}%`,
+            background: i % 3 === 0 ? "rgba(242,116,13,0.4)" : i % 3 === 1 ? "rgba(251,146,60,0.3)" : "rgba(168,85,247,0.25)",
+          }}
+          animate={{ y: [0, -90 - i * 5], x: [0, i % 2 === 0 ? 12 : -12], opacity: [0, 0.55, 0] }}
+          transition={{ duration: 5 + (i % 3) * 1.5, repeat: Infinity, delay: i * 0.45, ease: "easeOut" }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ── Eyebrow ── */
+function Eyebrow({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-2">
+      <div className="h-px w-8 bg-orange opacity-50" />
+      <span className="font-[Courier_Prime,monospace] text-[0.6rem] tracking-[0.2em] uppercase text-orange opacity-85">
+        {label}
+      </span>
+      <div className="h-px flex-1 bg-border-subtle" />
+    </div>
+  );
+}
+
+/* ── Animated counter ── */
+function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: string }) {
   const count = useMotionValue(0);
   const rounded = useTransform(count, (v) => Math.round(v));
   const [display, setDisplay] = useState(0);
   useEffect(() => {
-    const controls = animate(count, target, {
-      duration: 1.2,
-      ease: ease.gentle,
-    });
+    const controls = animate(count, target, { duration: 1.2, ease: ease.gentle });
     const unsub = rounded.on("change", (v) => setDisplay(v));
-    return () => {
-      controls.stop();
-      unsub();
-    };
+    return () => { controls.stop(); unsub(); };
   }, [count, rounded, target]);
-  return (
-    <span>
-      {display}
-      {suffix}
-    </span>
-  );
+  return <span>{display}{suffix}</span>;
 }
 
-/* ── Gradient orb (logic unchanged) ── */
+/* ── Gradient orb ── */
 function GradientOrb() {
   return (
-    <div style={{ position: "relative", height: 56, width: 56, flexShrink: 0 }}>
+    <div className="relative h-14 w-14 flex-shrink-0">
       <motion.div
-        style={{
-          position: "absolute",
-          inset: 0,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle at 40% 40%,#f2740d,#fb923c 50%,#a855f7 100%)",
-          filter: "blur(1px)",
-        }}
+        className="absolute inset-0 rounded-full"
+        style={{ background: "radial-gradient(circle at 40% 40%,#f2740d,#fb923c 50%,#a855f7 100%)", filter: "blur(1px)" }}
         {...breatheLoop()}
       />
       <div
-        style={{
-          position: "absolute",
-          inset: 2,
-          borderRadius: "50%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "var(--bg-surface)",
-        }}
+        className="absolute inset-0.5 rounded-full flex items-center justify-center bg-surface"
       >
-        <Sparkles size={18} strokeWidth={1.5} color="var(--orange)" />
+        <Sparkles size={18} strokeWidth={1.5} className="text-orange" />
       </div>
     </div>
   );
@@ -320,52 +153,25 @@ function GradientOrb() {
 export function StudentDashboard() {
   const greeting = getGreeting();
   const motivation = getMotivationalLine();
+  const [user, setUser] = useState<StudentUser | null>(null);
+
+  useEffect(() => {
+    fetchMe().then(setUser).catch(() => {});
+  }, []);
 
   return (
-    <div
-      style={{
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        gap: "2.5rem",
-        paddingBottom: "5rem",
-      }}
-    >
+    <div className="relative flex flex-col gap-10 pb-20">
       <StudentAnimatedBackground />
 
       {/* Greeting */}
       <section>
-        <h1
-          style={{
-            ...CAV,
-            fontSize: "clamp(2rem,4vw,3rem)",
-            fontWeight: 400,
-            color: "var(--text-primary)",
-            lineHeight: 1.1,
-          }}
-        >
-          {greeting}, Rahul
+        <h1 className="font-[Caveat,cursive] text-[clamp(2rem,4vw,3rem)] font-normal text-foreground leading-tight">
+          {greeting}, {user ? user.first_name : <span className="inline-block"><Loader2 size={20} className="animate-spin inline" /></span>}
         </h1>
-        <p
-          style={{
-            ...LOR,
-            fontStyle: "italic",
-            fontSize: "1rem",
-            color: "var(--text-secondary)",
-            marginTop: "0.35rem",
-          }}
-        >
-          Class 10-A &middot; Ready to learn something new?
+        <p className="font-[Lora,Georgia,serif] italic text-base text-muted-foreground mt-1">
+          {user?.email ?? "Loading..."} &middot; Ready to learn something new?
         </p>
-        <p
-          style={{
-            ...LOR,
-            fontStyle: "italic",
-            fontSize: "0.82rem",
-            color: "var(--text-muted)",
-            marginTop: "0.5rem",
-          }}
-        >
+        <p className="font-[Lora,Georgia,serif] italic text-sm text-muted mt-2">
           {motivation}
         </p>
         <AccentLine />
@@ -373,102 +179,34 @@ export function StudentDashboard() {
 
       {/* Continue learning */}
       <section>
-        <motion.div
-          whileHover={{ y: -4 }}
-          transition={{ duration: 0.25, ease: ease.gentle }}
-        >
-          <Link
+        <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.25, ease: ease.gentle }}>
+          <SmartLink
             to="/student/materials"
-            style={{
-              display: "block",
-              position: "relative",
-              overflow: "hidden",
-              textDecoration: "none",
-              background: "var(--bg-surface)",
-              border: "1px solid var(--border-default)",
-              borderRadius: "12px",
-            }}
+            className="block relative overflow-hidden no-underline bg-surface border border-border rounded-xl"
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "1.5rem",
-                padding: "2rem",
-              }}
-            >
+            <div className="flex items-center gap-6 p-8">
               <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 64,
-                  height: 64,
-                  flexShrink: 0,
-                  background: CONTINUE_MATERIAL.bg,
-                  borderRadius: 10,
-                }}
+                className="flex items-center justify-center w-16 h-16 flex-shrink-0 rounded-[10px]"
+                style={{ background: CONTINUE_MATERIAL.bg }}
               >
-                <CONTINUE_MATERIAL.icon
-                  size={30}
-                  strokeWidth={1.5}
-                  style={{ color: CONTINUE_MATERIAL.color }}
-                />
+                <CONTINUE_MATERIAL.icon size={30} strokeWidth={1.5} style={{ color: CONTINUE_MATERIAL.color }} />
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p
-                  style={{
-                    ...COU,
-                    fontSize: "0.6rem",
-                    letterSpacing: "0.18em",
-                    textTransform: "uppercase",
-                    color: "var(--text-muted)",
-                    marginBottom: "0.35rem",
-                  }}
-                >
+              <div className="flex-1 min-w-0">
+                <p className="font-[Courier_Prime,monospace] text-[0.6rem] tracking-[0.18em] uppercase text-muted mb-1">
                   Continue where you left off
                 </p>
                 <h2
-                  style={{
-                    ...CAV,
-                    fontSize: "1.6rem",
-                    fontWeight: 700,
-                    color: "var(--text-primary)",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
+                  className="font-[Caveat,cursive] text-[1.6rem] font-bold text-foreground truncate"
+                  style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
                 >
                   {CONTINUE_MATERIAL.title}
                 </h2>
-                <p
-                  style={{
-                    ...LOR,
-                    fontStyle: "italic",
-                    fontSize: "0.88rem",
-                    color: "var(--text-secondary)",
-                    marginTop: "0.2rem",
-                  }}
-                >
-                  {CONTINUE_MATERIAL.subject} · {CONTINUE_MATERIAL.progress}%
-                  complete
+                <p className="font-[Lora,Georgia,serif] italic text-sm text-muted-foreground mt-0.5">
+                  {CONTINUE_MATERIAL.subject} &middot; {CONTINUE_MATERIAL.progress}% complete
                 </p>
-                <div
-                  style={{
-                    marginTop: "1rem",
-                    height: 6,
-                    maxWidth: 400,
-                    background: "var(--bg-elevated)",
-                    borderRadius: "999px",
-                    overflow: "hidden",
-                  }}
-                >
+                <div className="mt-4 h-1.5 max-w-[400px] bg-elevated rounded-full overflow-hidden">
                   <motion.div
-                    style={{
-                      height: "100%",
-                      background: "var(--orange)",
-                      borderRadius: "999px",
-                    }}
+                    className="h-full rounded-full bg-orange"
                     initial={{ width: 0 }}
                     animate={{ width: `${CONTINUE_MATERIAL.progress}%` }}
                     transition={{ duration: 1, delay: 0.4, ease: ease.gentle }}
@@ -478,49 +216,23 @@ export function StudentDashboard() {
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.4rem",
-                  flexShrink: 0,
-                  ...CAV,
-                  fontSize: "1.05rem",
-                  fontWeight: 700,
-                  background: "var(--orange)",
-                  color: "#07080d",
-                  padding: "0.65rem 1.4rem",
-                  borderRadius: "8px",
-                }}
+                className="flex items-center gap-1 flex-shrink-0 font-[Caveat,cursive] text-[1.05rem] font-bold bg-orange text-[#07080d] px-4 py-2.5 rounded-lg"
               >
                 <Play size={15} strokeWidth={2} /> Continue Learning
               </motion.div>
             </div>
-          </Link>
+          </SmartLink>
         </motion.div>
       </section>
 
       {/* Two-column grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,340px),1fr))",
-          gap: "2.5rem",
-        }}
-      >
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,340px),1fr))] gap-10">
         {/* LEFT */}
-        <div
-          style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}
-        >
+        <div className="flex flex-col gap-10">
           {/* Stats */}
           <section>
             <Eyebrow label="Your progress" />
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3,1fr)",
-                gap: "1rem",
-              }}
-            >
+            <div className="grid grid-cols-3 gap-4">
               {STATS.map((stat) => {
                 const Icon = stat.icon;
                 return (
@@ -528,70 +240,25 @@ export function StudentDashboard() {
                     key={stat.label}
                     whileHover={{ y: -4 }}
                     transition={{ duration: 0.25, ease: ease.gentle }}
-                    style={{
-                      background: "var(--bg-surface)",
-                      border: "1px solid var(--border-default)",
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                    }}
+                    className="bg-surface border border-border rounded-xl overflow-hidden"
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.75rem",
-                        padding: "1.25rem 1rem",
-                      }}
-                    >
+                    <div className="flex flex-col gap-3 p-5 pt-4">
                       <div
-                        style={{
-                          width: 48,
-                          height: 48,
-                          background: stat.bg,
-                          borderRadius: 8,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
+                        className="w-12 h-12 rounded-lg flex items-center justify-center"
+                        style={{ background: stat.bg }}
                       >
                         {stat.isStreak ? (
                           <motion.div {...pulseLoop()}>
-                            <Icon
-                              size={24}
-                              strokeWidth={1.5}
-                              style={{ color: stat.color }}
-                            />
+                            <Icon size={24} strokeWidth={1.5} style={{ color: stat.color }} />
                           </motion.div>
                         ) : (
-                          <Icon
-                            size={24}
-                            strokeWidth={1.5}
-                            style={{ color: stat.color }}
-                          />
+                          <Icon size={24} strokeWidth={1.5} style={{ color: stat.color }} />
                         )}
                       </div>
-                      <p
-                        style={{
-                          ...CAV,
-                          fontSize: "2.2rem",
-                          fontWeight: 700,
-                          color: "var(--text-primary)",
-                          lineHeight: 1,
-                        }}
-                      >
-                        <AnimatedNumber
-                          target={stat.value}
-                          suffix={stat.suffix}
-                        />
+                      <p className="font-[Caveat,cursive] text-[2.2rem] font-bold text-foreground leading-none">
+                        <AnimatedNumber target={stat.value} suffix={stat.suffix} />
                       </p>
-                      <p
-                        style={{
-                          ...LOR,
-                          fontStyle: "italic",
-                          fontSize: "0.78rem",
-                          color: "var(--text-secondary)",
-                        }}
-                      >
+                      <p className="font-[Lora,Georgia,serif] italic text-sm text-muted-foreground">
                         {stat.label}
                       </p>
                     </div>
@@ -603,156 +270,58 @@ export function StudentDashboard() {
 
           {/* Study Materials */}
           <section>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "0.35rem",
-              }}
-            >
-              <h2
-                style={{
-                  ...CAV,
-                  fontSize: "1.5rem",
-                  fontWeight: 700,
-                  color: "var(--text-primary)",
-                }}
-              >
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="font-[Caveat,cursive] text-xl font-bold text-foreground">
                 Study Materials
               </h2>
-              <Link
+              <SmartLink
                 to="/student/materials"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.3rem",
-                  ...COU,
-                  fontSize: "0.65rem",
-                  letterSpacing: "0.1em",
-                  color: "var(--orange)",
-                  textDecoration: "none",
-                }}
+                className="inline-flex items-center gap-1 font-[Courier_Prime,monospace] text-[0.65rem] tracking-widest text-orange no-underline"
               >
                 View all <ArrowRight size={12} />
-              </Link>
+              </SmartLink>
             </div>
             <Eyebrow label="by subject" />
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "0.85rem",
-              }}
-            >
+            <div className="grid grid-cols-2 gap-3">
               {SUBJECTS.map((sub, i) => {
                 const Icon = sub.icon;
                 const pct = Math.round((sub.completed / sub.chapters) * 100);
                 return (
-                  <motion.div
-                    key={sub.name}
-                    whileHover={{ y: -4 }}
-                    transition={{ duration: 0.25, ease: ease.gentle }}
-                  >
-                    <Link
+                  <motion.div key={sub.name} whileHover={{ y: -4 }} transition={{ duration: 0.25, ease: ease.gentle }}>
+                    <SmartLink
                       to="/student/materials"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "1rem",
-                        padding: "1.1rem",
-                        background: "var(--bg-surface)",
-                        border: `1px solid ${sub.border}`,
-                        textDecoration: "none",
-                        borderRadius: "8px",
-                      }}
+                      className={`flex items-center gap-4 p-4 bg-surface no-underline rounded-lg border`}
+                      style={{ borderColor: sub.border }}
                     >
                       <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: 44,
-                          height: 44,
-                          flexShrink: 0,
-                          background: sub.bg,
-                          borderRadius: 8,
-                        }}
+                        className="flex items-center justify-center w-11 h-11 flex-shrink-0 rounded-lg"
+                        style={{ background: sub.bg }}
                       >
-                        <Icon
-                          size={22}
-                          strokeWidth={1.5}
-                          style={{ color: sub.color }}
-                        />
+                        <Icon size={22} strokeWidth={1.5} style={{ color: sub.color }} />
                       </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <h3
-                          style={{
-                            ...CAV,
-                            fontSize: "1.1rem",
-                            fontWeight: 700,
-                            color: "var(--text-primary)",
-                          }}
-                        >
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-[Caveat,cursive] text-lg font-bold text-foreground">
                           {sub.name}
                         </h3>
-                        <p
-                          style={{
-                            ...COU,
-                            fontSize: "0.58rem",
-                            letterSpacing: "0.08em",
-                            color: "var(--text-muted)",
-                            marginTop: 2,
-                          }}
-                        >
+                        <p className="font-[Courier_Prime,monospace] text-[0.58rem] text-muted tracking-wide mt-0.5">
                           {sub.completed}/{sub.chapters} chapters
                         </p>
-                        <div
-                          style={{
-                            marginTop: "0.4rem",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.4rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              flex: 1,
-                              height: 3,
-                              background: "var(--bg-elevated)",
-                              borderRadius: "999px",
-                              overflow: "hidden",
-                            }}
-                          >
+                        <div className="mt-2 flex items-center gap-2">
+                          <div className="flex-1 h-0.5 bg-elevated rounded-full overflow-hidden">
                             <motion.div
-                              style={{
-                                height: "100%",
-                                background: sub.color,
-                                borderRadius: "999px",
-                              }}
+                              className="h-full rounded-full"
+                              style={{ background: sub.color }}
                               initial={{ width: 0 }}
                               animate={{ width: `${pct}%` }}
-                              transition={{
-                                duration: 0.8,
-                                delay: 0.5 + i * 0.1,
-                                ease: ease.gentle,
-                              }}
+                              transition={{ duration: 0.8, delay: 0.5 + i * 0.1, ease: ease.gentle }}
                             />
                           </div>
-                          <span
-                            style={{
-                              ...COU,
-                              fontSize: "0.55rem",
-                              color: "var(--text-muted)",
-                              width: 28,
-                              textAlign: "right",
-                            }}
-                          >
+                          <span className="font-[Courier_Prime,monospace] text-[0.55rem] text-muted w-7 text-right">
                             {pct}%
                           </span>
                         </div>
                       </div>
-                    </Link>
+                    </SmartLink>
                   </motion.div>
                 );
               })}
@@ -761,246 +330,35 @@ export function StudentDashboard() {
         </div>
 
         {/* RIGHT */}
-        <div
-          style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}
-        >
-          {/* Quiz temporarily disabled */}
-          {/* <QuizPerformanceChart /> */}
-
-          {/* <section>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "0.35rem",
-              }}
-            >
-              <h2
-                style={{
-                  ...CAV,
-                  fontSize: "1.5rem",
-                  fontWeight: 700,
-                  color: "var(--text-primary)",
-                }}
-              >
-                Recent Quizzes
-              </h2>
-              <Link
-                to="/student/results"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.3rem",
-                  ...COU,
-                  fontSize: "0.65rem",
-                  letterSpacing: "0.1em",
-                  color: "var(--orange)",
-                  textDecoration: "none",
-                }}
-              >
-                View all <ArrowRight size={12} />
-              </Link>
-            </div>
-            Quiz temporarily disabled
-            <Eyebrow label="latest attempts" />
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.6rem",
-              }}
-            >
-              {RECENT_QUIZZES.map((quiz) => {
-                const sc =
-                  quiz.score >= 70
-                    ? "#34d399"
-                    : quiz.score >= 50
-                      ? "#fbbf24"
-                      : "#f87171";
-                return (
-                  <motion.div
-                    key={quiz.id}
-                    whileHover={{ x: 4 }}
-                    transition={{ duration: 0.2, ease: ease.gentle }}
-                  >
-                    <Link
-                      to="/student/quizzes"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "1rem",
-                        padding: "0.9rem 1rem",
-                        background: "var(--bg-surface)",
-                        border: "1px solid var(--border-subtle)",
-                        textDecoration: "none",
-                        borderRadius: "12px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: 44,
-                          height: 44,
-                          flexShrink: 0,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          background: `${sc}18`,
-                          borderRadius: "50%",
-                        }}
-                      >
-                        <span
-                          style={{
-                            ...CAV,
-                            fontSize: "1.1rem",
-                            fontWeight: 700,
-                            color: sc,
-                          }}
-                        >
-                          {quiz.score}
-                        </span>
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p
-                          style={{
-                            ...CAV,
-                            fontSize: "1rem",
-                            fontWeight: 700,
-                            color: "var(--text-primary)",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {quiz.name}
-                        </p>
-                        <p
-                          style={{
-                            ...COU,
-                            fontSize: "0.58rem",
-                            letterSpacing: "0.08em",
-                            color: "var(--text-muted)",
-                            marginTop: 2,
-                          }}
-                        >
-                          {quiz.subject} · {quiz.date}
-                        </p>
-                      </div>
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "0.25rem",
-                          ...COU,
-                          fontSize: "0.6rem",
-                          letterSpacing: "0.08em",
-                          background: quiz.passed
-                            ? "rgba(52,211,153,0.10)"
-                            : "rgba(248,113,113,0.10)",
-                          color: quiz.passed ? "#34d399" : "#f87171",
-                          border: `1px solid ${quiz.passed ? "rgba(52,211,153,0.22)" : "rgba(248,113,113,0.22)"}`,
-                          padding: "0.2rem 0.55rem",
-                          borderRadius: "999px",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {quiz.passed ? (
-                          <CheckCircle2 size={11} />
-                        ) : (
-                          <XCircle size={11} />
-                        )}
-                        {quiz.passed ? "Pass" : "Fail"}
-                      </span>
-                      <ChevronRight
-                        size={15}
-                        strokeWidth={1.5}
-                        color="var(--text-muted)"
-                      />
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
-           
-          </section> */}
-        </div>
+        <div className="flex flex-col gap-10" />
       </div>
 
       {/* AI Tutor CTA */}
       <section>
-        <motion.div
-          whileHover={{ y: -4 }}
-          transition={{ duration: 0.25, ease: ease.gentle }}
-        >
-          <Link
+        <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.25, ease: ease.gentle }}>
+          <SmartLink
             to="/student/tutor"
-            style={{
-              display: "block",
-              position: "relative",
-              overflow: "hidden",
-              textDecoration: "none",
-              background: "var(--bg-surface)",
-              border: "1px solid rgba(242,116,13,0.28)",
-              borderRadius: "12px",
-            }}
+            className="block relative overflow-hidden no-underline bg-surface border border-orange-500/30 rounded-xl"
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "1.5rem",
-                padding: "2rem",
-              }}
-            >
+            <div className="flex items-center gap-6 p-8">
               <GradientOrb />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <h2
-                  style={{
-                    ...CAV,
-                    fontSize: "1.5rem",
-                    fontWeight: 700,
-                    color: "var(--text-primary)",
-                  }}
-                >
+              <div className="flex-1 min-w-0">
+                <h2 className="font-[Caveat,cursive] text-xl font-bold text-foreground">
                   Need help? Ask Erudio AI
                 </h2>
-                <p
-                  style={{
-                    ...LOR,
-                    fontStyle: "italic",
-                    fontSize: "0.88rem",
-                    color: "var(--text-secondary)",
-                    marginTop: "0.35rem",
-                    maxWidth: 480,
-                  }}
-                >
-                  Get instant explanations, solve doubts, and explore topics in
-                  depth with your personal AI tutor.
+                <p className="font-[Lora,Georgia,serif] italic text-sm text-muted-foreground mt-1 max-w-[480px]">
+                  Get instant explanations, solve doubts, and explore topics in depth with your personal AI tutor.
                 </p>
               </div>
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.4rem",
-                  flexShrink: 0,
-                  background: "rgba(242,116,13,0.10)",
-                  border: "1px solid rgba(242,116,13,0.30)",
-                  color: "var(--orange)",
-                  ...CAV,
-                  fontSize: "1.05rem",
-                  fontWeight: 700,
-                  padding: "0.65rem 1.4rem",
-                  borderRadius: "8px",
-                  transition: "all 0.2s",
-                }}
+                className="flex items-center gap-1 flex-shrink-0 bg-orange/10 border border-orange/30 text-orange font-[Caveat,cursive] text-[1.05rem] font-bold px-4 py-2.5 rounded-lg transition-all duration-200"
               >
                 <Sparkles size={15} strokeWidth={2} /> Start a conversation
               </motion.div>
             </div>
-          </Link>
+          </SmartLink>
         </motion.div>
       </section>
     </div>

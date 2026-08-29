@@ -121,7 +121,7 @@ function AuthLayout() {
       </div>
 
       <p className="z-10 mt-8 text-sm text-muted-foreground font-medium">
-        &copy; {new Date().getFullYear()} Vyasa Platform
+        &copy; {new Date().getFullYear()} Edactly Platform
       </p>
     </div>
   );

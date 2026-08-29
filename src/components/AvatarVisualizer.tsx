@@ -1,5 +1,5 @@
 // src/components/AvatarVisualizer.tsx
-// Copied from schoolme — no Next.js dependencies, works in Vite as-is.
+// Copied from edactly — no Next.js dependencies, works in Vite as-is.
 
 import { useRef, useEffect } from "react";
 

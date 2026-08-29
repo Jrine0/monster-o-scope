@@ -1,5 +1,5 @@
 // src/hooks/useGazeTrack.ts
-// GazeTrack hook for Vyasa (Vite + React).
+// GazeTrack hook for Edactly (Vite + React).
 // Identical logic to the schoolme version but:
 //   - no "use client" directive (not needed in Vite)
 //   - studentId pulled from useAuthStore externally and passed in

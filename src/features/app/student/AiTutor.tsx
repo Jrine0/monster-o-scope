@@ -1,13 +1,13 @@
 // src/features/app/student/AiTutor.tsx
 // Composes: TutorChat + TutorAvatar + GazeTrack attention monitoring.
-// Pulls studentId from Vyasa's useAuthStore.
+// Pulls studentId from Edactly's useAuthStore.
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useAuthStore } from "../../../stores/useAuthStore";
 import { apiClient } from "../../../lib/api-client";
 import TutorAvatar from "./tutor/TutorAvatar";
 import TutorChat from "./tutor/TutorChat";
-import { useSidebar } from "./SidebarContext";
+import { useSidebar } from "@/components/ui/sidebar";
 import AttentionSidebar from "../../../components/AttentionSidebar";
 import AttentionPulse from "../../../components/AttentionPulse";
 import AttentionToast from "../../../components/AttentionToast";
@@ -81,10 +81,10 @@ export default function AiTutor({ topicContext, lessonId, children }: AiTutorPro
   }, [chatWidth]);
 
   // Collapse sidebar on mount
-  const { setIsCollapsed } = useSidebar();
+  const { setOpen } = useSidebar();
   useEffect(() => {
-    setIsCollapsed(true);
-  }, [setIsCollapsed]);
+    setOpen(false);
+  }, [setOpen]);
 
   // Draggable attention panel state
   const [attentionPosition, setAttentionPosition] = useState({ x: 0, y: 72 });

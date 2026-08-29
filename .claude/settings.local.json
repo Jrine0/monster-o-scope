@@ -11,7 +11,14 @@
       "Bash(npx tsc:*)",
       "mcp__ide__getDiagnostics",
       "Bash(xxd)",
-      "Bash(pnpm install:*)"
+      "Bash(pnpm install:*)",
+      "Bash(mkdir -p \"C:/Users/jitin/Desktop/Desk/Projects/purrfect/welp/vyasa-frontend/src/features/landing/components\")",
+      "Bash(mkdir -p \"C:/Users/jitin/Desktop/Desk/Projects/purrfect/welp/vyasa-frontend/src/features/landing/hooks\")",
+      "Bash(grep -E '\"\"@hookform/resolvers\"\"|\"\"@hookform/resolvers/zod\"\"' package.json)",
+      "Bash(curl -s \"https://vyasa-api.zoodleme.in/openapi.json\")",
+      "Bash(python3 -m json.tool)",
+      "Read(//c/Users/jitin/.claude/**)",
+      "Read(//c/Users/jitin/**)"
     ]
   }
 }

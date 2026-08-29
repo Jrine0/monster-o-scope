@@ -2,52 +2,29 @@
 
 import { Moon, Sun } from "lucide-react";
 import { Button } from "./ui/button";
-import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { useTheme } from "next-themes";
 
 export default function ThemeSwitch({ className }: { className?: string }) {
-  const switchTheme = () => {
-    if (document.body.classList.contains("dark")) {
-      document.body.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    } else {
-      document.body.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    }
-  };
-
-  useEffect(() => {
-    const initTheme =
-      localStorage.getItem("theme") ||
-      (window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light");
-
-    if (initTheme === "dark") {
-      document.body.classList.add("dark");
-    } else {
-      document.body.classList.remove("dark");
-    }
-  }, []);
+  const { resolvedTheme, setTheme } = useTheme();
 
   return (
-    <>
-      <Tooltip>
-        <TooltipTrigger>
-          <Button
-            variant="outline"
-            size="icon"
-            className={cn("relative", className)}
-            onClick={switchTheme}
-            disabled={true}
-          >
-            <Sun className="scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 dark:hover:scale-75 dark:hover:rotate-90" />
-            <Moon className="absolute scale-100 rotate-0 transition-all hover:scale-100 hover:rotate-0 dark:scale-0 dark:rotate-90" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Coming Soon!</TooltipContent>
-      </Tooltip>
-    </>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="outline"
+          size="icon"
+          className={cn("relative", className)}
+          onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+        >
+          <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+          <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        {resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      </TooltipContent>
+    </Tooltip>
   );
 }
